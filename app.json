@@ -15,13 +15,22 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.fatih145911.FlapTalk"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6d799505-d280-4178-b4df-a143f0ed1340"
+      }
+    },
+    "plugins": ["@react-native-firebase/app", "@react-native-firebase/auth"]
+
   }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "737402285801",
+    "project_id": "flaptalk-63ca9",
+    "storage_bucket": "flaptalk-63ca9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:737402285801:android:8b9c2b52ad872c92f58a78",
+        "android_client_info": {
+          "package_name": "com.fatih145911.FlapTalk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcAlBGTmyRYKREbj0C133tw4dYsFR-KIo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
