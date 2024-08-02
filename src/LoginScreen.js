@@ -1,18 +1,20 @@
+// LoginScreen.js
+
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GoogleSignin } from '@react-native-community/google-signin';
 import * as Animatable from 'react-native-animatable';
+import { Bounce } from 'react-native-animated-spinkit';
+import AuthButton from './AuthButton';
 
-const AnimatedGradientText = ({ text, textColor }) => {
-  return (
-    <CustomText style={[styles.text, { color: textColor }]}>
-      {text}
-    </CustomText>
-  );
-};
+const AnimatedGradientText = ({ text, textColor }) => (
+  <CustomText style={[styles.text, { color: textColor }]}>
+    {text}
+  </CustomText>
+);
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -22,7 +24,9 @@ const LoginScreen = () => {
   const [useDefaultColors, setUseDefaultColors] = useState(true);
   const [userInfo, setUserInfo] = useState();
   const [showTwitterAnimation, setShowTwitterAnimation] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false); // Add state for animation
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showGoogleBounce, setShowGoogleBounce] = useState(false);
+  const [showPhoneBounce, setShowPhoneBounce] = useState(false);
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -79,7 +83,19 @@ const LoginScreen = () => {
   };
 
   const handlePhonePress = () => {
-    navigation.navigate('PhoneLoginScreen');
+    setShowPhoneBounce(true);
+    setTimeout(() => {
+      setShowPhoneBounce(false);
+      navigation.navigate('PhoneLoginScreen');
+    }, 1500);
+  };
+
+  const handleGooglePress = () => {
+    setShowGoogleBounce(true);
+    setTimeout(async () => {
+      setShowGoogleBounce(false);
+      await signIn();
+    }, 1500);
   };
 
   const { height } = Dimensions.get('window');
@@ -88,30 +104,38 @@ const LoginScreen = () => {
     <View style={[styles.appContainer, { backgroundColor }]}>
       <AnimatedGradientText text={currentText} textColor={textColor} />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.googleButton} onPress={signIn}>
-          <Icon name="google" size={20} color="#2f2f2f" style={styles.icon} />
-          <Text style={styles.googleButtonText}>Google ile devam et</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.twitterButton, isAnimating && { opacity: 0.5 }]} // Dim the button when animating
-          onPress={isAnimating ? null : handleTwitterPress} // Disable button press during animation
-          disabled={isAnimating} // Disable button interaction
-        >
-          <Icon name="twitter" size={20} color="#e6e6e6" style={styles.icon} />
-          <Text style={styles.twitterButtonText}>Twitter ile devam et</Text>
-        </TouchableOpacity>
+        <AuthButton
+          style={styles.googleButton}
+          iconName="google"
+          text="Google ile devam et"
+          onPress={handleGooglePress}
+          showBounce={showGoogleBounce}
+          bounceColor="#2f2f2f"
+        />
+        <AuthButton
+          style={[styles.twitterButton, isAnimating && { opacity: 0.5 }]}
+          iconName="twitter"
+          text="Twitter ile devam et"
+          onPress={isAnimating ? null : handleTwitterPress}
+          showBounce={false}
+          bounceColor="#e6e6e6"
+          disabled={isAnimating}
+        />
         <View style={styles.separator} />
-        <TouchableOpacity style={styles.button} onPress={handlePhonePress}>
-          <Icon name="phone" size={20} color="#e6e6e6" style={styles.icon} />
-          <Text style={styles.buttonText}>Telefon numarası ile devam et</Text>
-        </TouchableOpacity>
+        <AuthButton
+          style={styles.button}
+          iconName="phone"
+          text="Telefon numarası ile devam et"
+          onPress={handlePhonePress}
+          showBounce={showPhoneBounce}
+        />
       </View>
       {showTwitterAnimation && (
         <Animatable.View
           animation="fadeInUpBig"
           iterationCount={1}
           direction="alternate"
-          style={[styles.twitterAnimation, { top: height / 2 - 50 }]} // Center the icon
+          style={[styles.twitterAnimation, { top: height / 2 - 50 }]}
           onAnimationEnd={() => {
             setShowTwitterAnimation(false);
             setIsAnimating(false);
@@ -146,50 +170,11 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 20,
   },
-  button: {
-    backgroundColor: '#0d0d0d',
-    borderRadius: 30,
-    paddingVertical: 10,
-    marginVertical: 5,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
   googleButton: {
     backgroundColor: '#e6e6e6',
-    borderRadius: 30,
-    paddingVertical: 10,
-    marginVertical: 5,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
   },
   twitterButton: {
     backgroundColor: '#2f2f2f',
-    borderRadius: 30,
-    paddingVertical: 10,
-    marginVertical: 5,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    color: '#e6e6e6',
-    fontSize: 18,
-    marginLeft: 10,
-  },
-  googleButtonText: {
-    color: '#2f2f2f',
-    fontSize: 18,
-    marginLeft: 10,
-  },
-  twitterButtonText: {
-    color: '#e6e6e6',
-    fontSize: 18,
-    marginLeft: 10,
-  },
-  icon: {
-    marginRight: 10,
   },
   separator: {
     borderBottomColor: '#e6e6e6',
