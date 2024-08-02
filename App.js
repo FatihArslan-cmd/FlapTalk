@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, StyleSheet, Animated } from 'react-native';
+import CustomText from './src/CustomText';
 
 const AnimatedGradientText = ({ text, isDisappearing, textColor }) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
@@ -12,18 +13,17 @@ const AnimatedGradientText = ({ text, isDisappearing, textColor }) => {
     }).start();
   }, [isDisappearing]);
 
-  const interpolateColor = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: isDisappearing ? ['#FF00FF', '#00FFFF'] : ['#00FFFF', '#FF00FF'],
-  });
-
   const animatedText = text.split('').map((char, index) => (
     <Animated.Text key={index} style={{ color: textColor, opacity: animatedValue }}>
       {char}
     </Animated.Text>
   ));
 
-  return <Text style={styles.text}>{animatedText}</Text>;
+  return (
+    <CustomText style={styles.text}>
+      {animatedText}
+    </CustomText>
+  );
 };
 
 const App = () => {
