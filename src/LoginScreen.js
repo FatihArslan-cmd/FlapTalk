@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text,TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import CustomText from './CustomText';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the FontAwesome icon set
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { GoogleSignin } from '@react-native-community/google-signin';
+
 const AnimatedGradientText = ({ text, textColor }) => {
   return (
     <CustomText style={[styles.text, { color: textColor }]}>
@@ -11,10 +14,41 @@ const AnimatedGradientText = ({ text, textColor }) => {
 };
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
   const [currentText, setCurrentText] = useState('Hadi birlikte çalışalım');
   const [backgroundColor, setBackgroundColor] = useState('#190849');
   const [textColor, setTextColor] = useState('#d7cc00');
   const [useDefaultColors, setUseDefaultColors] = useState(true);
+  const [userInfo, setUserInfo] = useState();
+
+  useEffect(() => {
+    GoogleSignin.configure(
+      {
+        webClientId: '737402285801-hc9fhhs4mlqelvth26l3kv6p8g0ngr06.apps.googleusercontent.com'
+      }
+    );
+  }, []);
+
+  const signIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const user = await GoogleSignin.signIn();
+      setUserInfo(user);
+      navigation.navigate('AppHomePage', { userInfo: user });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const logOut = async () => {
+    try {
+      setUserInfo();
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const defaultColors = [
     { text: 'Hadi birlikte çalışalım', backgroundColor: '#190849', textColor: '#d7cc00' },
@@ -57,25 +91,25 @@ const LoginScreen = () => {
   };
 
   const handlePhonePress = () => {
-    console.log('Phone button pressed');
+    navigation.navigate('PhoneLoginScreen');
   };
 
   return (
     <View style={[styles.appContainer, { backgroundColor }]}>
       <AnimatedGradientText text={currentText} textColor={textColor} />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.googleButton} onPress={handleGooglePress}>
+        <TouchableOpacity style={styles.googleButton} onPress={signIn}>
           <Icon name="google" size={20} color="#2f2f2f" style={styles.icon} />
-          <Text style={styles.googleButtonText}>Google ile devam et </Text>
+          <Text style={styles.googleButtonText}>Google ile devam et</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.twitterButton} onPress={handleTwitterPress}>
           <Icon name="twitter" size={20} color="#e6e6e6" style={styles.icon} />
-          <Text style={styles.twitterButtonText}>Twitter ile devam et </Text>
+          <Text style={styles.twitterButtonText}>Twitter ile devam et</Text>
         </TouchableOpacity>
         <View style={styles.separator} />
         <TouchableOpacity style={styles.button} onPress={handlePhonePress}>
           <Icon name="phone" size={20} color="#e6e6e6" style={styles.icon} />
-          <Text style={styles.buttonText}>Telefon numarası ile devam et </Text>
+          <Text style={styles.buttonText}>Telefon numarası ile devam et</Text>
         </TouchableOpacity>
       </View>
     </View>

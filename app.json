@@ -3,6 +3,7 @@
     "name": "FlapTalk",
     "slug": "FlapTalk",
     "version": "1.0.0",
+    "plugins": ["@react-native-firebase/app", "@react-native-firebase/auth"],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -29,15 +30,6 @@
       "eas": {
         "projectId": "6d799505-d280-4178-b4df-a143f0ed1340"
       }
-    },
-    "plugins": ["@react-native-firebase/app", "@react-native-firebase/auth"],
-    "plugins": [
-      [
-        "expo-font",
-        {
-          "fonts": ["./assets/fonts/Poppins-Bold.ttf"]
-        }
-      ]
-    ]
+    }
   }
 }

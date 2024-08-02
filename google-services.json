@@ -12,7 +12,20 @@
           "package_name": "com.fatih145911.FlapTalk"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "737402285801-nqem72bmna2r1rvu862moe8u18dsq27k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fatih145911.FlapTalk",
+            "certificate_hash": "af252e4baa97fef9d4b6bdfb9a99f13d4d8ee661"
+          }
+        },
+        {
+          "client_id": "737402285801-hc9fhhs4mlqelvth26l3kv6p8g0ngr06.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCcAlBGTmyRYKREbj0C133tw4dYsFR-KIo"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "737402285801-hc9fhhs4mlqelvth26l3kv6p8g0ngr06.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
