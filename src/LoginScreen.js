@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GoogleSignin } from '@react-native-community/google-signin';
+import * as Animatable from 'react-native-animatable';
 
 const AnimatedGradientText = ({ text, textColor }) => {
   return (
@@ -20,13 +21,13 @@ const LoginScreen = () => {
   const [textColor, setTextColor] = useState('#d7cc00');
   const [useDefaultColors, setUseDefaultColors] = useState(true);
   const [userInfo, setUserInfo] = useState();
+  const [showTwitterAnimation, setShowTwitterAnimation] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false); // Add state for animation
 
   useEffect(() => {
-    GoogleSignin.configure(
-      {
-        webClientId: '737402285801-hc9fhhs4mlqelvth26l3kv6p8g0ngr06.apps.googleusercontent.com'
-      }
-    );
+    GoogleSignin.configure({
+      webClientId: '737402285801-hc9fhhs4mlqelvth26l3kv6p8g0ngr06.apps.googleusercontent.com'
+    });
   }, []);
 
   const signIn = async () => {
@@ -35,16 +36,6 @@ const LoginScreen = () => {
       const user = await GoogleSignin.signIn();
       setUserInfo(user);
       navigation.navigate('AppHomePage', { userInfo: user });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const logOut = async () => {
-    try {
-      setUserInfo();
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
     } catch (error) {
       console.log(error);
     }
@@ -82,17 +73,16 @@ const LoginScreen = () => {
     return () => clearInterval(interval);
   }, [useDefaultColors]);
 
-  const handleGooglePress = () => {
-    console.log('Google button pressed');
-  };
-
   const handleTwitterPress = () => {
-    console.log('Twitter button pressed');
+    setShowTwitterAnimation(true);
+    setIsAnimating(true);
   };
 
   const handlePhonePress = () => {
     navigation.navigate('PhoneLoginScreen');
   };
+
+  const { height } = Dimensions.get('window');
 
   return (
     <View style={[styles.appContainer, { backgroundColor }]}>
@@ -102,7 +92,11 @@ const LoginScreen = () => {
           <Icon name="google" size={20} color="#2f2f2f" style={styles.icon} />
           <Text style={styles.googleButtonText}>Google ile devam et</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.twitterButton} onPress={handleTwitterPress}>
+        <TouchableOpacity
+          style={[styles.twitterButton, isAnimating && { opacity: 0.5 }]} // Dim the button when animating
+          onPress={isAnimating ? null : handleTwitterPress} // Disable button press during animation
+          disabled={isAnimating} // Disable button interaction
+        >
           <Icon name="twitter" size={20} color="#e6e6e6" style={styles.icon} />
           <Text style={styles.twitterButtonText}>Twitter ile devam et</Text>
         </TouchableOpacity>
@@ -112,6 +106,20 @@ const LoginScreen = () => {
           <Text style={styles.buttonText}>Telefon numarası ile devam et</Text>
         </TouchableOpacity>
       </View>
+      {showTwitterAnimation && (
+        <Animatable.View
+          animation="fadeInUpBig"
+          iterationCount={1}
+          direction="alternate"
+          style={[styles.twitterAnimation, { top: height / 2 - 50 }]} // Center the icon
+          onAnimationEnd={() => {
+            setShowTwitterAnimation(false);
+            setIsAnimating(false);
+          }}
+        >
+          <Icon name="twitter" size={100} color="#1DA1F2" />
+        </Animatable.View>
+      )}
     </View>
   );
 };
@@ -187,6 +195,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e6e6e6',
     borderBottomWidth: 1,
     marginVertical: 10,
+  },
+  twitterAnimation: {
+    position: 'absolute',
+    alignItems: 'center',
+    width: '100%'
   },
 });
 
