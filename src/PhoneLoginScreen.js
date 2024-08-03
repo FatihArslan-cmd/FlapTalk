@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import CountryPicker from 'react-native-country-picker-modal';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { Bounce } from 'react-native-animated-spinkit';
+import AlertComponent from './components/AlertComponent'; // AlertComponent.js dosyasının yolu
 
 const { width, height } = Dimensions.get('window');
 
@@ -15,6 +16,9 @@ const PhoneLoginScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   const inputRefs = useRef([]);
   const navigation = useNavigation();
 
@@ -29,21 +33,56 @@ const PhoneLoginScreen = () => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
+  const showAlert = (title, message) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
+
+  const handleConfirmAlert = () => {
+    setAlertVisible(false);
+    // Additional confirmation logic if needed
+  };
+
   async function signInWithPhoneNumber() {
-    setLoading(true);
-    const confirmation = await auth().signInWithPhoneNumber(`+${callingCode}${phoneNumber}`);
-    setConfirm(confirmation);
-    setLoading(false);
+    if (phoneNumber.trim() === '') {
+      showAlert('Hata', 'Lütfen telefon numaranızı girin.');
+      return;
+    }
+
+    if (!/^\d+$/.test(phoneNumber)) {
+      showAlert('Hata', 'Geçersiz telefon numarası.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const confirmation = await auth().signInWithPhoneNumber(`+${callingCode}${phoneNumber}`);
+      setConfirm(confirmation);
+      setLoading(false);
+    } catch (error) {
+      showAlert('Hata', 'Telefon numarası doğrulaması başarısız.');
+    }
   }
 
   async function confirmCode() {
     try {
       const fullCode = code.join('');
+      if (fullCode.length !== 6) {
+        showAlert('Hata', 'Lütfen 6 haneli doğrulama kodunu girin.');
+        return;
+      }
+      setLoading(true);
       const userCredential = await confirm.confirm(fullCode);
       setUserInfo(userCredential.user);
+      setLoading(false);
       navigation.navigate('AppHomePage', { userInfo: userCredential.user });
     } catch (error) {
-      console.log('Invalid code.');
+      showAlert('Hata', 'Geçersiz doğrulama kodu.');
     }
   }
 
@@ -83,7 +122,16 @@ const PhoneLoginScreen = () => {
               }}
               containerButtonStyle={styles.countryPicker}
             />
-            <Text style={styles.callingCodeText}>+{callingCode}</Text>
+            <View style={styles.callingCodeContainer}>
+              <Text style={styles.plusSign}>+</Text>
+              <TextInput
+                style={styles.callingCodeInput}
+                value={callingCode}
+                onChangeText={setCallingCode}
+                keyboardType="number-pad"
+                maxLength={4}
+              />
+            </View>
             <TextInput
               style={styles.phoneNumberInput}
               placeholder="Telefon numarası"
@@ -120,6 +168,14 @@ const PhoneLoginScreen = () => {
           </TouchableOpacity>
         </>
       )}
+      <AlertComponent
+        visible={alertVisible}
+        onClose={handleCloseAlert}
+        title={alertTitle}
+        message={alertMessage}
+        onConfirm={handleConfirmAlert}
+        confirmText="Tamam"
+      />
     </View>
   );
 };
@@ -158,9 +214,23 @@ const styles = StyleSheet.create({
   countryPicker: {
     marginRight: 10,
   },
-  callingCodeText: {
+  callingCodeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: 'gray',
+    marginRight: 8,
+    paddingVertical: 5.5,
+    
+  },
+  plusSign: {
     fontSize: width * 0.04,
-    marginRight: 10,
+    marginRight: 5,
+  },
+  callingCodeInput: {
+    fontSize: width * 0.04,
+    width: width * 0.1,
+    textAlign: 'center',
   },
   phoneNumberInput: {
     fontSize: width * 0.04,
