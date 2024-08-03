@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import CustomText from './CustomText';
+import CustomText from './components/CustomText';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GoogleSignin } from '@react-native-community/google-signin';
 import * as Animatable from 'react-native-animatable';
@@ -36,7 +36,7 @@ const LoginScreen = () => {
       await GoogleSignin.hasPlayServices();
       const user = await GoogleSignin.signIn();
       setUserInfo(user);
-      navigation.navigate('AppHomePage', { userInfo: user });
+      navigation.navigate('AppHomePage', { userInfo: user, loginMethod: 'google' });
     } catch (error) {
       console.log(error);
     }

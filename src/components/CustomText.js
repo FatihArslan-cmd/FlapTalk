@@ -12,8 +12,8 @@ const CustomText = ({ children, style, fontFamily }) => {
   useEffect(() => {
     async function loadFonts() {
       await Font.loadAsync({
-        'pop': require('../assets/fonts/Poppins-Bold.ttf'),
-        'bungee': require('../assets/fonts/BungeeSpice-Regular.ttf'),
+        'pop': require('../../assets/fonts/Poppins-Bold.ttf'),
+        'bungee': require('../../assets/fonts/BungeeSpice-Regular.ttf'),
       });
       setFontsLoaded(true);
     }

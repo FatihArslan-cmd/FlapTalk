@@ -2,30 +2,41 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { GoogleSignin } from '@react-native-community/google-signin';
+import auth from '@react-native-firebase/auth';
 
 export default function LogoutButton() {
     const navigation = useNavigation();
     const route = useRoute(); // Use useRoute to get the current route
     const [userInfo, setUserInfo] = useState(route.params?.userInfo);
+    const [loginMethod, setLoginMethod] = useState(route.params?.loginMethod); // 'phone' or 'google'
 
-    const logOut = async () => {
+    const handleLogout = async () => {
         try {
-            if (userInfo) {
+            if (loginMethod === 'phone') {
+                await auth().signOut();
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: "LoginScreen" }],
+                });
+            } else if (loginMethod === 'google') {
                 await GoogleSignin.revokeAccess();
                 await GoogleSignin.signOut();
                 setUserInfo(null);
-                navigation.navigate('LoginScreen');
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: "LoginScreen" }],
+                });
             } else {
-                console.log("No user is signed in");
+                console.log("Unknown login method");
             }
         } catch (error) {
-            console.log(error);
+            console.log("Error during logout:", error);
         }
     };
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.button} onPress={logOut}>
+            <TouchableOpacity style={styles.button} onPress={handleLogout}>
                 <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
         </View>
