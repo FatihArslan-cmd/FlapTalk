@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Text, Dimensions, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import CustomText from './components/CustomText';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -8,29 +8,81 @@ import * as Animatable from 'react-native-animatable';
 import AuthButton from './AuthButton';
 import auth from '@react-native-firebase/auth';
 
+const colors = ['#361f34', '#005657', '#ff25ff', '#2c014d', '#fff0d3', '#ff6655'];
+const textColors = ['#e1f1ff', '#ffc480', '#000000', '#3cf467', '#0000ff', '#3c3cd6'];
+const texts = [
+  'Hadi birlikte çalışalım',
+  'Mesajlaşma uygulaması',
+  'FlapTalk',
+  'Birlikte başarıya ulaşalım',
+  'Yeni bir gün, yeni bir başlangıç',
+  'İletişimin yeni adresi',
+];
+
 const AnimatedGradientText = ({ text, textColor }) => (
-  <CustomText style={[styles.text, { color: textColor }]}>
+  <Animated.Text style={[styles.text, { color: textColor }]}>
     {text}
-  </CustomText>
+  </Animated.Text>
 );
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [currentText, setCurrentText] = useState('Hadi birlikte çalışalım');
-  const [backgroundColor, setBackgroundColor] = useState('#190849');
-  const [textColor, setTextColor] = useState('#d7cc00');
-  const [useDefaultColors, setUseDefaultColors] = useState(true);
-  const [userInfo, setUserInfo] = useState();
-  const [showTwitterAnimation, setShowTwitterAnimation] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showGoogleBounce, setShowGoogleBounce] = useState(false);
+  const [showTwitterAnimation, setShowTwitterAnimation] = useState(false);
   const [showPhoneBounce, setShowPhoneBounce] = useState(false);
+  const backgroundColor = useRef(new Animated.Value(0)).current;
+  const textColor = useRef(new Animated.Value(0)).current;
+  const animation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     GoogleSignin.configure({
       webClientId: '737402285801-hc9fhhs4mlqelvth26l3kv6p8g0ngr06.apps.googleusercontent.com'
     });
+
+    const animations = colors.map((_, index) => {
+      return Animated.sequence([
+        Animated.parallel([
+          Animated.timing(animation, {
+            toValue: index + 1,
+            duration: 450,
+            useNativeDriver: false,
+          }),
+          Animated.timing(textColor, {
+            toValue: index + 1,
+            duration: 450,
+            useNativeDriver: false,
+          })
+        ]),
+        Animated.delay(2000),
+      ]);
+    });
+
+    Animated.loop(Animated.sequence(animations)).start();
+  }, [animation]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentText((prev) => {
+        const currentIndex = texts.findIndex(text => text === prev);
+        const nextIndex = (currentIndex + 1) % texts.length;
+        return texts[nextIndex];
+      });
+    }, 2500);
+
+    return () => clearInterval(interval);
   }, []);
+
+  const interpolateBackgroundColor = animation.interpolate({
+    inputRange: [0, ...colors.map((_, index) => index + 1), colors.length + 1],
+    outputRange: [colors[colors.length - 1], ...colors, colors[0]],
+  });
+
+  const interpolateTextColor = textColor.interpolate({
+    inputRange: [0, ...textColors.map((_, index) => index + 1), textColors.length + 1],
+    outputRange: [textColors[textColors.length - 1], ...textColors, textColors[0]],
+  });
 
   const signIn = async () => {
     try {
@@ -38,43 +90,11 @@ const LoginScreen = () => {
       const user = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
       const userCredential = await auth().signInWithCredential(googleCredential);
-      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid }); // Yönlendirme
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid });
     } catch (error) {
       console.log(error);
     }
   };
-
-  const defaultColors = [
-    { text: 'Hadi birlikte çalışalım', backgroundColor: '#190849', textColor: '#d7cc00' },
-    { text: 'Mesajlaşma uygulaması', backgroundColor: '#d1ffd5', textColor: '#ff83ff' },
-    { text: 'FlapTalk', backgroundColor: '#ff25ff', textColor: '#000000' }
-  ];
-
-  const newColors = [
-    { text: 'Hadi birlikte çalışalım', backgroundColor: '#2c014d', textColor: '#3aa05f' },
-    { text: 'Mesajlaşma uygulaması', backgroundColor: '#361f34', textColor: '#8a8597' },
-    { text: 'FlapTalk', backgroundColor: '#ff6655', textColor: '#3c3cd6' }
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentText((prev) => {
-        const colors = useDefaultColors ? defaultColors : newColors;
-        const currentIndex = colors.findIndex(item => item.text === prev);
-        const nextIndex = (currentIndex + 1) % colors.length;
-
-        if (nextIndex === 0) {
-          setUseDefaultColors(prev => !prev);
-        }
-
-        setBackgroundColor(colors[nextIndex].backgroundColor);
-        setTextColor(colors[nextIndex].textColor);
-        return colors[nextIndex].text;
-      });
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [useDefaultColors]);
 
   const handleTwitterPress = () => {
     setShowTwitterAnimation(true);
@@ -100,8 +120,8 @@ const LoginScreen = () => {
   const { height } = Dimensions.get('window');
 
   return (
-    <View style={[styles.appContainer, { backgroundColor }]}>
-      <AnimatedGradientText text={currentText} textColor={textColor} />
+    <Animated.View style={[styles.appContainer, { backgroundColor: interpolateBackgroundColor }]}>
+      <AnimatedGradientText text={currentText} textColor={interpolateTextColor} />
       <View style={styles.buttonContainer}>
         <AuthButton
           style={styles.googleButton}
@@ -143,7 +163,7 @@ const LoginScreen = () => {
           <Icon name="twitter" size={100} color="#1DA1F2" />
         </Animatable.View>
       )}
-    </View>
+    </Animated.View>
   );
 };
 
