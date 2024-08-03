@@ -1,5 +1,3 @@
-// LoginScreen.js
-
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +5,6 @@ import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GoogleSignin } from '@react-native-community/google-signin';
 import * as Animatable from 'react-native-animatable';
-import { Bounce } from 'react-native-animated-spinkit';
 import AuthButton from './AuthButton';
 
 const AnimatedGradientText = ({ text, textColor }) => (

@@ -1,35 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { GoogleSignin } from '@react-native-community/google-signin';
 import useDisableBackButton from "./hooks/useDisableBackButton";
+import LogoutButton from "./components/LogoutButton";
 export default function AppHomePage({ route }) {
-    const navigation = useNavigation();
-    const [userInfo, setUserInfo] = useState(route.params?.userInfo);
-    useDisableBackButton();
-    const logOut = async () => {
-        try {
-            if (userInfo) {
-                await GoogleSignin.revokeAccess();
-                await GoogleSignin.signOut();
-                setUserInfo(null);
-                navigation.navigate('LoginScreen');
-            } else {
-                console.log("No user is signed in");
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
+  const navigation = useNavigation();
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.header}>Home Page</Text>
-            <TouchableOpacity style={styles.button} onPress={logOut}>
-                <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
-        </View>
-    );
+  return (
+      <View style={styles.container}>
+          <Text style={styles.header}>Home Page</Text>
+          <LogoutButton route={route} />
+      </View>
+  );
 }
 
 const styles = StyleSheet.create({

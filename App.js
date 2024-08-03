@@ -5,8 +5,9 @@ import LoginScreen from './src/LoginScreen';
 import Detail from './src/Detail';
 import AppHomePage from './src/AppHomePage';
 import PhoneLoginScreen from './src/PhoneLoginScreen';
+import { LogBox } from 'react-native';
 const Stack = createStackNavigator();
-
+LogBox.ignoreAllLogs()
 export default function App() {
   return (
     <NavigationContainer>
