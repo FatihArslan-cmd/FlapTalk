@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { GoogleSignin } from '@react-native-community/google-signin';
 import * as Animatable from 'react-native-animatable';
 import AuthButton from './AuthButton';
+import auth from '@react-native-firebase/auth';
 
 const AnimatedGradientText = ({ text, textColor }) => (
   <CustomText style={[styles.text, { color: textColor }]}>
@@ -35,8 +36,9 @@ const LoginScreen = () => {
     try {
       await GoogleSignin.hasPlayServices();
       const user = await GoogleSignin.signIn();
-      setUserInfo(user);
-      navigation.navigate('AppHomePage', { userInfo: user, loginMethod: 'google' });
+      const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
+      const userCredential = await auth().signInWithCredential(googleCredential);
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid }); // Yönlendirme
     } catch (error) {
       console.log(error);
     }

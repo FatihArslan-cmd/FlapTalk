@@ -82,14 +82,15 @@ const PhoneLoginScreen = () => {
       }
       setLoading(true);
       const userCredential = await confirm.confirm(fullCode);
-      setUserInfo(userCredential);
+      setUserInfo(userCredential.user);
       setLoading(false);
-      navigation.navigate('AppHomePage', { userInfo: userCredential, loginMethod: 'phone' });
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid }); // Yönlendirme
     } catch (error) {
       showAlert('Hata', 'Geçersiz doğrulama kodu.');
       setLoading(false);
     }
   }
+  
 
   return (
     <View style={styles.container}>
