@@ -12,7 +12,7 @@ import AvatarChoose from './AvatarChoose';
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
-  const { uid } = route.params;
+  const { uid, loginMethod } = route.params; // get loginMethod from route params
   const [username, setUsername] = useState('');
   const [about, setAbout] = useState('');
   const [alertVisible, setAlertVisible] = useState(false);
@@ -20,6 +20,7 @@ const UserInfoScreen = ({ route }) => {
   const [alertMessage, setAlertMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState('');
+  const [avatar, setAvatar] = useState(null);
 
   const navigation = useNavigation();
 
@@ -31,6 +32,7 @@ const UserInfoScreen = ({ route }) => {
         setUsername(userData.username || '');
         setAbout(userData.about || '');
         setDate(userData.date || '');
+        setAvatar(userData.avatar || null);
       }
     };
 
@@ -67,14 +69,19 @@ const UserInfoScreen = ({ route }) => {
         username: username.trim(),
         about: about.trim(),
         date: currentDate,
+        avatar: avatar ? (avatar.uri || avatar) : null,
       });
 
-      navigation.navigate('AppHomePage', { loginMethod: 'phone' });
+      navigation.navigate('AppHomePage', { uid: uid, loginMethod: loginMethod }); // pass loginMethod
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAvatarSelect = (selectedAvatar) => {
+    setAvatar(selectedAvatar);
   };
 
   return (
@@ -95,7 +102,7 @@ const UserInfoScreen = ({ route }) => {
         value={about}
         onChangeText={setAbout}
       />
-      <AvatarChoose/>
+      <AvatarChoose onAvatarSelect={handleAvatarSelect} />
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Kaydet</Text>
       </TouchableOpacity>
@@ -111,7 +118,6 @@ const UserInfoScreen = ({ route }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

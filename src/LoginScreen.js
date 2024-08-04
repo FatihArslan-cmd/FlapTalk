@@ -96,7 +96,7 @@ const LoginScreen = () => {
       const user = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
       const userCredential = await auth().signInWithCredential(googleCredential);
-      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid });
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'google' }); // Include loginMethod
     } catch (error) {
       console.log(error);
     }
@@ -124,6 +124,7 @@ const LoginScreen = () => {
   };
 
   const { height } = Dimensions.get('window');
+
 
   return (
     <SafeAreaWrapper>
