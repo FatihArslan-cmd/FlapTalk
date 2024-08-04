@@ -20,9 +20,11 @@ const texts = [
 ];
 
 const AnimatedGradientText = ({ text, textColor }) => (
+  <CustomText fontFamily="pop">
   <Animated.Text style={[styles.text, { color: textColor }]}>
     {text}
   </Animated.Text>
+  </CustomText>
 );
 
 const LoginScreen = () => {

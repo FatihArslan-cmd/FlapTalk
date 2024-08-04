@@ -5,7 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import AlertComponent from './AlertComponent';
 import LoadingOverlay from './LoadingOverlay';
-
+import CustomText from './CustomText';
+import Header from '../phoneLoginScreen/Header';
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
@@ -70,10 +71,10 @@ const UserInfoScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profil Bilgisi</Text>
-      <Text style={styles.subtitle}>
+      <Header fontSize={width * 0.07}  color='#008000' fontFamily='pop' text="Profil Bilgisi"/>
+      <CustomText fontFamily={"loti"} style={styles.subtitle}>
         Lütfen adınızı girin ve isteğe bağlı olarak profil fotoğrafınızı ekleyin.
-      </Text>
+      </CustomText>
       <View style={styles.avatarContainer}>
         <FontAwesome6 name='face-grin-wide' style={styles.avatar} size={height * 0.12} />
       </View>
@@ -113,12 +114,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: height * 0.03,
-    fontWeight: 'bold',
+    fontSize: height * 0.04,
     color: '#008000',
   },
   subtitle: {
-    fontSize: height * 0.02,
+    fontSize: height * 0.0250,
     color: '#555',
     textAlign: 'center',
     marginVertical: height * 0.02,

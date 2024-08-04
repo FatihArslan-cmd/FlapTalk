@@ -1,16 +1,19 @@
 import React from 'react';
-import { Text, StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+import CustomText from '../components/CustomText';
 
 const { width, height } = Dimensions.get('window');
 
-const Header = ({ text }) => {
-  return <Text style={styles.headerText}>{text}</Text>;
+const Header = ({ text, fontFamily = 'lato-bold', color = '#000', fontSize = width * 0.06 }) => {
+  return (
+    <CustomText style={[styles.headerText, { color, fontSize }]} fontFamily={fontFamily}>
+      {text}
+    </CustomText>
+  );
 };
 
 const styles = StyleSheet.create({
   headerText: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: height * 0.02,
   },

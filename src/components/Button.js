@@ -1,12 +1,15 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
+import { TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import CustomText from './CustomText';
 
 const { width, height } = Dimensions.get('window');
 
-const Button = ({ onPress, text, margin = 0 }) => {
+const Button = ({ onPress, text, margin = 0, fontFamily = 'pop' }) => {
   return (
     <TouchableOpacity style={[styles.button, { margin }]} onPress={onPress}>
-      <Text style={styles.buttonText}>{text}</Text>
+      <CustomText style={styles.buttonText} fontFamily={fontFamily}>
+        {text}
+      </CustomText>
     </TouchableOpacity>
   );
 };

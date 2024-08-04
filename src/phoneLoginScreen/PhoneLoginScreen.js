@@ -8,6 +8,8 @@ import CodeInput from './CodeInput';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Button from '../components/Button';
 import AlertComponent from '../components/AlertComponent';
+import CustomText from '../components/CustomText';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -97,11 +99,11 @@ const PhoneLoginScreen = () => {
       <LoadingOverlay visible={loading} />
       {!confirm ? (
         <>
-          <Header text="Telefon numaranızı girin" />
-          <Text style={styles.infoText}>
+          <Header fontFamily='lato-bold' text="Telefon numaranızı girin" />
+          <CustomText fontFamily={'lato'} style={styles.infoText}>
             Sana doğrulama kodu göndereceğiz.
-            <Text style={styles.linkText}> Numaram nedir? </Text>
-          </Text>
+            <CustomText fontFamily={'lato'} style={styles.linkText}> Numaram nedir? </CustomText>
+          </CustomText>
           <PhoneInput
             countryCode={countryCode}
             callingCode={callingCode}
@@ -114,9 +116,9 @@ const PhoneLoginScreen = () => {
         </>
       ) : (
         <>
-          <Header text="Numaranız Doğrulanıyor" />
-          <Text style={styles.verificationInfoText}>+{callingCode} {phoneNumber} numaralı telefona gönderilen kodu aşağıdaki bölmeye yazınız. </Text>
-          <Text style={styles.wrongNumberText}>Numara yanlış mı? </Text>
+          <Header text="Numaranız Doğrulanıyor"/>
+          <CustomText fontFamily={'lato'} style={styles.verificationInfoText}>+{callingCode} {phoneNumber} numaralı telefona gönderilen kodu aşağıdaki bölmeye yazınız. </CustomText>
+          <CustomText fontFamily={'lato'} style={styles.wrongNumberText}>Numara yanlış mı? </CustomText>
           <CodeInput code={code} setCode={setCode} inputRefs={inputRefs} />
           <Button margin={15} onPress={confirmCode} text="Onayla " />
         </>
