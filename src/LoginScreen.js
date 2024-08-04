@@ -7,7 +7,7 @@ import { GoogleSignin } from '@react-native-community/google-signin';
 import * as Animatable from 'react-native-animatable';
 import AuthButton from './AuthButton';
 import auth from '@react-native-firebase/auth';
-
+import SafeAreaWrapper from './components/SafeAreaWrapper';
 const colors = ['#361f34', '#005657', '#ff25ff', '#2c014d', '#fff0d3', '#ff6655'];
 const textColors = ['#e1f1ff', '#ffc480', '#000000', '#3cf467', '#0000ff', '#3c3cd6'];
 const texts = [
@@ -61,7 +61,10 @@ const LoginScreen = () => {
       ]);
     });
 
-    Animated.loop(Animated.sequence(animations)).start();
+    const animationLoop = Animated.loop(Animated.sequence(animations));
+    animationLoop.start();
+
+    return () => animationLoop.stop(); // Cleanup function to stop animation
   }, [animation]);
 
   useEffect(() => {
@@ -88,6 +91,7 @@ const LoginScreen = () => {
 
   const signIn = async () => {
     try {
+      await GoogleSignin.signOut(); // Sign out the current user
       await GoogleSignin.hasPlayServices();
       const user = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
@@ -122,6 +126,7 @@ const LoginScreen = () => {
   const { height } = Dimensions.get('window');
 
   return (
+    <SafeAreaWrapper>
     <Animated.View style={[styles.appContainer, { backgroundColor: interpolateBackgroundColor }]}>
       <AnimatedGradientText text={currentText} textColor={interpolateTextColor} />
       <View style={styles.buttonContainer}>
@@ -166,6 +171,7 @@ const LoginScreen = () => {
         </Animatable.View>
       )}
     </Animated.View>
+    </SafeAreaWrapper>
   );
 };
 

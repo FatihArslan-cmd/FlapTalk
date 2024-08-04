@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import { getCurrentDate } from '../utils/date';
 import AlertComponent from './AlertComponent';
 import LoadingOverlay from './LoadingOverlay';
 import CustomText from './CustomText';
 import Header from '../phoneLoginScreen/Header';
+import AvatarChoose from './AvatarChoose';
+
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
@@ -16,7 +18,9 @@ const UserInfoScreen = ({ route }) => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState('');
+
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -26,6 +30,7 @@ const UserInfoScreen = ({ route }) => {
         const userData = userDoc.data();
         setUsername(userData.username || '');
         setAbout(userData.about || '');
+        setDate(userData.date || '');
       }
     };
 
@@ -33,14 +38,14 @@ const UserInfoScreen = ({ route }) => {
   }, [uid]);
 
   const handleSave = async () => {
-    if (!username.trim() || !about.trim()) {
+    if (!username.trim()) {
       setAlertTitle('Uyarı');
       setAlertMessage('Lütfen tüm alanları doldurun.');
       setAlertVisible(true);
       return;
     }
 
-    setLoading(true); // Show loading overlay
+    setLoading(true);
 
     try {
       const usernameSnapshot = await firestore()
@@ -52,32 +57,32 @@ const UserInfoScreen = ({ route }) => {
         setAlertTitle('Hata');
         setAlertMessage('Bu kullanıcı adı zaten alınmış. Lütfen başka bir kullanıcı adı seçin.');
         setAlertVisible(true);
-        setLoading(false); // Hide loading overlay
+        setLoading(false);
         return;
       }
+
+      const currentDate = date || getCurrentDate();
 
       await firestore().collection('users').doc(uid).set({
         username: username.trim(),
         about: about.trim(),
+        date: currentDate,
       });
 
       navigation.navigate('AppHomePage', { loginMethod: 'phone' });
     } catch (error) {
       console.log(error);
     } finally {
-      setLoading(false); // Hide loading overlay
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Header fontSize={width * 0.07}  color='#008000' fontFamily='pop' text="Profil Bilgisi"/>
-      <CustomText fontFamily={"loti"} style={styles.subtitle}>
+      <Header fontSize={width * 0.07} color='#008000' fontFamily='pop' text="Profil Bilgisi"/>
+      <CustomText fontFamily="loti" style={styles.subtitle}>
         Lütfen adınızı girin ve isteğe bağlı olarak profil fotoğrafınızı ekleyin.
       </CustomText>
-      <View style={styles.avatarContainer}>
-        <FontAwesome6 name='face-grin-wide' style={styles.avatar} size={height * 0.12} />
-      </View>
       <TextInput
         style={styles.input}
         placeholder="Kullanıcı Adı"
@@ -90,6 +95,7 @@ const UserInfoScreen = ({ route }) => {
         value={about}
         onChangeText={setAbout}
       />
+      <AvatarChoose/>
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Kaydet</Text>
       </TouchableOpacity>
@@ -101,10 +107,11 @@ const UserInfoScreen = ({ route }) => {
         onConfirm={() => setAlertVisible(false)}
         confirmText="Tamam"
       />
-      <LoadingOverlay visible={loading} /> 
+      <LoadingOverlay visible={loading} />
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -118,7 +125,7 @@ const styles = StyleSheet.create({
     color: '#008000',
   },
   subtitle: {
-    fontSize: height * 0.0250,
+    fontSize: height * 0.025,
     color: '#555',
     textAlign: 'center',
     marginVertical: height * 0.02,

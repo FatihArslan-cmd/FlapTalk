@@ -5,7 +5,7 @@ import useDisableBackButton from "./hooks/useDisableBackButton";
 import LogoutButton from "./components/LogoutButton";
 export default function AppHomePage({ route }) {
   const navigation = useNavigation();
-
+  useDisableBackButton()
   return (
       <View style={styles.container}>
           <Text style={styles.header}>Home Page</Text>
