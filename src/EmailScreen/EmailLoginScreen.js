@@ -1,35 +1,53 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, TouchableOpacity, Text, Animated, Dimensions } from 'react-native';
+import { View, StyleSheet, TextInput, TouchableOpacity, Text, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/auth';
 import SafeAreaWrapper from '../components/SafeAreaWrapper';
 import * as Animatable from 'react-native-animatable';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const EmailLoginScreen = () => {
   const navigation = useNavigation();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Handle login functionality
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Validation Error', 'Please fill in all fields.');
+      return;
+    }
+
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+      // Navigate to another screen or show success message
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid,loginMethod: 'phone' }); // Yönlendirme
+    } catch (error) {
+      // Handle authentication errors
+      if (error.code === 'auth/user-not-found') {
+        Alert.alert('Login Error', 'No user found with that email.');
+      } else if (error.code === 'auth/wrong-password') {
+        Alert.alert('Login Error', 'Incorrect password.');
+      } else {
+        Alert.alert('Login Error', 'Something went wrong. Please try again.');
+      }
+    }
   };
 
   return (
-    
     <SafeAreaWrapper>
-        <Animatable.View
+      <Animatable.View
         style={styles.container}
         animation="fadeInDownBig"
         duration={600}
       >
-      <View style={styles.container}>
         <Text style={styles.title}>Login</Text>
         <TextInput
           style={styles.input}
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
@@ -44,7 +62,6 @@ const EmailLoginScreen = () => {
         <TouchableOpacity onPress={() => navigation.navigate('EmailSignup')}>
           <Text style={styles.link}>Don't have an account? Sign Up</Text>
         </TouchableOpacity>
-      </View>
       </Animatable.View>
     </SafeAreaWrapper>
   );
@@ -55,7 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff', // Use a background color matching your app's theme
+    backgroundColor: '#fff',
     padding: width * 0.05,
   },
   title: {

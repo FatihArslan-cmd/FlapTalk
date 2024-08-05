@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   clearButtonText: {
-    fontSize: width * 0.04,
+    fontSize: width * 0.4,
     color: 'red',
   },
   modalContainer: {

@@ -54,8 +54,9 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02,
   },
   modalMessage: {
-    marginBottom: height * 0.02,
+    marginBottom: height * 0.04,
     textAlign: 'center',
+    fontSize: width * 0.030,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -69,6 +70,7 @@ const styles = StyleSheet.create({
     margin: width * 0.01,
     flex: 1,
     alignItems: 'center',
+    fontSize: width * 0.030,
   },
   buttonText: {
     color: 'white',
