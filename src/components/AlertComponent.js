@@ -13,11 +13,11 @@ const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmTe
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>{title}</Text>
-          <Text style={styles.modalMessage}>{message}</Text>
+          <Text style={styles.modalTitle}>{title} </Text>
+          <Text style={styles.modalMessage}>{message} </Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={onConfirm}>
-              <Text style={styles.buttonText}>{confirmText}</Text>
+              <Text style={styles.buttonText}>{confirmText} </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   button: {
-    backgroundColor: '#075E54',
+    backgroundColor: '#00ae59',
     borderRadius: 10,
     padding: height * 0.015,
     margin: width * 0.01,

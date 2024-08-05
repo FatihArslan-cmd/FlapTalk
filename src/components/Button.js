@@ -16,8 +16,9 @@ const Button = ({ onPress, text, margin = 0, fontFamily = 'pop' }) => {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#075E54',
+    backgroundColor: '#00ae59',
     paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.1,
     borderRadius: 16,
     alignItems: 'center',
   },

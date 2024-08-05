@@ -1,15 +1,26 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, TextInput, StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 const CodeInput = ({ code, setCode, inputRefs }) => {
-  const handleChangeText = (index, value) => {
+  const handleChangeText = useCallback((index, value) => {
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
     if (value && index < 5) {
       inputRefs.current[index + 1].focus();
+    }
+  }, [code, setCode, inputRefs]);
+
+  const handleKeyPress = (index, key) => {
+    if (key === 'Backspace') {
+      if (index > 0) {
+        const newCode = [...code];
+        newCode[index] = '';
+        setCode(newCode);
+        inputRefs.current[index - 1].focus();
+      }
     }
   };
 
@@ -23,6 +34,7 @@ const CodeInput = ({ code, setCode, inputRefs }) => {
             keyboardType="number-pad"
             maxLength={1}
             onChangeText={(value) => handleChangeText(index, value)}
+            onKeyPress={({ nativeEvent: { key } }) => handleKeyPress(index, key)}
             value={digit}
           />
         </View>

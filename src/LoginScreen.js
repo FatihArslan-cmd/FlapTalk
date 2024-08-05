@@ -112,7 +112,7 @@ const LoginScreen = () => {
     setTimeout(() => {
       setShowPhoneBounce(false);
       navigation.navigate('PhoneLoginScreen');
-    }, 1500);
+    }, 1000);
   };
 
   const handleGooglePress = () => {
@@ -120,7 +120,7 @@ const LoginScreen = () => {
     setTimeout(async () => {
       setShowGoogleBounce(false);
       await signIn();
-    }, 1500);
+    }, 1000);
   };
 
   const { height } = Dimensions.get('window');

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getCurrentDate } from '../utils/date';
 import AlertComponent from './AlertComponent';
 import LoadingOverlay from './LoadingOverlay';
@@ -9,7 +9,8 @@ import CustomText from './CustomText';
 import Header from '../phoneLoginScreen/Header';
 import AvatarChoose from './AvatarChoose';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import ClearButton from './renderClearButton';
+import Button from './Button';
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
@@ -39,6 +40,16 @@ const UserInfoScreen = ({ route }) => {
 
     fetchUserInfo();
   }, [uid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const storeLoginMethod = async () => {
+        await AsyncStorage.setItem('loginMethod', loginMethod);
+      };
+      console.log(loginMethod)
+      storeLoginMethod();
+    }, [loginMethod])
+  );
 
   const handleSave = async () => {
     if (!username.trim()) {
@@ -74,9 +85,8 @@ const UserInfoScreen = ({ route }) => {
       });
       
       await AsyncStorage.setItem('userToken', 'logged_in');
-      await AsyncStorage.setItem('loginMethod', loginMethod); // Store the login method in AsyncStorage
 
-      navigation.navigate('AppHomePage', { uid: uid, loginMethod: loginMethod }); // pass loginMethod
+      navigation.navigate('AppHomePage', { uid: uid });
     } catch (error) {
       console.log(error);
     } finally {
@@ -90,26 +100,30 @@ const UserInfoScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Header fontSize={width * 0.07} color='#008000' fontFamily='pop' text="Profil Bilgisi"/>
+      <Header fontSize={width * 0.07} color='#00ad59' fontFamily='pop' text="Profil Bilgisi"/>
       <CustomText fontFamily="loti" style={styles.subtitle}>
         Lütfen adınızı girin ve isteğe bağlı olarak profil fotoğrafınızı ekleyin.
       </CustomText>
-      <TextInput
-        style={styles.input}
-        placeholder="Kullanıcı Adı"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Hakkında"
-        value={about}
-        onChangeText={setAbout}
-      />
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Kullanıcı Adı"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <ClearButton value={username} setValue={setUsername} />
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Hakkında"
+          value={about}
+          onChangeText={setAbout}
+        />
+        <ClearButton value={about} setValue={setAbout} />
+      </View>
       <AvatarChoose onAvatarSelect={handleAvatarSelect} />
-      <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>Kaydet</Text>
-      </TouchableOpacity>
+      <Button onPress={handleSave} text={'Kaydet'}/>
       <AlertComponent
         visible={alertVisible}
         onClose={() => setAlertVisible(false)}
@@ -141,20 +155,19 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.02,
     paddingHorizontal: width * 0.08,
   },
-  avatarContainer: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: height * 0.02,
-  },
-  avatar: {
-    color: '#555',
-  },
-  input: {
     width: width * 0.8,
-    height: height * 0.05,
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
     paddingHorizontal: width * 0.03,
-    marginBottom: height * 0.02,
+  },
+  input: {
+    flex: 1,
+    height: height * 0.05,
   },
   button: {
     backgroundColor: '#008000',

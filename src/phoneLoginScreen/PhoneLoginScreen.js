@@ -79,7 +79,7 @@ const PhoneLoginScreen = () => {
     try {
       const fullCode = code.join('');
       if (fullCode.length !== 6) {
-        showAlert('Hata', 'Lütfen 6 haneli doğrulama kodunu girin.');
+        showAlert('Hata ', 'Lütfen 6 haneli doğrulama kodunu girin. ');
         return;
       }
       setLoading(true);
@@ -88,7 +88,7 @@ const PhoneLoginScreen = () => {
       setLoading(false);
       navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid,loginMethod: 'phone' }); // Yönlendirme
     } catch (error) {
-      showAlert('Hata', 'Geçersiz doğrulama kodu.');
+      showAlert('Hata ', 'Geçersiz doğrulama kodu. ');
       setLoading(false);
     }
   }
@@ -99,7 +99,7 @@ const PhoneLoginScreen = () => {
       <LoadingOverlay visible={loading} />
       {!confirm ? (
         <>
-          <Header fontFamily='lato-bold' text="Telefon numaranızı girin" />
+          <Header color='#00ad59' fontFamily='lato-bold' text="Telefon numaranızı girin" />
           <CustomText fontFamily={'lato'} style={styles.infoText}>
             Sana doğrulama kodu göndereceğiz.
             <CustomText fontFamily={'lato'} style={styles.linkText}> Numaram nedir? </CustomText>
@@ -116,7 +116,7 @@ const PhoneLoginScreen = () => {
         </>
       ) : (
         <>
-          <Header text="Numaranız Doğrulanıyor"/>
+          <Header color='#00ae59' text="Numaranız Doğrulanıyor"/>
           <CustomText fontFamily={'lato'} style={styles.verificationInfoText}>+{callingCode} {phoneNumber} numaralı telefona gönderilen kodu aşağıdaki bölmeye yazınız. </CustomText>
           <CustomText fontFamily={'lato'} style={styles.wrongNumberText}>Numara yanlış mı? </CustomText>
           <CodeInput code={code} setCode={setCode} inputRefs={inputRefs} />
