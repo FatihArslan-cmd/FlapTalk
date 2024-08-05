@@ -3,6 +3,7 @@ import { View, Image, StyleSheet, FlatList, TouchableOpacity, Modal, Dimensions 
 import * as ImagePicker from 'expo-image-picker';
 import Button from '../../src/components/Button';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import ProfileIconWithCamera from './ProfileIconWithCamera';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,7 +30,7 @@ const avatars = [
   { id: 'gallery', type: 'button' } // Özel buton için eklenen öğe
 ];
 
-const defaultAvatar = require('../../assets/avatars/defaultavatar.png'); // Default avatar
+const defaultAvatar = "file:///data/user/0/com.fatih145911.FlapTalk/cache/ImagePicker/5d3f60eb-b1db-40d4-a463-41a3e091b1a6.jpeg";
 
 export default function AvatarChoose({ onAvatarSelect }) {
   const [selectedAvatar, setSelectedAvatar] = useState(defaultAvatar);
@@ -77,7 +78,7 @@ export default function AvatarChoose({ onAvatarSelect }) {
     }
 
     return (
-      <TouchableOpacity onPress={() => selectAvatar(item)}>
+      <TouchableOpacity >
         <Image source={item} style={styles.avatar} />
       </TouchableOpacity>
     );
@@ -85,9 +86,10 @@ export default function AvatarChoose({ onAvatarSelect }) {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={openModal}>
-        <Image source={selectedAvatar} style={styles.icon} />
-      </TouchableOpacity>
+      <ProfileIconWithCamera 
+        avatarUri={selectedAvatar.uri} 
+        onCameraPress={openModal} 
+      />
 
       <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContainer}>
@@ -107,13 +109,6 @@ export default function AvatarChoose({ onAvatarSelect }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  icon: {
-    width: height * 0.12,
-    height: height * 0.12,
-    borderRadius: (height * 0.12) / 2,
-    borderWidth: 2,
-    borderColor: '#000',
   },
   modalContainer: {
     flex: 1,

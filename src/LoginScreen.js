@@ -8,6 +8,9 @@ import * as Animatable from 'react-native-animatable';
 import AuthButton from './AuthButton';
 import auth from '@react-native-firebase/auth';
 import SafeAreaWrapper from './components/SafeAreaWrapper';
+
+const { width, height } = Dimensions.get('window');
+
 const colors = ['#361f34', '#005657', '#ff25ff', '#2c014d', '#fff0d3', '#ff6655'];
 const textColors = ['#e1f1ff', '#ffc480', '#000000', '#3cf467', '#0000ff', '#3c3cd6'];
 const texts = [
@@ -21,9 +24,9 @@ const texts = [
 
 const AnimatedGradientText = ({ text, textColor }) => (
   <CustomText fontFamily="pop">
-  <Animated.Text style={[styles.text, { color: textColor }]}>
-    {text}
-  </Animated.Text>
+    <Animated.Text style={[styles.text, { color: textColor }]}>
+      {text}
+    </Animated.Text>
   </CustomText>
 );
 
@@ -32,8 +35,8 @@ const LoginScreen = () => {
   const [currentText, setCurrentText] = useState('Hadi birlikte çalışalım');
   const [isAnimating, setIsAnimating] = useState(false);
   const [showGoogleBounce, setShowGoogleBounce] = useState(false);
-  const [showTwitterAnimation, setShowTwitterAnimation] = useState(false);
   const [showPhoneBounce, setShowPhoneBounce] = useState(false);
+  const [showEmailBounce, setShowEmailBounce] = useState(false);
   const backgroundColor = useRef(new Animated.Value(0)).current;
   const textColor = useRef(new Animated.Value(0)).current;
   const animation = useRef(new Animated.Value(0)).current;
@@ -103,8 +106,11 @@ const LoginScreen = () => {
   };
 
   const handleTwitterPress = () => {
-    setShowTwitterAnimation(true);
-    setIsAnimating(true);
+    setShowEmailBounce(true);
+    setTimeout(() => {
+      setShowEmailBounce(false);
+      navigation.navigate('EmailLogin');
+    }, 1000);
   };
 
   const handlePhonePress = () => {
@@ -123,55 +129,38 @@ const LoginScreen = () => {
     }, 1000);
   };
 
-  const { height } = Dimensions.get('window');
-
-
   return (
     <SafeAreaWrapper>
-    <Animated.View style={[styles.appContainer, { backgroundColor: interpolateBackgroundColor }]}>
-      <AnimatedGradientText text={currentText} textColor={interpolateTextColor} />
-      <View style={styles.buttonContainer}>
-        <AuthButton
-          style={styles.googleButton}
-          iconName="google"
-          text="Google ile devam et"
-          onPress={handleGooglePress}
-          showBounce={showGoogleBounce}
-          bounceColor="#2f2f2f"
-        />
-        <AuthButton
-          style={[styles.twitterButton, isAnimating && { opacity: 0.5 }]}
-          iconName="twitter"
-          text="Twitter ile devam et"
-          onPress={isAnimating ? null : handleTwitterPress}
-          showBounce={false}
-          bounceColor="#e6e6e6"
-          disabled={isAnimating}
-        />
-        <View style={styles.separator} />
-        <AuthButton
-          style={styles.button}
-          iconName="phone"
-          text="Telefon numarası ile devam et"
-          onPress={handlePhonePress}
-          showBounce={showPhoneBounce}
-        />
-      </View>
-      {showTwitterAnimation && (
-        <Animatable.View
-          animation="fadeInUpBig"
-          iterationCount={1}
-          direction="alternate"
-          style={[styles.twitterAnimation, { top: height / 2 - 50 }]}
-          onAnimationEnd={() => {
-            setShowTwitterAnimation(false);
-            setIsAnimating(false);
-          }}
-        >
-          <Icon name="twitter" size={100} color="#1DA1F2" />
-        </Animatable.View>
-      )}
-    </Animated.View>
+      <Animated.View style={[styles.appContainer, { backgroundColor: interpolateBackgroundColor }]}>
+        <AnimatedGradientText text={currentText} textColor={interpolateTextColor} />
+        <View style={styles.buttonContainer}>
+          <AuthButton
+            style={styles.googleButton}
+            iconName="google"
+            text="Google ile devam et"
+            onPress={handleGooglePress}
+            showBounce={showGoogleBounce}
+            bounceColor="#2f2f2f"
+          />
+          <AuthButton
+            style={[styles.twitterButton, isAnimating && { opacity: 0.5 }]}
+            iconName="envelope"
+            text="Mail ile devam et"
+            onPress={isAnimating ? null : handleTwitterPress}
+            bounceColor="#e6e6e6"
+            showBounce={showEmailBounce}
+          />
+          <View style={styles.separator} />
+          <AuthButton
+            style={styles.button}
+            iconName="phone"
+            text="Telefon numarası ile devam et"
+            onPress={handlePhonePress}
+            showBounce={showPhoneBounce}
+          />
+        </View>
+      
+      </Animated.View>
     </SafeAreaWrapper>
   );
 };
@@ -183,7 +172,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: 32,
+    fontSize: width * 0.08, // Adjust font size based on screen width
     fontWeight: 'bold',
     flexDirection: 'row',
   },
@@ -194,9 +183,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: 30,
+    bottom: height * 0.05, // Adjust bottom padding based on screen height
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: width * 0.05, // Adjust horizontal padding based on screen width
   },
   googleButton: {
     backgroundColor: '#e6e6e6',
@@ -207,12 +196,11 @@ const styles = StyleSheet.create({
   separator: {
     borderBottomColor: '#e6e6e6',
     borderBottomWidth: 1,
-    marginVertical: 10,
   },
   twitterAnimation: {
     position: 'absolute',
     alignItems: 'center',
-    width: '100%'
+    width: '100%',
   },
 });
 

@@ -5,6 +5,8 @@ import firestore from '@react-native-firebase/firestore';
 import useDisableBackButton from "./hooks/useDisableBackButton";
 import LogoutButton from "./components/LogoutButton";
 import LoadingOverlay from "./components/LoadingOverlay";
+import SafeAreaWrapper from "./components/SafeAreaWrapper";
+import ProfileIconWithCamera from "./components/ProfileIconWithCamera";
 const { width, height } = Dimensions.get('window');
 
 export default function AppHomePage({ route }) {
@@ -34,16 +36,16 @@ export default function AppHomePage({ route }) {
   }
 
   return (
+    <SafeAreaWrapper>
     <View style={styles.container}>
-      <Text style={styles.header}>Home Page</Text>
-      {userData.avatar && (
-        <Image source={{ uri: userData.avatar }} style={styles.avatar} />
-      )}
-      <Text style={styles.text}>Kullanıcı Adı: {userData.username} </Text>
+      <Text style={styles.header}>Home Page </Text>
+      <ProfileIconWithCamera         avatarUri={userData.avatar}/>
+      <Text style={styles.text}>Kullanıcı Adı: {userData.username} o</Text>
       <Text style={styles.text}>Hakkında: {userData.about} </Text>
       <Text style={styles.text}>Tarih: {userData.date} </Text>
       <LogoutButton route={route} />
     </View>
+    </SafeAreaWrapper>
   );
 }
 

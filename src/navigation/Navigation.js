@@ -5,7 +5,8 @@ import LoginScreen from '../LoginScreen';
 import AppHomePage from '../AppHomePage';
 import PhoneLoginScreen from '../phoneLoginScreen/PhoneLoginScreen';
 import UserInfoScreen from '../components/UserInfoScreen';
-
+import EmailLoginScreen from '../EmailScreen/EmailLoginScreen';
+import EmailSignupScreen from '../EmailScreen/EmailSignupScreen';
 const Stack = createStackNavigator();
 
 const Navigation = ({ user }) => {
@@ -13,10 +14,11 @@ const Navigation = ({ user }) => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName={user ? 'AppHomePage' : 'LoginScreen'}>
         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="AppHomePage" component={AppHomePage} options={{ headerShown: false }}
-          initialParams={{ uid: user ? user.uid : null }} />
+        <Stack.Screen name="AppHomePage" component={AppHomePage} options={{ headerShown: false }} initialParams={{ uid: user ? user.uid : null }} />
         <Stack.Screen name="PhoneLoginScreen" component={PhoneLoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="UserInfoScreen" component={UserInfoScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="EmailLogin" component={EmailLoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="EmailSignup" component={EmailSignupScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

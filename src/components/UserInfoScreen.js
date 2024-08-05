@@ -11,10 +11,12 @@ import AvatarChoose from './AvatarChoose';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClearButton from './renderClearButton';
 import Button from './Button';
+import { defaultAvatar } from './AvatarChoose'; // Import the defaultAvatar
+
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
-  const { uid, loginMethod } = route.params; // get loginMethod from route params
+  const { uid, loginMethod } = route.params;
   const [username, setUsername] = useState('');
   const [about, setAbout] = useState('');
   const [alertVisible, setAlertVisible] = useState(false);
@@ -81,7 +83,7 @@ const UserInfoScreen = ({ route }) => {
         username: username.trim(),
         about: about.trim(),
         date: currentDate,
-        avatar: avatar ? (avatar.uri || avatar) : null,
+        avatar: avatar ? (avatar.uri || avatar) : defaultAvatar, // Use defaultAvatar if avatar is not selected
       });
       
       await AsyncStorage.setItem('userToken', 'logged_in');

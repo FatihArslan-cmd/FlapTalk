@@ -1,42 +1,45 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Dimensions, Text } from 'react-native';
-import CountryPicker from 'react-native-country-picker-modal';
-import ClearButton from '../components/renderClearButton';// Adjust the path as needed
+import { View, TextInput, StyleSheet, Dimensions, Text, TouchableOpacity, Modal, FlatList } from 'react-native';
+import countryCodes from '../utils/countryCodes';
+import ClearButton from '../components/renderClearButton';
+import CountryFlag from 'react-native-country-flag';
 
 const { width, height } = Dimensions.get('window');
 
-const PhoneInput = ({ countryCode, callingCode, setCountryCode, setCallingCode, phoneNumber, setPhoneNumber }) => {
+const PhoneInput = ({ phoneNumber, setPhoneNumber }) => {
   const [localPhoneNumber, setLocalPhoneNumber] = useState(phoneNumber);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(countryCodes[0]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleClear = () => {
+  const handleClearPhoneNumber = () => {
     setLocalPhoneNumber('');
-    setPhoneNumber(''); // Update parent state if necessary
+    setPhoneNumber('');
   };
+
+  const handleClearSearchQuery = () => {
+    setSearchQuery('');
+  };
+
+  const handleSelectCountry = (country) => {
+    setSelectedCountry(country);
+    setModalVisible(false);
+  };
+
+  const filteredCountryCodes = countryCodes.filter(country =>
+    country.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <View style={styles.inputContainer}>
-      <CountryPicker
-        countryCode={countryCode}
-        withFilter
-        withFlag
-        withCallingCode
-        withEmoji
-        onSelect={(country) => {
-          setCountryCode(country.cca2);
-          setCallingCode(country.callingCode[0]);
-        }}
-        containerButtonStyle={styles.countryPicker}
-      />
-      <View style={styles.callingCodeContainer}>
-        <Text style={styles.plusSign}>+</Text>
-        <TextInput
-          style={styles.callingCodeInput}
-          value={callingCode}
-          onChangeText={setCallingCode}
-          keyboardType="number-pad"
-          maxLength={4}
-        />
-      </View>
+      <TouchableOpacity
+        style={styles.countryPicker}
+        onPress={() => setModalVisible(true)}
+      >
+        <CountryFlag isoCode={selectedCountry.isoCode} size={24} />
+        <Text style={styles.countryCodeText}>{selectedCountry.code}</Text>
+      </TouchableOpacity>
+
       <View style={styles.phoneNumberContainer}>
         <TextInput
           style={styles.phoneNumberInput}
@@ -45,11 +48,47 @@ const PhoneInput = ({ countryCode, callingCode, setCountryCode, setCallingCode, 
           value={localPhoneNumber}
           onChangeText={(text) => {
             setLocalPhoneNumber(text);
-            setPhoneNumber(text); // Update parent state if necessary
+            setPhoneNumber(text);
           }}
         />
-        <ClearButton value={localPhoneNumber} setValue={setLocalPhoneNumber}  />
+        <ClearButton value={localPhoneNumber} setValue={setLocalPhoneNumber} />
       </View>
+
+      <Modal
+         transparent={true}
+         animationType="slide"
+         visible={modalVisible}
+         onRequestClose={() => {
+           setModalVisible(false);
+           setSearchQuery('');
+         }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Ülke arayın"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <ClearButton value={searchQuery} setValue={setSearchQuery} />
+          </View>
+          <FlatList
+            data={filteredCountryCodes}
+            keyExtractor={(item) => item.isoCode}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.countryItem}
+                onPress={() => handleSelectCountry(item)}
+              >
+                <CountryFlag isoCode={item.isoCode} size={24} />
+                <Text style={styles.countryItemText}>{item.name}</Text>
+                <Text style={styles.countryCodeText}>{item.code}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -64,26 +103,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginBottom: height * 0.05,
+    backgroundColor: 'white',
+    elevation: 3,
   },
   countryPicker: {
-    marginRight: 10,
-  },
-  callingCodeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: 'gray',
-    marginRight: 8,
-    paddingVertical: 5.5,
+    marginRight: 10,
+    padding: 10,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: 'white',
   },
-  plusSign: {
+  countryCodeText: {
     fontSize: width * 0.04,
-    marginRight: 5,
-  },
-  callingCodeInput: {
-    fontSize: width * 0.04,
-    width: width * 0.1,
-    textAlign: 'center',
+    marginLeft: 5,
   },
   phoneNumberContainer: {
     flexDirection: 'row',
@@ -97,6 +132,54 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     flex: 1,
     paddingHorizontal: 8,
+  },
+  clearButton: {
+    marginLeft: 10,
+  },
+  clearButtonText: {
+    fontSize: width * 0.04,
+    color: 'red',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 15,
+    width: width * 0.8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  searchInput: {
+    fontSize: width * 0.04,
+    padding: width * 0.02,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 5,
+    flex: 1,
+  },
+  countryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: width * 0.03,
+    width: width * 0.8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  countryItemText: {
+    fontSize: width * 0.04,
+    flex: 1,
+    marginLeft: width * 0.05,
+  },
+  countryCodeText: {
+    fontSize: width * 0.04,
+    marginLeft: 10,
   },
 });
 

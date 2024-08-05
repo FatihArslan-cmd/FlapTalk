@@ -151,16 +151,18 @@ const styles = StyleSheet.create({
     color: '#0084ff',
   },
   verificationInfoText: {
-    fontSize: 16,
-    marginBottom: 15,
+    fontSize: width * 0.04,
+    marginBottom: height * 0.02,
     textAlign: 'center',
   },
   wrongNumberText: {
-    fontSize: 16,
-    marginBottom: 15,
+    fontSize: width * 0.04,
+    marginBottom: height * 0.02,
     textAlign: 'center',
-    color: '#5eb2ce'
+    color: '#5eb2ce',
   },
 });
+
+
 
 export default PhoneLoginScreen;
