@@ -4,21 +4,24 @@ import { useNavigation } from "@react-navigation/native";
 import firestore from '@react-native-firebase/firestore';
 import useDisableBackButton from "./hooks/useDisableBackButton";
 import LogoutButton from "./components/LogoutButton";
-
+import LoadingOverlay from "./components/LoadingOverlay";
 const { width, height } = Dimensions.get('window');
 
 export default function AppHomePage({ route }) {
   const { uid } = route.params;
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   useDisableBackButton();
 
   useEffect(() => {
+    setLoading(true)
     const fetchUserData = async () => {
       const userDoc = await firestore().collection('users').doc(uid).get();
       if (userDoc.exists) {
         setUserData(userDoc.data());
       }
+      setLoading(false)
     };
 
     fetchUserData();
@@ -26,9 +29,7 @@ export default function AppHomePage({ route }) {
 
   if (!userData) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
+      <LoadingOverlay visible={loading} />
     );
   }
 

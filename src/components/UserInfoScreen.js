@@ -8,6 +8,7 @@ import LoadingOverlay from './LoadingOverlay';
 import CustomText from './CustomText';
 import Header from '../phoneLoginScreen/Header';
 import AvatarChoose from './AvatarChoose';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -71,6 +72,9 @@ const UserInfoScreen = ({ route }) => {
         date: currentDate,
         avatar: avatar ? (avatar.uri || avatar) : null,
       });
+      
+      await AsyncStorage.setItem('userToken', 'logged_in');
+      await AsyncStorage.setItem('loginMethod', loginMethod); // Store the login method in AsyncStorage
 
       navigation.navigate('AppHomePage', { uid: uid, loginMethod: loginMethod }); // pass loginMethod
     } catch (error) {
