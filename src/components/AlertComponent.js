@@ -49,28 +49,28 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modalTitle: {
-    fontSize: width * 0.045,
+    fontSize: width * 0.060,
     fontWeight: 'bold',
     marginBottom: height * 0.02,
   },
   modalMessage: {
     marginBottom: height * 0.04,
     textAlign: 'center',
-    fontSize: width * 0.030,
+    fontSize: width * 0.040,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    width: '80%',
   },
   button: {
     backgroundColor: '#00ae59',
     borderRadius: 10,
-    padding: height * 0.015,
+    padding: height * 0.010,
     margin: width * 0.01,
     flex: 1,
     alignItems: 'center',
-    fontSize: width * 0.030,
+    fontSize: width * 0.040,
   },
   buttonText: {
     color: 'white',

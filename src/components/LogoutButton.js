@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LogoutButton() {
     const navigation = useNavigation();
-    const route = useRoute(); // Use useRoute to get the current route
+    const route = useRoute();
     const [loginMethod, setLoginMethod] = useState(null);
     const [userInfo, setUserInfo] = useState(route.params?.userInfo);
 
@@ -23,7 +23,7 @@ export default function LogoutButton() {
 
     const handleLogout = async () => {
         try {
-            if (loginMethod === 'phone') {
+            if (loginMethod === 'phone' || loginMethod === 'email') {
                 await auth().signOut();
                 navigation.reset({
                     index: 0,
