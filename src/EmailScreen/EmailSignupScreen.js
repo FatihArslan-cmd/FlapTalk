@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Text, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
@@ -60,13 +60,26 @@ const EmailSignupScreen = () => {
       setAlertMessage('Please check your email to verify your account.');
       setAlertVisible(true);
 
+      const userDoc = firebase.firestore().collection('users').doc(user.uid);
+      await userDoc.set({
+        email: email,
+        emailVerified: false,
+      });
+
+      // Schedule cleanup for unverified user
+      setTimeout(async () => {
+        const userSnapshot = await userDoc.get();
+        if (userSnapshot.exists && !userSnapshot.data().emailVerified) {
+          await user.delete();
+          await userDoc.delete();
+        }
+      }, 1000000); // 24 hours in milliseconds
+
       const intervalId = setInterval(async () => {
         await user.reload();
         if (user.emailVerified) {
           clearInterval(intervalId);
-          await firebase.firestore().collection('users').doc(user.uid).set({
-            email: email,
-          });
+          await userDoc.update({ emailVerified: true });
           setAlertTitle('Email Verified');
           setAlertMessage('Your email has been verified.');
           setAlertVisible(true);

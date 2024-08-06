@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
+import LoadingOverlay from '../components/LoadingOverlay';
+import firestore from '@react-native-firebase/firestore';
 
 export const AuthContext = createContext();
 
@@ -12,15 +14,21 @@ export const AuthProvider = ({ children }) => {
     const subscriber = auth().onAuthStateChanged(async user => {
       if (user) {
         await AsyncStorage.setItem('userToken', 'logged_in');
-        await AsyncStorage.setItem('uid', user.uid); // Store the uid
+        await AsyncStorage.setItem('uid', user.uid);
+        
+        // Retrieve the username from your user profile
+        const userDoc = await firestore().collection('users').doc(user.uid).get();
+        const username = userDoc.exists ? userDoc.data().username : null;
+        
+        setUser({ uid: user.uid, username });
       } else {
         await AsyncStorage.removeItem('userToken');
-        await AsyncStorage.removeItem('uid'); // Remove the uid
+        await AsyncStorage.removeItem('uid');
+        setUser(null);
       }
-      setUser(user);
       if (initializing) setInitializing(false);
     });
-    return subscriber; // unsubscribe on unmount
+    return subscriber; 
   }, []);
 
   useEffect(() => {
@@ -29,7 +37,9 @@ export const AuthProvider = ({ children }) => {
         const userToken = await AsyncStorage.getItem('userToken');
         const uid = await AsyncStorage.getItem('uid');
         if (userToken && uid) {
-          setUser({ uid }); // Set the user state with the uid
+          const userDoc = await firestore().collection('users').doc(uid).get();
+          const username = userDoc.exists ? userDoc.data().username : null;
+          setUser({ uid, username });
         }
         setInitializing(false);
       } catch (e) {
@@ -39,7 +49,7 @@ export const AuthProvider = ({ children }) => {
     checkUserToken();
   }, []);
 
-  if (initializing) return null; // veya bir yükleniyor ekranı gösterebilirsiniz
+  if (initializing) return <LoadingOverlay visible={true} />;
 
   return (
     <AuthContext.Provider value={{ user }}>
