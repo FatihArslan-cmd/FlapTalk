@@ -40,6 +40,8 @@ export const AuthProvider = ({ children }) => {
           const userDoc = await firestore().collection('users').doc(uid).get();
           const username = userDoc.exists ? userDoc.data().username : null;
           setUser({ uid, username });
+        } else {
+          setUser(null);
         }
         setInitializing(false);
       } catch (e) {

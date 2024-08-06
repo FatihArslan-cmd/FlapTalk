@@ -14,15 +14,14 @@ const Stack = createStackNavigator();
 const Navigation = () => {
   const { user } = useContext(AuthContext);
 
-  if (!user) {
-    return <LoginScreen />; // or handle navigation to login if user is not authenticated
-  }
+  // Ensure user is not null before accessing properties
+  const initialRouteName = user ? 'AppHomePage' : 'LoginScreen';
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={user.username ? 'AppHomePage' : 'LoginScreen'}>
+      <Stack.Navigator initialRouteName={initialRouteName}>
         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="AppHomePage" component={AppHomePage} options={{ headerShown: false }} initialParams={{ uid: user.uid }} />
+        <Stack.Screen name="AppHomePage" component={AppHomePage} options={{ headerShown: false }} initialParams={{ uid: user?.uid }} />
         <Stack.Screen name="PhoneLoginScreen" component={PhoneLoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="UserInfoScreen" component={UserInfoScreen} options={{ headerShown: false }} />
         <Stack.Screen name="EmailLogin" component={EmailLoginScreen} options={{ headerShown: false }} />

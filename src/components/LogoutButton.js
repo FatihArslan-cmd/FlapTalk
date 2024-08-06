@@ -30,8 +30,7 @@ export default function LogoutButton() {
                     routes: [{ name: "LoginScreen" }],
                 });
             } else if (loginMethod === 'google') {
-                GoogleSignin.configure({});
-                await GoogleSignin.revokeAccess();
+                await GoogleSignin.configure({});
                 await GoogleSignin.signOut();
                 setUserInfo(null);
                 navigation.reset({

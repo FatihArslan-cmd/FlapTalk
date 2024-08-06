@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "737402285801-8dkep4a271f4rsatiiqfga6q2tlku87u.apps.googleusercontent.com",
+          "client_id": "737402285801-vcv63ttkkhvgjio2ct2j0u3o6rvia6sm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.fatih145911.FlapTalk",
-            "certificate_hash": "0ce4b268955564d6d3901374b48f9dc1c8482abd"
+            "certificate_hash": "2ade0b13cadec45874ee2663af49083b244bf579"
           }
         },
         {

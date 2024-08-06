@@ -71,6 +71,7 @@ const PhoneLoginScreen = () => {
       setLoading(false);
     } catch (error) {
       showAlert('Hata', 'Telefon numarası doğrulaması başarısız.');
+      console.log(error)
       setLoading(false);
     }
   }

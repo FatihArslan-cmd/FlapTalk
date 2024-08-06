@@ -60,15 +60,15 @@ const UserInfoScreen = ({ route }) => {
       setAlertVisible(true);
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
       const usernameSnapshot = await firestore()
         .collection('users')
         .where('username', '==', username.trim())
         .get();
-
+  
       if (!usernameSnapshot.empty && usernameSnapshot.docs[0].id !== uid) {
         setAlertTitle('Hata');
         setAlertMessage('Bu kullanıcı adı zaten alınmış. Lütfen başka bir kullanıcı adı seçin.');
@@ -76,18 +76,19 @@ const UserInfoScreen = ({ route }) => {
         setLoading(false);
         return;
       }
-
+  
       const currentDate = date || getCurrentDate();
-
+      const aboutText = about.trim() || 'Hey dear, I am new in FlapTalk'; // Default text if 'about' is empty
+  
       await firestore().collection('users').doc(uid).set({
         username: username.trim(),
-        about: about.trim(),
+        about: aboutText,
         date: currentDate,
         avatar: avatar ? (avatar.uri || avatar) : defaultAvatar, // Use defaultAvatar if avatar is not selected
       });
-      
+  
       await AsyncStorage.setItem('userToken', 'logged_in');
-
+  
       navigation.navigate('AppHomePage', { uid: uid });
     } catch (error) {
       console.log(error);

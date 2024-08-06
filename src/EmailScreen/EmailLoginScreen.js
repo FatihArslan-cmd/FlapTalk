@@ -66,7 +66,8 @@ const EmailLoginScreen = () => {
         await AsyncStorage.removeItem('rememberedEmail');
       }
 
-      navigation.navigate('UserInfoScreen');
+      // Navigate to UserInfoScreen with user details
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid,loginMethod: 'email' });
     } catch (error) {
       if (error.code === 'auth/invalid-email') {
         setAlertTitle('Login Error');
