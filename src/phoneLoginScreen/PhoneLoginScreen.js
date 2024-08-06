@@ -58,41 +58,54 @@ const PhoneLoginScreen = () => {
       showAlert('Hata', 'Lütfen telefon numaranızı girin.');
       return;
     }
-
+  
     if (!/^\d+$/.test(phoneNumber)) {
       showAlert('Hata', 'Geçersiz telefon numarası.');
       return;
     }
-
+  
     try {
       setLoading(true);
       const confirmation = await auth().signInWithPhoneNumber(`+${callingCode}${phoneNumber}`);
       setConfirm(confirmation);
       setLoading(false);
     } catch (error) {
-      showAlert('Hata', 'Telefon numarası doğrulaması başarısız.');
-      console.log(error)
       setLoading(false);
+      if (error.code === 'auth/too-many-requests') {
+        showAlert('Hata', 'Bu cihazdan yapılan istekler alışılmadık bir etkinlik nedeniyle engellendi. Lütfen daha sonra tekrar deneyin.');
+      } else {
+        showAlert('Hata', 'Telefon numarası doğrulaması başarısız.');
+        console.log(error);
+      }
     }
   }
+  
 
   async function confirmCode() {
     try {
       const fullCode = code.join('');
       if (fullCode.length !== 6) {
-        showAlert('Hata ', 'Lütfen 6 haneli doğrulama kodunu girin. ');
+        showAlert('Hata', 'Lütfen 6 haneli doğrulama kodunu girin.');
         return;
       }
       setLoading(true);
       const userCredential = await confirm.confirm(fullCode);
       setUserInfo(userCredential.user);
       setLoading(false);
-      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid,loginMethod: 'phone' }); // Yönlendirme
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'phone' });
     } catch (error) {
-      showAlert('Hata ', 'Geçersiz doğrulama kodu. ');
       setLoading(false);
+      if (error.code === 'auth/invalid-verification-code') {
+        showAlert('Hata', 'Geçersiz doğrulama kodu.');
+      } else if (error.code === 'auth/too-many-requests') {
+        showAlert('Hata', 'Bu cihazdan yapılan istekler alışılmadık bir etkinlik nedeniyle engellendi. Lütfen daha sonra tekrar deneyin.');
+      } else {
+        showAlert('Hata', 'Doğrulama kodu doğrulaması başarısız.');
+        console.log(error);
+      }
     }
   }
+  
   
 
   return (

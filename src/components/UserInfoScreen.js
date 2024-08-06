@@ -84,7 +84,7 @@ const UserInfoScreen = ({ route }) => {
         username: username.trim(),
         about: aboutText,
         date: currentDate,
-        avatar: avatar ? (avatar.uri || avatar) : defaultAvatar, // Use defaultAvatar if avatar is not selected
+        avatar: avatar ? (avatar.uri || avatar) : null, // Use defaultAvatar if avatar is not selected
       });
   
       await AsyncStorage.setItem('userToken', 'logged_in');

@@ -24,6 +24,26 @@ const EmailLoginScreen = () => {
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setAlertTitle('Validation Error');
+      setAlertMessage('Please enter your email address.');
+      setAlertVisible(true);
+      return;
+    }
+
+    try {
+      await firebase.auth().sendPasswordResetEmail(email);
+      setAlertTitle('Success');
+      setAlertMessage('Password reset email sent.');
+      setAlertVisible(true);
+    } catch (error) {
+      setAlertTitle('Error');
+      setAlertMessage('Failed to send password reset email. Please try again.');
+      setAlertVisible(true);
+    }
+  };
 
   useEffect(() => {
     const loadRememberedEmail = async () => {
@@ -66,8 +86,7 @@ const EmailLoginScreen = () => {
         await AsyncStorage.removeItem('rememberedEmail');
       }
 
-      // Navigate to UserInfoScreen with user details
-      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid,loginMethod: 'email' });
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'email' });
     } catch (error) {
       if (error.code === 'auth/invalid-email') {
         setAlertTitle('Login Error');
@@ -126,6 +145,10 @@ const EmailLoginScreen = () => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Icon name="login" size={20} color="#fff" style={styles.buttonIcon} />
           <CustomText fontFamily={'pop'} style={styles.buttonText}>Log In</CustomText>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
+          <Icon name="help-outline" size={20} color="#005657" style={styles.forgotPasswordIcon} />
+          <CustomText fontFamily={'pop'} style={styles.forgotPasswordText}>Forgot Password?</CustomText>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('EmailSignup')} style={styles.linkWrapper}>
           <Icon name="person-add" size={20} color="#005657" style={styles.linkIcon} />
@@ -214,6 +237,17 @@ const styles = StyleSheet.create({
   rememberMeText: {
     marginLeft: 5,
     color: '#888',
+  },
+  forgotPassword: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  forgotPasswordIcon: {
+    marginRight: 5,
+  },
+  forgotPasswordText: {
+    color: '#005657',
   },
 });
 
