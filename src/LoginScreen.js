@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Text, Dimensions, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import CustomText from './components/CustomText';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { GoogleSignin } from '@react-native-community/google-signin';
 import * as Animatable from 'react-native-animatable';
 import AuthButton from './AuthButton';
@@ -106,26 +105,32 @@ const LoginScreen = () => {
   };
 
   const handleTwitterPress = () => {
+    setIsAnimating(true);
     setShowEmailBounce(true);
     setTimeout(() => {
       setShowEmailBounce(false);
       navigation.navigate('EmailLogin');
+      setIsAnimating(false);
     }, 1000);
   };
 
   const handlePhonePress = () => {
+    setIsAnimating(true);
     setShowPhoneBounce(true);
     setTimeout(() => {
       setShowPhoneBounce(false);
       navigation.navigate('PhoneLoginScreen');
+      setIsAnimating(false);
     }, 1000);
   };
 
   const handleGooglePress = () => {
+    setIsAnimating(true);
     setShowGoogleBounce(true);
     setTimeout(async () => {
       setShowGoogleBounce(false);
       await signIn();
+      setIsAnimating(false);
     }, 1000);
   };
 
@@ -138,9 +143,10 @@ const LoginScreen = () => {
             style={styles.googleButton}
             iconName="google"
             text="Google ile devam et"
-            onPress={handleGooglePress}
+            onPress={isAnimating ? null : handleGooglePress}
             showBounce={showGoogleBounce}
             bounceColor="#2f2f2f"
+            disabled={isAnimating}
           />
           <AuthButton
             style={[styles.twitterButton, isAnimating && { opacity: 0.5 }]}
@@ -149,17 +155,18 @@ const LoginScreen = () => {
             onPress={isAnimating ? null : handleTwitterPress}
             bounceColor="#e6e6e6"
             showBounce={showEmailBounce}
+            disabled={isAnimating}
           />
           <View style={styles.separator} />
           <AuthButton
             style={styles.button}
             iconName="phone"
             text="Telefon numarası ile devam et"
-            onPress={handlePhonePress}
+            onPress={isAnimating ? null : handlePhonePress}
             showBounce={showPhoneBounce}
+            disabled={isAnimating}
           />
         </View>
-      
       </Animated.View>
     </SafeAreaWrapper>
   );

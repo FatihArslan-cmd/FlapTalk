@@ -42,6 +42,9 @@ const SplashScreenComponent = ({ onAnimationEnd }) => {
         color="#FFFFFF" 
         style={styles.spinner}
       />
+      <CustomText style={styles.versionText} fontFamily="pop">
+        Version 2.4.3
+      </CustomText>
     </Animated.View>
   );
 };
@@ -67,6 +70,11 @@ const styles = StyleSheet.create({
   },
   spinner: {
     marginTop: 20,
+  },
+  versionText: {
+    color: 'white',
+    position: 'absolute',
+    bottom: width * 0.15, // Adjust the distance from the bottom
   },
 });
 
