@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
+import { AuthContext } from '../context/AuthContext';
+import SplashScreenComponent from '../components/SplashScreen';
 import LoginScreen from '../LoginScreen';
 import AppHomePage from '../AppHomePage';
 import PhoneLoginScreen from '../phoneLoginScreen/PhoneLoginScreen';
@@ -13,8 +14,29 @@ const Stack = createStackNavigator();
 
 const Navigation = () => {
   const { user } = useContext(AuthContext);
+  const [isSplashReady, setSplashReady] = useState(false);
 
-  // Ensure user is not null before accessing properties
+  useEffect(() => {
+    const loadSplashScreen = async () => {
+      // If user is already authenticated, skip the splash screen
+      if (user) {
+        setSplashReady(true);
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setSplashReady(true);
+    };
+    loadSplashScreen();
+  }, [user]);
+
+  const handleAnimationEnd = () => {
+    setSplashReady(true);
+  };
+
+  if (!isSplashReady) {
+    return <SplashScreenComponent onAnimationEnd={handleAnimationEnd} />;
+  }
+
   const initialRouteName = user ? 'AppHomePage' : 'LoginScreen';
 
   return (

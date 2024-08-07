@@ -25,23 +25,24 @@ export default function LogoutButton() {
         try {
             if (loginMethod === 'phone' || loginMethod === 'email') {
                 await auth().signOut();
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: "LoginScreen" }],
-                });
             } else if (loginMethod === 'google') {
                 await GoogleSignin.configure({});
                 await GoogleSignin.signOut();
                 setUserInfo(null);
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: "LoginScreen" }],
-                });
             } else {
                 console.log("Unknown login method");
             }
         } catch (error) {
-            console.log("Error during logout:", error);
+            if (error.code === 'auth/no-current-user') {
+                console.log("No user currently signed in.");
+            } else {
+                console.log("Error during logout:", error);
+            }
+        } finally {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: "LoginScreen" }],
+            });
         }
     };
 

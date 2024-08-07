@@ -25,8 +25,10 @@
     "expo-dev-client": "~4.0.21",
     "expo-font": "^12.0.9",
     "expo-image-picker": "^15.0.7",
+    "expo-splash-screen": "^0.27.5",
     "expo-status-bar": "~1.12.1",
     "expo-web-browser": "~13.0.3",
+    "lottie-react-native": "^6.7.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.3",
@@ -43,6 +45,7 @@
     "react-native-screens": "3.31.1",
     "react-native-vector-icons": "^10.1.0",
     "react-native-web": "~0.19.10",
+    "react-native-webview": "^13.10.5",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

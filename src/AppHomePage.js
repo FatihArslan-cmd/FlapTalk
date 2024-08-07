@@ -7,6 +7,7 @@ import LogoutButton from "./components/LogoutButton";
 import LoadingOverlay from "./components/LoadingOverlay";
 import SafeAreaWrapper from "./components/SafeAreaWrapper";
 import ProfileIconWithCamera from "./components/ProfileIconWithCamera";
+import UsersList from "./home/UserList";
 const { width, height } = Dimensions.get('window');
 
 export default function AppHomePage({ route }) {
@@ -44,6 +45,7 @@ export default function AppHomePage({ route }) {
       <Text style={styles.text}>Hakkında: {userData.about} </Text>
       <Text style={styles.text}>Tarih: {userData.date} </Text>
       <LogoutButton route={route} />
+      
     </View>
     </SafeAreaWrapper>
   );
