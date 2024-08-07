@@ -1,86 +1,114 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import firestore from '@react-native-firebase/firestore';
-import useDisableBackButton from "./hooks/useDisableBackButton";
-import LogoutButton from "./components/LogoutButton";
-import LoadingOverlay from "./components/LoadingOverlay";
-import SafeAreaWrapper from "./components/SafeAreaWrapper";
-import ProfileIconWithCamera from "./components/ProfileIconWithCamera";
-import Button from "./components/Button";
-import { useNavigation } from "@react-navigation/native";
-import { AuthContext } from "./context/AuthContext";
-const { width } = Dimensions.get('window');
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CustomText from './components/CustomText';
+import SafeAreaWrapper from './components/SafeAreaWrapper';
+const data = [
+  { id: '1', name: 'İlker Samut', message: 'ama ona göre para alırım', time: '19:33', avatar: require('../assets/avatars/Untitled (11).jpg') },
+  { id: '2', name: 'Gurup Gurup Gurup', message: 'Şu mesaja 😢 ifadesini bıraktınız:', time: 'Dün', avatar: require('../assets/avatars/Untitled (10).jpg') },
+  { id: '3', name: 'M.Ali', message: 'Büyük ihtimal 👍', time: '5.08.2024',avatar: require('../assets/avatars/Untitled (9).jpg')  },
+  { id: '4', name: 'Filiz', message: 'https://youtube.com/shorts/Qr8-eYtA', time: '3.08.2024',avatar: require('../assets/avatars/Untitled (8).jpg') },
+  { id: '5', name: 'Abla', message: 'Offf', time: '2.08.2024',avatar: require('../assets/avatars/Untitled (7).jpg')  },
+  { id: '7', name: 'Kafdir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (6).jpg') },
+  { id: '8', name: 'Kadirs Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (5).jpg') },
+  { id: '9', name: 'Kadffir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (4).jpg') },
+  { id: '10', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', avatar: require('../assets/avatars/Untitled (3).jpg')},
+  { id: '11', name: 'Kagdidr Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (2).jpg') },
+  { id: '12', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (1).jpg') },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+
+];
 
 export default function AppHomePage() {
-  const { user } = useContext(AuthContext);
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
-  useDisableBackButton();
-
-  useEffect(() => {
-    if (user) {
-      setLoading(true);
-      const fetchUserData = async () => {
-        const userDoc = await firestore().collection('users').doc(user.uid).get();
-        if (userDoc.exists) {
-          setUserData(userDoc.data());
-        }
-        setLoading(false);
-      };
-      fetchUserData();
-    }
-  }, [user]);
-
-  if (!userData) {
-    return <LoadingOverlay visible={loading} />;
-  }
+  const renderItem = ({ item }) => (
+    <TouchableOpacity style={styles.item}>
+      <Image source={item.avatar} style={styles.avatar} />
+      <View style={styles.messageContainer}>
+        <CustomText fontFamily={'pop'} style={styles.name}>{item.name}</CustomText>
+        <CustomText fontFamily={'lato-bold'} style={styles.message}>{item.message}</CustomText>
+      </View>
+      <CustomText fontFamily={'lato-bold'} style={styles.time}>{item.time}</CustomText>
+    </TouchableOpacity>
+  );
 
   return (
-    <SafeAreaWrapper>
-      <View style={styles.container}>
-        <Text style={styles.header}>Home Page</Text>
-        <ProfileIconWithCamera avatarUri={userData.avatar} />
-        <Text style={styles.text}>Kullanıcı Adı: {userData.username}</Text>
-        <Text style={styles.text}>Hakkında: {userData.about}</Text>
-        <Text style={styles.text}>Tarih: {userData.date}</Text>
-        <LogoutButton />
-        <Button text={'Chat Screen'} onPress={() => navigation.navigate('ChatScreen', { chatId: 'someChatId', userId: user.uid })} />
-        <Button text={'Users List'} onPress={() => navigation.navigate('UsersList')} />
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <CustomText fontFamily={'pop'} style={styles.headerText}>FlapTalk</CustomText>
+        <View style={{flexDirection:'row',marginLeft:'auto' }}> 
+        <MaterialCommunityIcons name="camera" size={28} color="black" style={styles.inputIcon} />
+        <Icon name="search" size={28} color="black" style={styles.inputIcon} />
+        <MaterialCommunityIcons name="dots-vertical" size={28} color="black" style={styles.inputIcon} />
+        </View>
       </View>
-    </SafeAreaWrapper>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        style={styles.list}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
+    backgroundColor: '#fff',
+  },
+  inputIcon:{
+    margin:10
   },
   header: {
-    fontSize: 24,
-    marginBottom: 20,
+    height: 55,
+    justifyContent: 'center',
+    borderBottomColor: '#ccc',
+    marginLeft:35,
+    flexDirection:'row'
+  },
+  headerText: {
+    fontSize: 26,
+    color:'#00ae59'
+  },
+  list: {
+    flex: 1,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
   avatar: {
-    width: width * 0.3,
-    height: width * 0.3,
-    borderRadius: (width * 0.3) / 2,
-    marginBottom: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 15,
   },
-  text: {
-    fontSize: 18,
-    marginBottom: 10,
+  messageContainer: {
+    flex: 1,
+    marginLeft: 10,
   },
-  button: {
-    backgroundColor: '#007BFF',
-    padding: 12,
-    borderRadius: 4,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFF',
+  name: {
     fontSize: 16,
   },
+  message: {
+    color: '#888',
+  },
+  time: {
+    color: '#888',
+    fontSize: 12,
+  },
+ 
 });
