@@ -3,7 +3,6 @@ import { View, StyleSheet, Text, Dimensions, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import CustomText from './components/CustomText';
 import { GoogleSignin } from '@react-native-community/google-signin';
-import * as Animatable from 'react-native-animatable';
 import AuthButton from './AuthButton';
 import auth from '@react-native-firebase/auth';
 import SafeAreaWrapper from './components/SafeAreaWrapper';

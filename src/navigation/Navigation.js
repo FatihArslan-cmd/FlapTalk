@@ -4,11 +4,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { AuthContext } from '../context/AuthContext';
 import SplashScreenComponent from '../components/SplashScreen';
 import LoginScreen from '../LoginScreen';
-import AppHomePage from '../AppHomePage';
 import PhoneLoginScreen from '../phoneLoginScreen/PhoneLoginScreen';
 import UserInfoScreen from '../components/UserInfoScreen';
 import EmailLoginScreen from '../EmailScreen/EmailLoginScreen';
 import EmailSignupScreen from '../EmailScreen/EmailSignupScreen';
+import ChatScreen from '../ChatScreen/ChatScreen';
+import UsersList from '../ChatScreen/UsersList';
+import TabNavigator from './TabNavigator';
 
 const Stack = createStackNavigator();
 
@@ -18,7 +20,6 @@ const Navigation = () => {
 
   useEffect(() => {
     const loadSplashScreen = async () => {
-      // If user is already authenticated, skip the splash screen
       if (user) {
         setSplashReady(true);
         return;
@@ -37,17 +38,19 @@ const Navigation = () => {
     return <SplashScreenComponent onAnimationEnd={handleAnimationEnd} />;
   }
 
-  const initialRouteName = user ? 'AppHomePage' : 'LoginScreen';
+  const initialRouteName = user ? 'MainApp' : 'LoginScreen';
 
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={initialRouteName}>
         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="AppHomePage" component={AppHomePage} options={{ headerShown: false }} initialParams={{ uid: user?.uid }} />
+        <Stack.Screen name="MainApp" component={TabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="PhoneLoginScreen" component={PhoneLoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="UserInfoScreen" component={UserInfoScreen} options={{ headerShown: false }} />
         <Stack.Screen name="EmailLogin" component={EmailLoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="EmailSignup" component={EmailSignupScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="UsersList" component={UsersList} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

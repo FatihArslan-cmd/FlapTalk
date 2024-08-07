@@ -89,7 +89,7 @@ const UserInfoScreen = ({ route }) => {
   
       await AsyncStorage.setItem('userToken', 'logged_in');
   
-      navigation.navigate('AppHomePage', { uid: uid });
+      navigation.navigate('MainApp', { uid: uid });
     } catch (error) {
       console.log(error);
     } finally {
