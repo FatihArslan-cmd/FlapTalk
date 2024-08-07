@@ -41,9 +41,9 @@ export default function SettingScreen() {
       <View style={styles.container}>
         <Text style={styles.header}>Home Page</Text>
         <ProfileIconWithCamera avatarUri={userData.avatar} />
-        <Text style={styles.text}>Kullanıcı Adı: {userData.username}</Text>
-        <Text style={styles.text}>Hakkında: {userData.about}</Text>
-        <Text style={styles.text}>Tarih: {userData.date}</Text>
+        <Text style={styles.text}>Kullanıcı Adı: {userData.username}   </Text>
+        <Text style={styles.text}>Hakkında: {userData.about} </Text>
+        <Text style={styles.text}>Tarih: {userData.date} </Text>
         <LogoutButton />
         <Button text={'Chat Screen'} onPress={() => navigation.navigate('ChatScreen', { chatId: 'someChatId', userId: user.uid })} />
         <Button text={'Users List'} onPress={() => navigation.navigate('UsersList')} />

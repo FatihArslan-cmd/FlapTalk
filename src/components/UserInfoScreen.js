@@ -24,7 +24,7 @@ const UserInfoScreen = ({ route }) => {
   const [alertMessage, setAlertMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState('');
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState('');
 
   const navigation = useNavigation();
 
@@ -36,7 +36,7 @@ const UserInfoScreen = ({ route }) => {
         setUsername(userData.username || '');
         setAbout(userData.about || '');
         setDate(userData.date || '');
-        setAvatar(userData.avatar || null);
+        setAvatar(userData.avatar || '');
       }
     };
 

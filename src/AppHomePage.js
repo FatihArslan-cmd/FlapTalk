@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AppHeader from './components/AppHeader';
 import CustomText from './components/CustomText';
 import SafeAreaWrapper from './components/SafeAreaWrapper';
 const data = [
@@ -44,14 +43,7 @@ export default function AppHomePage() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <CustomText fontFamily={'pop'} style={styles.headerText}>FlapTalk</CustomText>
-        <View style={{flexDirection:'row',marginLeft:'auto' }}> 
-        <MaterialCommunityIcons name="camera" size={28} color="black" style={styles.inputIcon} />
-        <Icon name="search" size={28} color="black" style={styles.inputIcon} />
-        <MaterialCommunityIcons name="dots-vertical" size={28} color="black" style={styles.inputIcon} />
-        </View>
-      </View>
+      <AppHeader title="FlapTalk" textColor="#00ae59" />
       <FlatList
         data={data}
         renderItem={renderItem}
@@ -66,20 +58,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  inputIcon:{
-    margin:10
-  },
-  header: {
-    height: 55,
-    justifyContent: 'center',
-    borderBottomColor: '#ccc',
-    marginLeft:35,
-    flexDirection:'row'
-  },
-  headerText: {
-    fontSize: 26,
-    color:'#00ae59'
   },
   list: {
     flex: 1,
@@ -110,5 +88,4 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 12,
   },
- 
 });
