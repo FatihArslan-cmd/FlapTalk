@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, FlatList, StyleSheet, Text,Dimensions } from 'react-native'; 
 import { useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import ChatRoomHeader from './ChatRoomHeader';
 import { StatusBar } from 'expo-status-bar';
 import SafeAreaWrapper from '../components/SafeAreaWrapper';
+import MessageInput from './MessageInput';
+
+const { width } = Dimensions.get('window');
+
 
 const ChatRoom = () => {
   const route = useRoute();
   const { chatId, userId } = route.params;
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
   const [user, setUser] = useState(null);
+  const flatListRef = useRef(null); // Create a ref for FlatList
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -41,6 +45,7 @@ const ChatRoom = () => {
               id: doc.id,
             }));
             setMessages(messages);
+            flatListRef.current?.scrollToEnd({ animated: true }); // Scroll to the end on new messages
           } else {
             console.warn('No messages found');
           }
@@ -55,8 +60,8 @@ const ChatRoom = () => {
     return () => fetchMessages();
   }, [chatId, userId]);
 
-  const sendMessage = async () => {
-    if (newMessage.trim().length === 0) return;
+  const sendMessage = async (message) => {
+    if (message.trim().length === 0) return;
 
     try {
       await firestore()
@@ -64,11 +69,10 @@ const ChatRoom = () => {
         .doc(chatId)
         .collection('messages')
         .add({
-          text: newMessage,
+          text: message,
           createdAt: firestore.FieldValue.serverTimestamp(),
           userId: auth().currentUser.uid,
         });
-      setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -85,77 +89,50 @@ const ChatRoom = () => {
       <StatusBar style="auto" />
       <ChatRoomHeader user={user} />
       <FlatList
+        ref={flatListRef} // Attach the ref to FlatList
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.messagesContainer}
+        ListEmptyComponent={<Text style={styles.noMessages}>No messages yet</Text>} // Handle empty state
       />
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={newMessage}
-          onChangeText={setNewMessage}
-          placeholder="Type a message..."
-        />
-        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-          <Text style={styles.sendButtonText}>Send</Text>
-        </TouchableOpacity>
-      </View>
+      <MessageInput onSendMessage={sendMessage} />
     </SafeAreaWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  messagesContainer: {
-    padding: 10,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    marginRight: 10,
-  },
-  sendButton: {
-    justifyContent: 'center',
-    paddingHorizontal: 15,
-    backgroundColor: '#007AFF',
-    borderRadius: 25,
-  },
-  sendButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  myMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#DCF8C6',
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 5,
-    maxWidth: '80%',
-  },
-  theirMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#ECECEC',
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 5,
-    maxWidth: '80%',
-  },
-  messageText: {
-    fontSize: 16,
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
+    messagesContainer: {
+      padding: 10,
+    },
+    myMessage: {
+      alignSelf: 'flex-end',
+      backgroundColor: '#DCF8C6',
+      borderRadius: 10,
+      padding: 10,
+      marginVertical: 5,
+      maxWidth: width * 0.75, // 75% of the screen width
+    },
+    theirMessage: {
+      alignSelf: 'flex-start',
+      backgroundColor: '#ECECEC',
+      borderRadius: 10,
+      padding: 10,
+      marginVertical: 5,
+      maxWidth: width * 0.75, // 75% of the screen width
+    },
+    messageText: {
+      fontSize: 16,
+    },
+    noMessages: {
+      textAlign: 'center',
+      fontSize: 16,
+      color: 'gray',
+    },
+  });
 
 export default ChatRoom;
