@@ -4,7 +4,6 @@ import firestore from '@react-native-firebase/firestore';
 import useDisableBackButton from "../hooks/useDisableBackButton";
 import LogoutButton from "../components/LogoutButton";
 import LoadingOverlay from "../components/LoadingOverlay";
-import SafeAreaWrapper from "../components/SafeAreaWrapper";
 import ProfileIconWithCamera from "../components/ProfileIconWithCamera";
 import Button from "../components/Button";
 import { useNavigation } from "@react-navigation/native";
@@ -37,7 +36,6 @@ export default function SettingScreen() {
   }
 
   return (
-    <SafeAreaWrapper>
       <View style={styles.container}>
         <Text style={styles.header}>Home Page</Text>
         <ProfileIconWithCamera avatarUri={userData.avatar} />
@@ -48,7 +46,6 @@ export default function SettingScreen() {
         <Button text={'Chat Screen'} onPress={() => navigation.navigate('ChatScreen', { chatId: 'someChatId', userId: user.uid })} />
         <Button text={'Users List'} onPress={() => navigation.navigate('UsersList')} />
       </View>
-    </SafeAreaWrapper>
   );
 }
 

@@ -108,7 +108,6 @@ const EmailLoginScreen = () => {
   };
 
   return (
-    <SafeAreaWrapper>
       <Animatable.View style={styles.container} animation="fadeInDownBig" duration={600}>
         <CustomText fontFamily={'pop'} style={styles.title}>Log In</CustomText>
         <View style={styles.inputWrapper}>
@@ -162,9 +161,9 @@ const EmailLoginScreen = () => {
           onConfirm={() => setAlertVisible(false)}
           confirmText="OK"
         />
+        <LoadingOverlay visible={loading} />
       </Animatable.View>
-      <LoadingOverlay visible={loading} />
-    </SafeAreaWrapper>
+
   );
 };
 

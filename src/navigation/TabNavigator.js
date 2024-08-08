@@ -1,7 +1,6 @@
-import React, { useEffect, useRef,useReducer } from 'react';
+import React, { useEffect, useRef, useReducer } from 'react';
 import { Pressable, StyleSheet, View, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import Animated, { useAnimatedStyle, withTiming, useDerivedValue } from 'react-native-reanimated';
 import Lottie from 'lottie-react-native';
@@ -21,46 +20,74 @@ const PlaceholderScreen = () => {
 
 const TabNavigator = () => {
   return (
-      <Tab.Navigator
-        tabBar={(props) => <AnimatedTabBar {...props} />}
-      >
-        <Tab.Screen
-          name="Home"
-          options={{
-            tabBarIcon: ({ ref }) =>
-            <Lottie ref={ref} loop={false} source={require('../../assets/lottie/home.icon.json')} style={styles.icon}
-             />,headerShown: false
-          }}
-          component={AppHomePage}
-        />
-        <Tab.Screen
-          name="Community"
-          options={{
-            tabBarIcon: ({ ref }) => <Lottie ref={ref} loop={false} source={require('../../assets/lottie/chat.icon.json')} style={styles.icon} />,
-            headerShown: false }}
-          component={CommunityScreen}
-        />
-        <Tab.Screen
-          name="Calls"
-          options={{
-            tabBarIcon: ({ ref }) => <Lottie ref={ref} loop={false} source={require('../../assets/lottie/Call.json')} style={styles.icon} />,
-            headerShown: false }}
-          component={CallsScreen}
-        />
-        <Tab.Screen
-          name="Settings"
-          options={{
-            tabBarIcon: ({ ref }) => <Lottie ref={ref} loop={false} source={require('../../assets/lottie/settings.icon.json')} style={styles.icon} />,
-            headerShown: false}}
-          component={SettingScreen}
-        />
-      </Tab.Navigator>
+    <Tab.Navigator
+      tabBar={(props) => <AnimatedTabBar {...props} />}
+    >
+      <Tab.Screen
+        name="Home"
+        options={{
+          tabBarIcon: ({ ref }) => (
+            <Lottie
+              ref={ref}
+              loop={false}
+              source={require('../../assets/lottie/home.icon.json')}
+              style={styles.icon}
+            />
+          ),
+          headerShown: false
+        }}
+        component={AppHomePage}
+      />
+      <Tab.Screen
+        name="Community"
+        options={{
+          tabBarIcon: ({ ref }) => (
+            <Lottie
+              ref={ref}
+              loop={false}
+              source={require('../../assets/lottie/chat.icon.json')}
+              style={styles.icon}
+            />
+          ),
+          headerShown: false
+        }}
+        component={CommunityScreen}
+      />
+      <Tab.Screen
+        name="Calls"
+        options={{
+          tabBarIcon: ({ ref }) => (
+            <Lottie
+              ref={ref}
+              loop={false}
+              source={require('../../assets/lottie/Call.json')}
+              style={styles.icon}
+            />
+          ),
+          headerShown: false
+        }}
+        component={CallsScreen}
+      />
+      <Tab.Screen
+        name="Settings"
+        options={{
+          tabBarIcon: ({ ref }) => (
+            <Lottie
+              ref={ref}
+              loop={false}
+              source={require('../../assets/lottie/settings.icon.json')}
+              style={styles.icon}
+            />
+          ),
+          headerShown: false
+        }}
+        component={SettingScreen}
+      />
+    </Tab.Navigator>
   );
 };
 
 const AnimatedTabBar = ({ state: { index: activeIndex, routes }, navigation, descriptors }) => {
-  const { bottom } = useSafeAreaInsets();
-
   const reducer = (state, action) => {
     return [...state, { x: action.x, index: action.index }];
   };
@@ -83,7 +110,7 @@ const AnimatedTabBar = ({ state: { index: activeIndex, routes }, navigation, des
   });
 
   return (
-    <View style={[styles.tabBar, { paddingBottom: bottom }]}>
+    <View style={styles.tabBar}>
       <AnimatedSvg
         width={110}
         height={60}

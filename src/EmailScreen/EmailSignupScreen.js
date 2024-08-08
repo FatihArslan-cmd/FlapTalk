@@ -107,7 +107,6 @@ const EmailSignupScreen = () => {
   };
 
   return (
-    <SafeAreaWrapper>
       <Animatable.View style={styles.container} animation="fadeInDownBig" duration={600}>
         <CustomText fontFamily={'pop'} style={styles.title}>Sign Up</CustomText>
         <View style={styles.inputWrapper}>
@@ -162,9 +161,8 @@ const EmailSignupScreen = () => {
           onConfirm={() => setAlertVisible(false)}
           confirmText="OK"
         />
+       <LoadingOverlay visible={loading} />
       </Animatable.View>
-      <LoadingOverlay visible={loading} />
-    </SafeAreaWrapper>
   );
 };
 

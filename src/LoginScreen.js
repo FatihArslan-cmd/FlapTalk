@@ -134,7 +134,6 @@ const LoginScreen = () => {
   };
 
   return (
-    <SafeAreaWrapper>
       <Animated.View style={[styles.appContainer, { backgroundColor: interpolateBackgroundColor }]}>
         <AnimatedGradientText text={currentText} textColor={interpolateTextColor} />
         <View style={styles.buttonContainer}>
@@ -167,7 +166,6 @@ const LoginScreen = () => {
           />
         </View>
       </Animated.View>
-    </SafeAreaWrapper>
   );
 };
 

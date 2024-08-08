@@ -3,7 +3,8 @@ import NetInfo from '@react-native-community/netinfo';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import CustomText from '../components/CustomText';
-// Create NetworkContext
+import { StatusBar, Platform } from 'react-native';
+
 export const NetworkContext = createContext();
 
 // Create NetworkProvider component
@@ -62,6 +63,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 10,
+    paddingTop:30,
     justifyContent: 'center',
     alignItems: 'center',
   },

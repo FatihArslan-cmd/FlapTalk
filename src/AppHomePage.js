@@ -43,7 +43,7 @@ export default function AppHomePage() {
 
   return (
     <View style={styles.container}>
-      <AppHeader title="FlapTalk" textColor="#00ae59" />
+      <AppHeader title="FlapTalk" textColor="#00ae59" showCameraIcon={true} />
       <FlatList
         data={data}
         renderItem={renderItem}

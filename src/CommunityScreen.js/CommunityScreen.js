@@ -1,31 +1,33 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, RefreshControl } from "react-native";
-import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import CustomText from "../components/CustomText";
 import AppHeader from "../components/AppHeader";
-import { UserStatusContext } from '../context/UserStatusContext';
 
-const defaultAvatar = 'data:image/png;base64,...'; // Add your default avatar URI here
+const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
-export default function CommunityScreen() {
+export default function UsersList() {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const navigation = useNavigation();
-  const status = useContext(UserStatusContext);
-  const currentUserId = auth().currentUser.uid;
+  const [searchText, setSearchText] = useState('');
 
   const fetchUsers = async () => {
-    setRefreshing(true);
-    const usersCollection = await firestore().collection('users').get();
-    const fetchedUsers = usersCollection.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-    const filteredUsers = fetchedUsers.filter(user => user.id !== currentUserId);
-    const sortedUsers = filteredUsers.sort((a, b) => (a.state === 'online' ? -1 : 1));
-    setUsers(sortedUsers);
-    setRefreshing(false);
+    try {
+      const currentUser = auth().currentUser.uid;
+      const usersCollection = await firestore().collection('users').get();
+      const fetchedUsers = usersCollection.docs
+        .map(doc => ({ ...doc.data(), id: doc.id }))
+        .filter(user => user.id !== currentUser)
+        .sort((a, b) => (b.state === 'online') - (a.state === 'online'));
+
+      setUsers(fetchedUsers);
+      setFilteredUsers(fetchedUsers);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
   };
 
   useFocusEffect(
@@ -35,43 +37,53 @@ export default function CommunityScreen() {
   );
 
   useEffect(() => {
-    const filtered = users.filter(user => user.username.toLowerCase().includes(searchText.toLowerCase()));
+    fetchUsers();
+  }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchUsers().then(() => setRefreshing(false));
+  };
+
+  useEffect(() => {
+    const filtered = users.filter(user =>
+      user.username.toLowerCase().includes(searchText.toLowerCase())
+    );
     setFilteredUsers(filtered);
   }, [searchText, users]);
 
-  const startChat = async (userId) => {
+  const startChat = (userId) => {
     const chatId = [auth().currentUser.uid, userId].sort().join('_');
-    navigation.navigate('ChatScreen', { chatId, userId });
+    navigation.navigate('ChatRoom', { chatId, userId });
   };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => startChat(item.id)}>
       <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
       <View style={styles.messageContainer}>
-        <CustomText fontFamily={'pop'} style={styles.name}>{item.username}</CustomText>
+        <Text style={styles.name}>{item.username}</Text>
         <Text style={item.state === 'online' ? styles.online : styles.offline}>
           {item.state === 'online' ? 'Online' : 'Offline'}
         </Text>
       </View>
-      {item.rank ? (
-        <CustomText fontFamily={'pop'} style={styles.rankname}>{item.rank}</CustomText>
-      ) : (
-        <Text style={styles.rankname}></Text>
-      )}
+      <Text style={styles.rankname}>{item.rank || ''}</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <AppHeader title="Find Friends" textColor="black" showCameraIcon={false} onSearch={setSearchText} />
+      <AppHeader title="Find Friends" textColor="black" showCameraIcon={false} 
+      onSearch={setSearchText}  />
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        style={styles.list}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={fetchUsers} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No users found</Text>
+          </View>
+        )}
       />
     </View>
   );
@@ -81,9 +93,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  list: {
-    flex: 1,
   },
   item: {
     flexDirection: 'row',
@@ -113,5 +122,14 @@ const styles = StyleSheet.create({
   },
   offline: {
     color: 'red',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#888',
   },
 });
