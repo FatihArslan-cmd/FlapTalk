@@ -1,17 +1,20 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import SafeAreaWrapper from '../components/SafeAreaWrapper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 
-const { width } = Dimensions.get('window'); // Get screen dimensions
+const { width } = Dimensions.get('window');
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
-const ChatRoomHeader = ({ user }) => {
+const ChatRoomHeader = ({ user, chatId }) => {
   const navigation = useNavigation();
+
+  const startVideoCall = () => {
+    navigation.navigate('VideoCallScreen', { chatId, userId: user.id, isCaller: true });
+  };
 
   return (
     <View style={styles.header}>
@@ -24,7 +27,9 @@ const ChatRoomHeader = ({ user }) => {
           <Image source={{ uri: user.avatar || defaultAvatar }} style={styles.avatar} />
           <Text style={styles.username}>{user.username}</Text>
           <View style={styles.iconContainer}>
-            <Octicons name="device-camera-video" size={28} color="black" style={styles.inputIcon} />
+            <TouchableOpacity onPress={startVideoCall}>
+              <Octicons name="device-camera-video" size={28} color="black" style={styles.inputIcon} />
+            </TouchableOpacity>
             <TouchableOpacity>
               <Icon name="call" size={28} color="black" style={styles.inputIcon} />
             </TouchableOpacity>
@@ -35,6 +40,8 @@ const ChatRoomHeader = ({ user }) => {
     </View>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   header: {

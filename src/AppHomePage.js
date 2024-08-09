@@ -1,54 +1,72 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import AppHeader from './components/AppHeader';
+import React, { useState, useEffect, useCallback } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from "react-native";
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import CustomText from './components/CustomText';
-import SafeAreaWrapper from './components/SafeAreaWrapper';
-const data = [
-  { id: '1', name: 'İlker Samut', message: 'ama ona göre para alırım', time: '19:33', avatar: require('../assets/avatars/Untitled (11).jpg') },
-  { id: '2', name: 'Gurup Gurup Gurup', message: 'Şu mesaja 😢 ifadesini bıraktınız:', time: 'Dün', avatar: require('../assets/avatars/Untitled (10).jpg') },
-  { id: '3', name: 'M.Ali', message: 'Büyük ihtimal 👍', time: '5.08.2024',avatar: require('../assets/avatars/Untitled (9).jpg')  },
-  { id: '4', name: 'Filiz', message: 'https://youtube.com/shorts/Qr8-eYtA', time: '3.08.2024',avatar: require('../assets/avatars/Untitled (8).jpg') },
-  { id: '5', name: 'Abla', message: 'Offf', time: '2.08.2024',avatar: require('../assets/avatars/Untitled (7).jpg')  },
-  { id: '7', name: 'Kafdir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (6).jpg') },
-  { id: '8', name: 'Kadirs Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (5).jpg') },
-  { id: '9', name: 'Kadffir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (4).jpg') },
-  { id: '10', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', avatar: require('../assets/avatars/Untitled (3).jpg')},
-  { id: '11', name: 'Kagdidr Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (2).jpg') },
-  { id: '12', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024',avatar: require('../assets/avatars/Untitled (1).jpg') },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
-  { id: '6', name: 'Kadir Emir', message: 'Şu mesaja 😂 ifadesini bıraktınız:', time: '31.07.2024', },
+import AppHeader from "./components/AppHeader";
+const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
-];
+export default function HomeScreen() {
+  const [chatList, setChatList] = useState([]);
+  const navigation = useNavigation();
 
-export default function AppHomePage() {
-  const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.item}>
-      <Image source={item.avatar} style={styles.avatar} />
+  const fetchChatList = async () => {
+    try {
+      const currentUser = auth().currentUser.uid;
+      const chatListSnapshot = await firestore().collection('friends')
+        .where('userId', '==', currentUser)
+        .get();
+  
+      const chatListData = chatListSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          friendId: data.friendId,
+          avatar: data.avatar, // Fetch the avatar
+          ...data,
+        };
+      });
+  
+      setChatList(chatListData);
+    } catch (error) {
+      console.error('Error fetching chat list:', error);
+    }
+  };
+  
+  useFocusEffect(
+    useCallback(() => {
+      fetchChatList();
+    }, [])
+  );
+
+  const startChat = (userId) => {
+    const chatId = [auth().currentUser.uid, userId].sort().join('_');
+    navigation.navigate('ChatRoom', { chatId, userId });
+  };
+
+  const renderChatItem = ({ item }) => (
+    <TouchableOpacity style={styles.item} onPress={() => startChat(item.friendId)}>
+      <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
       <View style={styles.messageContainer}>
-        <CustomText fontFamily={'pop'} style={styles.name}>{item.name}</CustomText>
-        <CustomText fontFamily={'lato-bold'} style={styles.message}>{item.message}</CustomText>
+        <CustomText fontFamily={'pop'} style={styles.name}>  {item.friendId}   </CustomText>
+        <CustomText fontFamily={'lato-bold'} style={styles.time}>{item.time || 'N/A'} </CustomText>
       </View>
-      <CustomText fontFamily={'lato-bold'} style={styles.time}>{item.time}</CustomText>
     </TouchableOpacity>
   );
+  
 
   return (
     <View style={styles.container}>
-      <AppHeader title="FlapTalk" textColor="#00ae59" showCameraIcon={true} />
+      <AppHeader showCameraIcon={true} title={'FlapTalk'} textColor={'#00ae59'}/>
       <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        style={styles.list}
+        data={chatList}
+        keyExtractor={(item) => item.id}
+        renderItem={renderChatItem}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No chats found</Text>
+          </View>
+        )}
       />
     </View>
   );
@@ -58,9 +76,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  list: {
-    flex: 1,
   },
   item: {
     flexDirection: 'row',
@@ -81,11 +96,17 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
   },
-  message: {
-    color: '#888',
-  },
   time: {
     color: '#888',
     fontSize: 12,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#888',
   },
 });

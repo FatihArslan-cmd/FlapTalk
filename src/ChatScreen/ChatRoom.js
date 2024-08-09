@@ -80,14 +80,14 @@ const ChatRoom = () => {
 
   const renderItem = ({ item }) => (
     <View style={item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage}>
-      <Text style={styles.messageText}>{item.text}</Text>
+      <Text style={styles.messageText}>{item.text}   </Text>
     </View>
   );
 
   return (
     <SafeAreaWrapper style={styles.container}>
       <StatusBar style="auto" />
-      <ChatRoomHeader user={user} />
+      <ChatRoomHeader user={user} chatId={chatId} />
       <FlatList
         ref={flatListRef} // Attach the ref to FlatList
         data={messages}

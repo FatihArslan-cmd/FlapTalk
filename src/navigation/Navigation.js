@@ -12,6 +12,7 @@ import ChatScreen from '../ChatScreen/ChatScreen';
 import UsersList from '../ChatScreen/UsersList';
 import TabNavigator from './TabNavigator';
 import ChatRoom from '../ChatScreen/ChatRoom';
+import VideoCallScreen from '../CallsScreen/VideoCallScreen';
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -52,6 +53,7 @@ const Navigation = () => {
         <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
         <Stack.Screen name="UsersList" component={UsersList} options={{ headerShown: false }} />
         <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }} />
+        <Stack.Screen name="VideoCallScreen" component={VideoCallScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
