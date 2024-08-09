@@ -18,14 +18,17 @@ export default function HomeScreen() {
         .where('userId', '==', currentUser)
         .get();
   
-      const chatListData = chatListSnapshot.docs.map(doc => {
+      const chatListData = await Promise.all(chatListSnapshot.docs.map(async doc => {
         const data = doc.data();
+        const friendSnapshot = await firestore().collection('users').doc(data.friendId).get();
+        const friendData = friendSnapshot.data();
         return {
           friendId: data.friendId,
-          avatar: data.avatar, // Fetch the avatar
-          ...data,
+          avatar: friendData.avatar || defaultAvatar, // Fetch the avatar
+          username: friendData.username, // Fetch the username
+          time: data.time || 'N/A',
         };
-      });
+      }));
   
       setChatList(chatListData);
     } catch (error) {
@@ -48,19 +51,18 @@ export default function HomeScreen() {
     <TouchableOpacity style={styles.item} onPress={() => startChat(item.friendId)}>
       <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
       <View style={styles.messageContainer}>
-        <CustomText fontFamily={'pop'} style={styles.name}>  {item.friendId}   </CustomText>
-        <CustomText fontFamily={'lato-bold'} style={styles.time}>{item.time || 'N/A'} </CustomText>
+        <CustomText fontFamily={'pop'} style={styles.name}>  {item.username}   </CustomText>
+        <CustomText fontFamily={'lato-bold'} style={styles.time}>{item.time} </CustomText>
       </View>
     </TouchableOpacity>
   );
-  
 
   return (
     <View style={styles.container}>
       <AppHeader showCameraIcon={true} title={'FlapTalk'} textColor={'#00ae59'}/>
       <FlatList
         data={chatList}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.friendId}
         renderItem={renderChatItem}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
