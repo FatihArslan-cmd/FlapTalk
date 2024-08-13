@@ -117,31 +117,35 @@ const styles = StyleSheet.create({
   },
   myMessage: {
     alignSelf: 'flex-end',
-    flexDirection:'row',
+    flexDirection: 'row',
     backgroundColor: '#DCF8C6',
     borderRadius: 10,
     padding: 10,
     marginVertical: 5,
     maxWidth: width * 0.75, // 75% of the screen width
+    flexShrink: 1, // Allow the message container to shrink if necessary
   },
   theirMessage: {
     alignSelf: 'flex-start',
-    flexDirection:'row',
+    flexDirection: 'row',
     backgroundColor: '#ECECEC',
     borderRadius: 10,
     padding: 10,
     marginVertical: 5,
     maxWidth: width * 0.75, // 75% of the screen width
+    flexShrink: 1, // Allow the message container to shrink if necessary
   },
   messageText: {
     fontSize: 16,
+    flexShrink: 1, // Allow text to wrap within the container
   },
   messageTime: {
     fontSize: 12,
     color: 'gray',
-    marginTop: 10,
-    marginLeft:5,
-    textAlign: 'right', // Align the time to the right
+    marginTop: 5,
+    marginLeft: 5,
+    textAlign: 'right',
+    alignSelf: 'flex-end', // Ensure timestamp aligns to the end of the message container
   },
   noMessages: {
     textAlign: 'center',

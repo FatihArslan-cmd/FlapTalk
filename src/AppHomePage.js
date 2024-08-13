@@ -5,11 +5,14 @@ import auth from '@react-native-firebase/auth';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import CustomText from './components/CustomText';
 import AppHeader from "./components/AppHeader";
+import moment from 'moment'; // Import moment for formatting the time
+
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function HomeScreen() {
   const [chatList, setChatList] = useState([]);
   const navigation = useNavigation();
+
 
   const fetchChatList = async () => {
     try {
@@ -22,11 +25,37 @@ export default function HomeScreen() {
         const data = doc.data();
         const friendSnapshot = await firestore().collection('users').doc(data.friendId).get();
         const friendData = friendSnapshot.data();
+  
+        // Fetch the latest message and its timestamp
+        const chatId = [auth().currentUser.uid, data.friendId].sort().join('_');
+        const messagesSnapshot = await firestore()
+          .collection('chats')
+          .doc(chatId)
+          .collection('messages')
+          .orderBy('createdAt', 'desc')
+          .limit(1)
+          .get();
+  
+        const latestMessageData = messagesSnapshot.docs.length > 0 
+          ? messagesSnapshot.docs[0].data() 
+          : { text: 'No messages yet', createdAt: null };
+  
+        // Truncate the message to 40 characters
+        let latestMessage = latestMessageData.text;
+        if (latestMessage.length > 40) {
+          latestMessage = latestMessage.substring(0, 40) + '...';
+        }
+  
+        const latestMessageTime = latestMessageData.createdAt 
+          ? moment(latestMessageData.createdAt.toDate()).format('HH:mm') 
+          : '';
+  
         return {
           friendId: data.friendId,
-          avatar: friendData.avatar || defaultAvatar, // Fetch the avatar
-          username: friendData.username, // Fetch the username
-          time: data.time || 'N/A',
+          avatar: friendData.avatar || defaultAvatar,
+          username: friendData.username,
+          latestMessage: latestMessage, // Include the truncated latest message
+          latestMessageTime: latestMessageTime, // Include the latest message time
         };
       }));
   
@@ -35,6 +64,8 @@ export default function HomeScreen() {
       console.error('Error fetching chat list:', error);
     }
   };
+  
+  
   
   useFocusEffect(
     useCallback(() => {
@@ -51,11 +82,16 @@ export default function HomeScreen() {
     <TouchableOpacity style={styles.item} onPress={() => startChat(item.friendId)}>
       <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
       <View style={styles.messageContainer}>
-        <CustomText fontFamily={'pop'} style={styles.name}>  {item.username}   </CustomText>
-        <CustomText fontFamily={'lato-bold'} style={styles.time}>{item.time} </CustomText>
+        <CustomText fontFamily={'pop'} style={styles.name}>{item.username}</CustomText>
+        <View style={styles.latestMessageContainer}>
+          <CustomText fontFamily={'lato-bold'} style={styles.latestMessage}>{item.latestMessage}</CustomText>
+          <CustomText fontFamily={'lato-bold'} style={styles.latestMessageTime}>{item.latestMessageTime}</CustomText>
+        </View>
       </View>
     </TouchableOpacity>
   );
+  
+  
 
   return (
     <View style={styles.container}>
@@ -85,6 +121,21 @@ const styles = StyleSheet.create({
     padding: 18,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  latestMessageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  latestMessage: {
+    color: '#666',
+    fontSize: 14,
+    flex: 1,
+  },
+  latestMessageTime: {
+    color: '#888',
+    fontSize: 12,
+    marginLeft: 10,
   },
   avatar: {
     width: 50,
