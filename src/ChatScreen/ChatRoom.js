@@ -100,22 +100,27 @@ const ChatRoom = () => {
     return (
       <View style={[item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage, { backgroundColor }]}>
         {item.text ? (
-          <Text style={styles.messageText}>{item.text} </Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.messageText}>{item.text}</Text>
+            <Text style={styles.messageTime}>{messageTime}</Text>
+          </View>
         ) : item.url ? (
-          item.type === 'image' ? (
-            <Image source={{ uri: item.url }} style={styles.media} />
-          ) : item.type === 'video' ? (
-            <Video
-              source={{ uri: item.url }}
-              style={styles.media}
-              useNativeControls
-              resizeMode="cover"
-            />
-          ) : item.type === 'audio' ? (
-            <Text style={styles.audioMessage} onPress={() => playAudio(item.url)}>Audio </Text>
-          ) : null
+          <View>
+            {item.type === 'image' ? (
+              <Image source={{ uri: item.url }} style={styles.media} />
+            ) : item.type === 'video' ? (
+              <Video
+                source={{ uri: item.url }}
+                style={styles.media}
+                useNativeControls
+                resizeMode="cover"
+              />
+            ) : item.type === 'audio' ? (
+              <Text style={styles.audioMessage} onPress={() => playAudio(item.url)}>Audio</Text>
+            ) : null}
+            <Text style={styles.mediaTime}>{messageTime}</Text>
+          </View>
         ) : null}
-        <Text style={styles.messageTime}> {messageTime} </Text>
       </View>
     );
   };
@@ -150,18 +155,18 @@ const styles = StyleSheet.create({
   },
   audioMessage: {
     fontSize: 16,
-    color: '#007AFF', // Blue color to indicate it's clickable
+    color: '#007AFF',
     textDecorationLine: 'underline',
   },
   myMessage: {
     alignSelf: 'flex-end',
-    flexDirection: 'row',
+    flexDirection: 'column',
     backgroundColor: '#DCF8C6',
     borderRadius: 10,
     padding: 10,
     marginVertical: 5,
-    maxWidth: width * 0.75, // 75% of the screen width
-    flexShrink: 1, // Allow the message container to shrink if necessary
+    maxWidth: width * 0.75,
+    flexShrink: 1,
   },
   media: {
     width: width * 0.70,
@@ -171,25 +176,32 @@ const styles = StyleSheet.create({
   },
   theirMessage: {
     alignSelf: 'flex-start',
-    flexDirection: 'row',
+    flexDirection: 'column',
     backgroundColor: '#ECECEC',
     borderRadius: 10,
     padding: 10,
     marginVertical: 5,
-    maxWidth: width * 0.75, // 75% of the screen width
-    flexShrink: 1, // Allow the message container to shrink if necessary
+    maxWidth: width * 0.75,
+    flexShrink: 1,
+  },
+  textContainer: {
+    flexDirection: 'row', // For text and time to be in a row
+    alignItems: 'center', // Vertically center the text and time
   },
   messageText: {
     fontSize: 16,
-    flexShrink: 1, // Allow text to wrap within the container
+    flexShrink: 1,
   },
   messageTime: {
     fontSize: 12,
     color: 'gray',
+    marginLeft: 10, // Add space between text and time
+  },
+  mediaTime: {
+    fontSize: 12,
+    color: 'gray',
     marginTop: 5,
-    marginLeft: 5,
     textAlign: 'right',
-    alignSelf: 'flex-end', // Ensure timestamp aligns to the end of the message container
   },
   noMessages: {
     textAlign: 'center',
@@ -197,5 +209,6 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
 });
+
 
 export default ChatRoom;

@@ -1,22 +1,24 @@
 import React, { useState, useRef } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, Platform, Pressable, Text } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, Platform, Pressable, Text, Modal, KeyboardAvoidingView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import EmojiKeyboard from 'rn-emoji-keyboard';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
 import storage from '@react-native-firebase/storage';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import EmojiSelector, { Categories } from 'react-native-emoji-selector';
+import { Plane } from 'react-native-animated-spinkit'; // Import Plane spinner
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const MessageInput = ({ onSendMessage }) => {
   const [message, setMessage] = useState('');
-  const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
   const [recording, setRecording] = useState(null);
   const [audioUri, setAudioUri] = useState(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackInstance, setPlaybackInstance] = useState(null);
+  const [isEmojiPickerVisible, setEmojiPickerVisible] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
   const recordingInterval = useRef(null);
   const playbackRef = useRef(null);
 
@@ -32,15 +34,6 @@ const MessageInput = ({ onSendMessage }) => {
     }
     setMessage('');
     setAudioUri(null);
-  };
-
-  const handleEmoticonPress = () => {
-    setShowEmojiKeyboard(!showEmojiKeyboard);
-  };
-
-  const handleEmojiSelect = (emoji) => {
-    setMessage((prevMessage) => prevMessage + emoji);
-    setShowEmojiKeyboard(false);
   };
 
   const handleMediaSelect = async () => {
@@ -66,16 +59,19 @@ const MessageInput = ({ onSendMessage }) => {
         const fileName = uri.split('/').pop();
         const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
 
+        setLoading(true); // Start loading
         const path = `media/${Date.now()}_${fileName}`;
         const reference = storage().ref(path);
         await reference.putFile(uploadUri);
 
         const downloadURL = await reference.getDownloadURL();
+        setLoading(false); // Stop loading
 
         onSendMessage({ url: downloadURL, type });
       }
     } catch (error) {
       console.error('Error selecting media:', error);
+      setLoading(false); // Stop loading on error
       Alert.alert('Error', 'Failed to select media.');
     }
   };
@@ -123,15 +119,18 @@ const MessageInput = ({ onSendMessage }) => {
       const fileName = audioUri.split('/').pop();
       const uploadUri = Platform.OS === 'ios' ? audioUri.replace('file://', '') : audioUri;
 
+      setLoading(true); // Start loading
       const path = `audio/${Date.now()}_${fileName}`;
       const reference = storage().ref(path);
       await reference.putFile(uploadUri);
 
       const downloadURL = await reference.getDownloadURL();
+      setLoading(false); // Stop loading
 
       onSendMessage({ url: downloadURL, type: 'audio' });
     } catch (error) {
       console.error('Failed to send audio:', error);
+      setLoading(false); // Stop loading on error
       Alert.alert('Error', 'Failed to send audio.');
     }
   };
@@ -157,79 +156,110 @@ const MessageInput = ({ onSendMessage }) => {
     }
   };
 
+  const handleEmojiSelect = (emoji) => {
+    setMessage((prevMessage) => prevMessage + emoji);
+  };
+
+  const toggleEmojiPicker = () => {
+    setEmojiPickerVisible(!isEmojiPickerVisible);
+  };
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={handleEmoticonPress}>
-        <Icon name="insert-emoticon" size={30} color="gray" style={styles.icon} />
-      </TouchableOpacity>
-      {audioUri ? (
-        <View style={styles.playbackContainer}>
-          <TouchableOpacity onPress={handlePlayPause} style={styles.playbackButton}>
-            <Icon name={isPlaying ? 'pause' : 'play-arrow'} size={30} color="#00ae59" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleCancelRecording} style={styles.playbackButton}>
-            <Icon name="cancel" size={30} color="red" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleSendPress} style={styles.playbackButton}>
-            <Icon name="send" size={30} color="#00ae59" />
-          </TouchableOpacity>
-        </View>
-      ) : (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+      {loading && (
         <>
-          <TextInput
-            style={styles.input}
-            placeholder="Mesaj"
-            value={message}
-            onChangeText={handleTextChange}
-          />
-          {message.length === 0 ? (
-            <>
-              <TouchableOpacity onPress={handleMediaSelect}>
-                <Ionicons name="document-outline" size={28} color="gray" style={styles.icon} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleMediaSelect}>
-                <Icon name="photo-camera" size={30} color="gray" style={styles.icon} />
-              </TouchableOpacity>
-              <Pressable
-                onPressIn={handleStartRecording}
-                onPressOut={handleStopRecording}
-                style={({ pressed }) => [
-                  styles.micButton,
-                  { backgroundColor: pressed || recording ? 'red' : 'gray' },
-                ]}
-              >
-                <Icon name="mic" size={30} color="#fff" />
-                {recording && (
-                  <Text style={styles.recordingText}>{recordingDuration}s</Text>
-                )}
-              </Pressable>
-            </>
-          ) : (
-            <TouchableOpacity onPress={handleSendPress} disabled={message.length === 0 && !audioUri}>
-              <Icon name={"send"} size={30} color={"#00ae59"} style={styles.icon} />
-            </TouchableOpacity>
-          )}
-          {showEmojiKeyboard && (
-            <EmojiKeyboard
-              onEmojiSelected={handleEmojiSelect}
-              onBackspace={() => {}}
-            />
-          )}
+          <Plane size={48} color="#00ae59" />
         </>
       )}
-    </View>
+      <View style={styles.inputContainer}>
+        <TouchableOpacity onPress={toggleEmojiPicker}>
+          <Icon name="insert-emoticon" size={30} color="gray" style={styles.icon} />
+        </TouchableOpacity>
+        {audioUri ? (
+          <View style={styles.playbackContainer}>
+            <TouchableOpacity onPress={handlePlayPause} style={styles.playbackButton}>
+              <Icon name={isPlaying ? 'pause' : 'play-arrow'} size={30} color="#00ae59" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleCancelRecording} style={styles.playbackButton}>
+              <Icon name="cancel" size={30} color="red" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSendPress} style={styles.playbackButton}>
+              <Icon name="send" size={30} color="#00ae59" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Message"
+              value={message}
+              onChangeText={handleTextChange}
+            />
+            {message.length === 0 ? (
+              <>
+                <TouchableOpacity onPress={handleMediaSelect}>
+                  <Ionicons name="document-outline" size={28} color="gray" style={styles.icon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleMediaSelect}>
+                  <Icon name="photo-camera" size={30} color="gray" style={styles.icon} />
+                </TouchableOpacity>
+                <Pressable
+                  onPressIn={handleStartRecording}
+                  onPressOut={handleStopRecording}
+                  style={({ pressed }) => [
+                    styles.micButton,
+                    { backgroundColor: pressed || recording ? 'red' : 'gray' },
+                  ]}
+                >
+                  <Icon name="mic" size={30} color="#fff" />
+                  {recording && (
+                    <Text style={styles.recordingText}>{recordingDuration}s</Text>
+                  )}
+                </Pressable>
+              </>
+            ) : (
+              <TouchableOpacity onPress={handleSendPress} disabled={message.length === 0 && !audioUri}>
+                <Icon name="send" size={30} color="#00ae59" style={styles.icon} />
+              </TouchableOpacity>
+            )}
+          </>
+        )}
+      </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isEmojiPickerVisible}
+        onRequestClose={() => setEmojiPickerVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <EmojiSelector
+            onEmojiSelected={handleEmojiSelect}
+            showSearchBar={false}
+            showTabs={true}
+            category={Categories.emotion}
+            columns={8}
+            style={styles.emojiSelector}
+          />
+        </View>
+      </Modal>
+    </KeyboardAvoidingView>
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     padding: width * 0.03,
     backgroundColor: '#fff',
     borderRadius: 25,
     borderWidth: 1,
     borderColor: '#ddd',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   icon: {
     marginHorizontal: width * 0.02,
@@ -258,6 +288,13 @@ const styles = StyleSheet.create({
   },
   playbackButton: {
     marginHorizontal: width * 0.05,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  emojiSelector: {
+    height: height * 0.5,
   },
 });
 
