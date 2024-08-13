@@ -5,9 +5,8 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import ChatRoomHeader from './ChatRoomHeader';
 import { StatusBar } from 'expo-status-bar';
-import SafeAreaWrapper from '../components/SafeAreaWrapper';
+import { Video,Audio } from 'expo-av';
 import MessageInput from './MessageInput';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment'; // Import moment for formatting the time
 
 const { width } = Dimensions.get('window');
@@ -83,25 +82,45 @@ const ChatRoom = () => {
   const renderItem = ({ item }) => {
     const messageTime = moment(item.createdAt).format('HH:mm');
   
+    let backgroundColor = item.userId === auth().currentUser.uid ? '#DCF8C6' : '#ECECEC';
+  
+    if (item.type === 'audio') {
+      backgroundColor = item.userId === auth().currentUser.uid ? '#A3E4D7' : '#D5DBDB';
+    }
+  
+    const playAudio = async (uri) => {
+      try {
+        const { sound } = await Audio.Sound.createAsync({ uri });
+        await sound.playAsync();
+      } catch (error) {
+        console.error('Error playing audio:', error);
+      }
+    };
+  
     return (
-      <View style={item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage}>
+      <View style={[item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage, { backgroundColor }]}>
         {item.text ? (
           <Text style={styles.messageText}>{item.text} </Text>
         ) : item.url ? (
           item.type === 'image' ? (
             <Image source={{ uri: item.url }} style={styles.media} />
-          ) : (
+          ) : item.type === 'video' ? (
             <Video
               source={{ uri: item.url }}
               style={styles.media}
               useNativeControls
+              resizeMode="cover"
             />
-          )
+          ) : item.type === 'audio' ? (
+            <Text style={styles.audioMessage} onPress={() => playAudio(item.url)}>Audio </Text>
+          ) : null
         ) : null}
         <Text style={styles.messageTime}> {messageTime} </Text>
       </View>
     );
   };
+  
+  
   
 
   return (
@@ -128,6 +147,11 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     padding: 10,
+  },
+  audioMessage: {
+    fontSize: 16,
+    color: '#007AFF', // Blue color to indicate it's clickable
+    textDecorationLine: 'underline',
   },
   myMessage: {
     alignSelf: 'flex-end',

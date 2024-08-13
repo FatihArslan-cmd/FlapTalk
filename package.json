@@ -57,7 +57,8 @@
     "react-native-webrtc": "^124.0.3",
     "react-native-webview": "^13.10.5",
     "rn-emoji-keyboard": "^1.7.0",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "expo-av": "~14.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

@@ -3,8 +3,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import CustomText from '../components/CustomText';
-import { StatusBar, Platform } from 'react-native';
-
+import { StatusBar } from 'expo-status-bar';
 export const NetworkContext = createContext();
 
 // Create NetworkProvider component
@@ -43,12 +42,14 @@ export const NetworkProvider = ({ children }) => {
 
   return (
     <NetworkContext.Provider value={{ isOnline }}>
+    
       {children}
       {showNotification && (
         <Animatable.View animation="fadeInDown" style={[styles.notification, { backgroundColor: notificationColor.interpolate({
           inputRange: [0, 1],
           outputRange: ['red', 'green'],
         }) }]}>
+            <StatusBar style="auto" />
           <CustomText fontFamily={'pop'} style={styles.notificationText}>{notificationText}</CustomText>
         </Animatable.View>
       )}
