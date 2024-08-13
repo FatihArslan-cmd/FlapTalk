@@ -237,7 +237,7 @@ const MessageInput = ({ onSendMessage }) => {
                     { backgroundColor: pressed || recording ? 'red' : 'gray' },
                   ]}
                 >
-                  <Icon name="mic" size={30} color="#fff" />
+                  <Icon name="mic" size={24} color="#fff" />
                 
                 </Pressable>
               </>

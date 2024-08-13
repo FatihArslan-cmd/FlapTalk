@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, StyleSheet, Text, Dimensions,Image } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import ChatRoomHeader from './ChatRoomHeader';
 import { StatusBar } from 'expo-status-bar';
-import { Video,Audio } from 'expo-av';
+import { Video, Audio } from 'expo-av';
 import MessageInput from './MessageInput';
-import moment from 'moment'; // Import moment for formatting the time
+import moment from 'moment';
+import FullScreenImageModal from './FullScreenImageModal'; // Import the FullScreenImageModal component
 
 const { width } = Dimensions.get('window');
 
@@ -16,7 +17,8 @@ const ChatRoom = () => {
   const { chatId, userId } = route.params;
   const [messages, setMessages] = useState([]);
   const [user, setUser] = useState(null);
-  const flatListRef = useRef(null); // Create a ref for FlatList
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+  const flatListRef = useRef(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -43,10 +45,10 @@ const ChatRoom = () => {
             const messages = querySnapshot.docs.map(doc => ({
               ...doc.data(),
               id: doc.id,
-              createdAt: doc.data().createdAt?.toDate(), // Convert Firestore timestamp to JS Date
+              createdAt: doc.data().createdAt?.toDate(),
             }));
             setMessages(messages);
-            flatListRef.current?.scrollToEnd({ animated: true }); // Scroll to the end on new messages
+            flatListRef.current?.scrollToEnd({ animated: true });
           } else {
             console.warn('No messages found');
           }
@@ -63,7 +65,7 @@ const ChatRoom = () => {
 
   const sendMessage = async (messageData) => {
     if (!messageData.text && !messageData.url) return;
-  
+
     try {
       await firestore()
         .collection('chats')
@@ -78,12 +80,11 @@ const ChatRoom = () => {
       console.error('Error sending message:', error);
     }
   };
-  
+
   const renderItem = ({ item }) => {
     const messageTime = moment(item.createdAt).format('HH:mm');
-  
     let backgroundColor = item.userId === auth().currentUser.uid ? '#DCF8C6' : '#ECECEC';
-  
+
     const openDocument = async (url) => {
       try {
         await WebBrowser.openBrowserAsync(url);
@@ -91,7 +92,7 @@ const ChatRoom = () => {
         console.error('Error opening document:', error);
       }
     };
-  
+
     return (
       <View style={[item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage, { backgroundColor }]}>
         {item.text ? (
@@ -102,7 +103,9 @@ const ChatRoom = () => {
         ) : item.url ? (
           <View>
             {item.type === 'image' ? (
-              <Image source={{ uri: item.url }} style={styles.media} />
+              <TouchableOpacity onPress={() => setSelectedImageUrl(item.url)}>
+                <Image source={{ uri: item.url }} style={styles.media} />
+              </TouchableOpacity>
             ) : item.type === 'video' ? (
               <Video
                 source={{ uri: item.url }}
@@ -123,24 +126,27 @@ const ChatRoom = () => {
       </View>
     );
   };
-  
-  
-  
-  
 
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <ChatRoomHeader user={user} chatId={chatId} />
       <FlatList
-        ref={flatListRef} // Attach the ref to FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.messagesContainer}
-        ListEmptyComponent={<Text style={styles.noMessages}>No messages yet</Text>} // Handle empty state
+        ListEmptyComponent={<Text style={styles.noMessages}>No messages yet</Text>}
       />
       <MessageInput onSendMessage={sendMessage} />
+      {selectedImageUrl && (
+        <FullScreenImageModal
+          visible={!!selectedImageUrl}
+          imageUrl={selectedImageUrl}
+          onClose={() => setSelectedImageUrl(null)}
+        />
+      )}
     </View>
   );
 };
@@ -179,7 +185,6 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     textDecorationLine: 'underline',
   },
-  
   theirMessage: {
     alignSelf: 'flex-start',
     flexDirection: 'column',
@@ -191,8 +196,8 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   textContainer: {
-    flexDirection: 'row', // For text and time to be in a row
-    alignItems: 'center', // Vertically center the text and time
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   messageText: {
     fontSize: 16,
@@ -201,7 +206,7 @@ const styles = StyleSheet.create({
   messageTime: {
     fontSize: 12,
     color: 'gray',
-    marginLeft: 10, // Add space between text and time
+    marginLeft: 10,
   },
   mediaTime: {
     fontSize: 12,
@@ -215,6 +220,5 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
 });
-
 
 export default ChatRoom;
