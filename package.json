@@ -26,6 +26,7 @@
     "expo": "~51.0.24",
     "expo-barcode-generator": "^3.0.2",
     "expo-dev-client": "~4.0.21",
+    "expo-emoji-keyboard": "^0.1.18",
     "expo-font": "^12.0.9",
     "expo-image-picker": "^15.0.7",
     "expo-splash-screen": "^0.27.5",
@@ -55,6 +56,7 @@
     "react-native-web": "~0.19.10",
     "react-native-webrtc": "^124.0.3",
     "react-native-webview": "^13.10.5",
+    "rn-emoji-keyboard": "^1.7.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
