@@ -38,14 +38,23 @@ export default function HomeScreen() {
   
         const latestMessageData = messagesSnapshot.docs.length > 0 
           ? messagesSnapshot.docs[0].data() 
-          : { text: 'No messages yet', createdAt: null };
+          : { text: 'No messages yet', createdAt: null, type: 'text' };
   
-        // Truncate the message to 40 characters
-        let latestMessage = latestMessageData.text;
-        if (latestMessage.length > 40) {
-          latestMessage = latestMessage.substring(0, 40) + '...';
+        // Handle different message types
+        let latestMessage = '';
+        
+        if (latestMessageData.type === 'image') {
+          latestMessage = 'Image';
+        } else if (latestMessageData.type === 'video') {
+          latestMessage = 'Video';
+        } else if (latestMessageData.type === 'audio') {
+          latestMessage = 'Audio';
         }
-  
+        else  {
+          latestMessage = latestMessageData.text.length > 40 
+            ? latestMessageData.text.substring(0, 40) + '...' 
+            : latestMessageData.text;
+        }
         const latestMessageTime = latestMessageData.createdAt 
           ? moment(latestMessageData.createdAt.toDate()).format('HH:mm') 
           : '';
@@ -54,7 +63,7 @@ export default function HomeScreen() {
           friendId: data.friendId,
           avatar: friendData.avatar || defaultAvatar,
           username: friendData.username,
-          latestMessage: latestMessage, // Include the truncated latest message
+          latestMessage: latestMessage, // Include the message type or truncated text
           latestMessageTime: latestMessageTime, // Include the latest message time
         };
       }));
@@ -64,7 +73,6 @@ export default function HomeScreen() {
       console.error('Error fetching chat list:', error);
     }
   };
-  
   
   
   useFocusEffect(
@@ -82,14 +90,15 @@ export default function HomeScreen() {
     <TouchableOpacity style={styles.item} onPress={() => startChat(item.friendId)}>
       <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
       <View style={styles.messageContainer}>
-        <CustomText fontFamily={'pop'} style={styles.name}>{item.username}</CustomText>
+        <CustomText fontFamily={'pop'} style={styles.name}>{item.username} </CustomText>
         <View style={styles.latestMessageContainer}>
-          <CustomText fontFamily={'lato-bold'} style={styles.latestMessage}>{item.latestMessage}</CustomText>
-          <CustomText fontFamily={'lato-bold'} style={styles.latestMessageTime}>{item.latestMessageTime}</CustomText>
+          <CustomText fontFamily={'lato-bold'} style={styles.latestMessage}> {item.latestMessage} </CustomText>
+          <CustomText fontFamily={'lato-bold'} style={styles.latestMessageTime}>{item.latestMessageTime} </CustomText>
         </View>
       </View>
     </TouchableOpacity>
   );
+  
   
   
 
