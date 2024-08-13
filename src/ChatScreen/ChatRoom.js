@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, StyleSheet, Text, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Dimensions, Image, TouchableOpacity, Linking } from 'react-native'; // Linking eklendi
 import { useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -8,8 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Video, Audio } from 'expo-av';
 import MessageInput from './MessageInput';
 import moment from 'moment';
-import FullScreenImageModal from './FullScreenImageModal'; // Import the FullScreenImageModal component
-
+import FullScreenImageModal from './FullScreenImageModal';
 const { width } = Dimensions.get('window');
 
 const ChatRoom = () => {
@@ -80,24 +79,31 @@ const ChatRoom = () => {
       console.error('Error sending message:', error);
     }
   };
-
+  const renderMessageText = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+  
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <TouchableOpacity key={index} onPress={() => Linking.openURL(part)}>
+            <Text style={styles.link}>{part}</Text>
+          </TouchableOpacity>
+        );
+      } else {
+        return <Text key={index} style={styles.messageText}>{part}</Text>;
+      }
+    });
+  };
   const renderItem = ({ item }) => {
     const messageTime = moment(item.createdAt).format('HH:mm');
     let backgroundColor = item.userId === auth().currentUser.uid ? '#DCF8C6' : '#ECECEC';
-
-    const openDocument = async (url) => {
-      try {
-        await WebBrowser.openBrowserAsync(url);
-      } catch (error) {
-        console.error('Error opening document:', error);
-      }
-    };
 
     return (
       <View style={[item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage, { backgroundColor }]}>
         {item.text ? (
           <View style={styles.textContainer}>
-            <Text style={styles.messageText}>{item.text}</Text>
+            <Text style={styles.messageText}>{renderMessageText(item.text)}</Text>
             <Text style={styles.messageTime}>{messageTime}</Text>
           </View>
         ) : item.url ? (
@@ -151,6 +157,7 @@ const ChatRoom = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -164,6 +171,10 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     textDecorationLine: 'underline',
   },
+  link: {
+    color: '#007AFF',
+    textDecorationLine: 'underline',
+  },
   myMessage: {
     alignSelf: 'flex-end',
     flexDirection: 'column',
@@ -173,17 +184,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     maxWidth: width * 0.75,
     flexShrink: 1,
-  },
-  media: {
-    width: width * 0.70,
-    height: 200,
-    borderRadius: 10,
-    marginVertical: 5,
-  },
-  documentMessage: {
-    fontSize: 16,
-    color: '#007AFF',
-    textDecorationLine: 'underline',
+    overflow: 'hidden', // This ensures that the content doesn't overflow the message bubble
   },
   theirMessage: {
     alignSelf: 'flex-start',
@@ -194,19 +195,27 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     maxWidth: width * 0.75,
     flexShrink: 1,
+    overflow: 'hidden', // This ensures that the content doesn't overflow the message bubble
   },
   textContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap', // This allows the text to wrap to the next line
   },
   messageText: {
     fontSize: 16,
     flexShrink: 1,
   },
+  link: {
+    color: '#007AFF',
+    textDecorationLine: 'underline',
+    flexShrink: 1, // This ensures that the link shrinks if it's too long
+  },
   messageTime: {
     fontSize: 12,
     color: 'gray',
     marginLeft: 10,
+    alignSelf: 'flex-end', // Align the time to the right side
   },
   mediaTime: {
     fontSize: 12,
