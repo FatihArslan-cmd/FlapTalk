@@ -84,16 +84,11 @@ const ChatRoom = () => {
   
     let backgroundColor = item.userId === auth().currentUser.uid ? '#DCF8C6' : '#ECECEC';
   
-    if (item.type === 'audio') {
-      backgroundColor = item.userId === auth().currentUser.uid ? '#A3E4D7' : '#D5DBDB';
-    }
-  
-    const playAudio = async (uri) => {
+    const openDocument = async (url) => {
       try {
-        const { sound } = await Audio.Sound.createAsync({ uri });
-        await sound.playAsync();
+        await WebBrowser.openBrowserAsync(url);
       } catch (error) {
-        console.error('Error playing audio:', error);
+        console.error('Error opening document:', error);
       }
     };
   
@@ -117,6 +112,10 @@ const ChatRoom = () => {
               />
             ) : item.type === 'audio' ? (
               <Text style={styles.audioMessage} onPress={() => playAudio(item.url)}>Audio</Text>
+            ) : item.type === 'document' ? (
+              <Pressable onPress={() => openDocument(item.url)}>
+                <Text style={styles.documentMessage}>{item.name || 'Document'}</Text>
+              </Pressable>
             ) : null}
             <Text style={styles.mediaTime}>{messageTime}</Text>
           </View>
@@ -124,6 +123,7 @@ const ChatRoom = () => {
       </View>
     );
   };
+  
   
   
   
@@ -174,6 +174,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 5,
   },
+  documentMessage: {
+    fontSize: 16,
+    color: '#007AFF',
+    textDecorationLine: 'underline',
+  },
+  
   theirMessage: {
     alignSelf: 'flex-start',
     flexDirection: 'column',

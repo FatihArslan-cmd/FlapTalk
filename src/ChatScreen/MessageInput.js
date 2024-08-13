@@ -7,6 +7,7 @@ import { Audio } from 'expo-av';
 import storage from '@react-native-firebase/storage';
 import EmojiSelector, { Categories } from 'react-native-emoji-selector';
 import { Plane } from 'react-native-animated-spinkit'; // Import Plane spinner
+import * as DocumentPicker from 'expo-document-picker';
 
 const { width, height } = Dimensions.get('window');
 
@@ -75,7 +76,32 @@ const MessageInput = ({ onSendMessage }) => {
       Alert.alert('Error', 'Failed to select media.');
     }
   };
-
+  const handleDocumentSelect = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: '*/*', // You can specify document types, e.g., 'application/pdf' for PDF files
+        copyToCacheDirectory: true,
+      });
+  
+      if (result.type === 'success') {
+        const { uri, name } = result;
+  
+        setLoading(true); // Start loading
+        const path = `documents/${Date.now()}_${name}`;
+        const reference = storage().ref(path);
+        await reference.putFile(uri);
+  
+        const downloadURL = await reference.getDownloadURL();
+        setLoading(false); // Stop loading
+  
+        onSendMessage({ url: downloadURL, type: 'document', name });
+      }
+    } catch (error) {
+      console.error('Error selecting document:', error);
+      setLoading(false); // Stop loading on error
+      Alert.alert('Error', 'Failed to select document.');
+    }
+  };
   const handleStartRecording = async () => {
     try {
       const permission = await Audio.requestPermissionsAsync();
@@ -197,9 +223,9 @@ const MessageInput = ({ onSendMessage }) => {
             />
             {message.length === 0 ? (
               <>
-                <TouchableOpacity onPress={handleMediaSelect}>
-                  <Ionicons name="document-outline" size={28} color="gray" style={styles.icon} />
-                </TouchableOpacity>
+                <TouchableOpacity onPress={handleDocumentSelect}>
+  <Ionicons name="document-attach" size={28} color="gray" style={styles.icon} />
+</TouchableOpacity>
                 <TouchableOpacity onPress={handleMediaSelect}>
                   <Icon name="photo-camera" size={30} color="gray" style={styles.icon} />
                 </TouchableOpacity>
@@ -212,9 +238,7 @@ const MessageInput = ({ onSendMessage }) => {
                   ]}
                 >
                   <Icon name="mic" size={30} color="#fff" />
-                  {recording && (
-                    <Text style={styles.recordingText}>{recordingDuration}s</Text>
-                  )}
+                
                 </Pressable>
               </>
             ) : (
