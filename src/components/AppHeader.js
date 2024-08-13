@@ -5,11 +5,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useFocusEffect } from '@react-navigation/native';
 import CustomText from './CustomText';
 import ClearButton from './renderClearButton';
-import SafeAreaWrapper from './SafeAreaWrapper';
+import ModalContainer from '../document/ModalContainer';
+
 const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState('');
-  
+  const [modalVisible, setModalVisible] = useState(false);
+
   // Reset search mode when navigating away
   useFocusEffect(
     useCallback(() => {
@@ -22,17 +24,25 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
 
   const handleSearchTextChange = (text) => {
     setSearchText(text);
-    onSearch(text); // Call the onSearch callback
+    onSearch(text);
   };
 
   const handleClearSearch = () => {
     setSearchText('');
-    onSearch(''); // Clear the search results
+    onSearch('');
   };
 
   const handleBackPress = () => {
     setIsSearching(false);
-    handleClearSearch(); // Clear the search input when back arrow is pressed
+    handleClearSearch();
+  };
+
+  const handleMenuPress = (option) => {
+    if (option === 'Introduction') {
+      setModalVisible(true);
+    } else if (option === 'About') {
+      // Handle "About" option
+    }
   };
 
   return (
@@ -63,10 +73,14 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
             <TouchableOpacity onPress={() => setIsSearching(true)}>
               <Icon name="search" size={28} color="black" style={styles.inputIcon} />
             </TouchableOpacity>
-            <MaterialCommunityIcons name="dots-vertical" size={28} color="black" style={styles.inputIcon} />
+            <TouchableOpacity onPress={() => handleMenuPress('Introduction')}>
+              <MaterialCommunityIcons name="dots-vertical" size={28} color="black" style={styles.inputIcon} />
+            </TouchableOpacity>
           </View>
         </>
       )}
+
+      <ModalContainer visible={modalVisible} onClose={() => setModalVisible(false)} />
     </View>
   );
 };
@@ -79,7 +93,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
-   
   },
   headerText: {
     fontSize: 26,
@@ -107,9 +120,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     fontSize: 18,
-    padding: 5,
-  },
-  clearButton: {
     padding: 5,
   },
 });

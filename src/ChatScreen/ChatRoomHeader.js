@@ -1,16 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
+import firestore from '@react-native-firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 const ChatRoomHeader = ({ user, chatId }) => {
+  const [userStatus, setUserStatus] = useState(null);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    if (user?.id) {
+      const unsubscribe = firestore()
+        .collection('users')
+        .doc(user.id)
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            setUserStatus(doc.data().state);
+          }
+        });
+    
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   const startVideoCall = () => {
     navigation.navigate('VideoCallScreen', { chatId, userId: user.id, isCaller: true });
@@ -25,7 +42,10 @@ const ChatRoomHeader = ({ user, chatId }) => {
       {user && (
         <>
           <Image source={{ uri: user.avatar || defaultAvatar }} style={styles.avatar} />
-          <Text style={styles.username}>{user.username}</Text>
+          <Text style={styles.username}>
+            {user.username} 
+            {userStatus === 'online' && <Text style={styles.onlineStatus}> (Online) </Text>}
+          </Text>
           <View style={styles.iconContainer}>
             <TouchableOpacity onPress={startVideoCall}>
               <Octicons name="device-camera-video" size={28} color="black" style={styles.inputIcon} />
@@ -41,8 +61,6 @@ const ChatRoomHeader = ({ user, chatId }) => {
   );
 };
 
-
-
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
@@ -53,7 +71,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   inputIcon: {
-    margin: width * 0.02, // Adjust margin based on screen width
+    margin: width * 0.02,
   },
   iconContainer: {
     flexDirection: 'row',
@@ -64,13 +82,17 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   avatar: {
-    width: width * 0.1, // Adjust avatar size based on screen width
-    height: width * 0.1, // Adjust avatar size based on screen width
-    borderRadius: width * 0.05, // Half of avatar width/height for a circle
+    width: width * 0.1,
+    height: width * 0.1,
+    borderRadius: width * 0.05,
     marginRight: 10,
   },
   username: {
     fontSize: 18,
+  },
+  onlineStatus: {
+    color: 'green',
+    fontSize: 16,
   },
 });
 

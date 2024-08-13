@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, StyleSheet, Text,Dimensions } from 'react-native'; 
+import { View, FlatList, StyleSheet, Text, Dimensions } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -7,9 +7,10 @@ import ChatRoomHeader from './ChatRoomHeader';
 import { StatusBar } from 'expo-status-bar';
 import SafeAreaWrapper from '../components/SafeAreaWrapper';
 import MessageInput from './MessageInput';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import moment from 'moment'; // Import moment for formatting the time
 
 const { width } = Dimensions.get('window');
-
 
 const ChatRoom = () => {
   const route = useRoute();
@@ -43,6 +44,7 @@ const ChatRoom = () => {
             const messages = querySnapshot.docs.map(doc => ({
               ...doc.data(),
               id: doc.id,
+              createdAt: doc.data().createdAt?.toDate(), // Convert Firestore timestamp to JS Date
             }));
             setMessages(messages);
             flatListRef.current?.scrollToEnd({ animated: true }); // Scroll to the end on new messages
@@ -78,14 +80,18 @@ const ChatRoom = () => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage}>
-      <Text style={styles.messageText}>{item.text}   </Text>
-    </View>
-  );
+  const renderItem = ({ item }) => {
+    const messageTime = moment(item.createdAt).format('HH:mm'); // Format the time as HH:mm
+    return (
+      <View style={item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage}>
+        <Text style={styles.messageText}>{item.text} </Text>
+        <Text style={styles.messageTime}>{messageTime} </Text>
+      </View>
+    );
+  };
 
   return (
-    <SafeAreaWrapper style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       <ChatRoomHeader user={user} chatId={chatId} />
       <FlatList
@@ -97,42 +103,51 @@ const ChatRoom = () => {
         ListEmptyComponent={<Text style={styles.noMessages}>No messages yet</Text>} // Handle empty state
       />
       <MessageInput onSendMessage={sendMessage} />
-    </SafeAreaWrapper>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-    },
-    messagesContainer: {
-      padding: 10,
-    },
-    myMessage: {
-      alignSelf: 'flex-end',
-      backgroundColor: '#DCF8C6',
-      borderRadius: 10,
-      padding: 10,
-      marginVertical: 5,
-      maxWidth: width * 0.75, // 75% of the screen width
-    },
-    theirMessage: {
-      alignSelf: 'flex-start',
-      backgroundColor: '#ECECEC',
-      borderRadius: 10,
-      padding: 10,
-      marginVertical: 5,
-      maxWidth: width * 0.75, // 75% of the screen width
-    },
-    messageText: {
-      fontSize: 16,
-    },
-    noMessages: {
-      textAlign: 'center',
-      fontSize: 16,
-      color: 'gray',
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f8f8',
+  },
+  messagesContainer: {
+    padding: 10,
+  },
+  myMessage: {
+    alignSelf: 'flex-end',
+    flexDirection:'row',
+    backgroundColor: '#DCF8C6',
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 5,
+    maxWidth: width * 0.75, // 75% of the screen width
+  },
+  theirMessage: {
+    alignSelf: 'flex-start',
+    flexDirection:'row',
+    backgroundColor: '#ECECEC',
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 5,
+    maxWidth: width * 0.75, // 75% of the screen width
+  },
+  messageText: {
+    fontSize: 16,
+  },
+  messageTime: {
+    fontSize: 12,
+    color: 'gray',
+    marginTop: 10,
+    marginLeft:5,
+    textAlign: 'right', // Align the time to the right
+  },
+  noMessages: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: 'gray',
+  },
+});
 
 export default ChatRoom;

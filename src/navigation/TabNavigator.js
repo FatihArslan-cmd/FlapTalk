@@ -8,7 +8,8 @@ import AppHomePage from '../AppHomePage';
 import CommunityScreen from '../CommunityScreen.js/CommunityScreen';
 import CallsScreen from '../CallsScreen/CallsScreen';
 import SettingScreen from '../settings/SettingScreen';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
+import SafeAreaWrapper from '../components/SafeAreaWrapper';
 const Tab = createBottomTabNavigator();
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
@@ -20,6 +21,7 @@ const PlaceholderScreen = () => {
 
 const TabNavigator = () => {
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <Tab.Navigator
       tabBar={(props) => <AnimatedTabBar {...props} />}
     >
@@ -38,6 +40,7 @@ const TabNavigator = () => {
         }}
         component={AppHomePage}
       />
+      
       <Tab.Screen
         name="Community"
         options={{
@@ -84,6 +87,7 @@ const TabNavigator = () => {
         component={SettingScreen}
       />
     </Tab.Navigator>
+    </SafeAreaView>
   );
 };
 

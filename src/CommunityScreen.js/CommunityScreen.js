@@ -7,7 +7,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AppHeader from "../components/AppHeader";
 import AlertComponent from "../components/AlertComponent";
-
+import { calculateMembershipDuration } from "../utils/calculateMembershipDuration ";
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function UsersList() {
@@ -90,7 +90,6 @@ export default function UsersList() {
   };
 
   const blockUser = async (userId) => {
-    // Implement your blocking functionality here
     setAlertMessage('This user has been blocked.');
     setAlertVisible(true);
   };
@@ -103,7 +102,7 @@ export default function UsersList() {
       </TouchableOpacity>
       <TouchableOpacity style={[styles.actionButton, styles.blockAction]} onPress={() => blockUser(item.id)}>
         <Icon name="ban-outline" size={24} color="#fff" />
-        <Text style={styles.actionText}>Block </Text>
+        <Text style={styles.actionText}>Block User </Text>
       </TouchableOpacity>
     </View>
   );
@@ -113,7 +112,10 @@ export default function UsersList() {
       <View style={styles.item}>
         <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
         <View style={styles.messageContainer}>
-          <Text style={styles.name}>{item.username}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.name}>{item.username}</Text>
+            <Text style={styles.date}>{`Member since ${calculateMembershipDuration(item.date)} `}</Text>
+          </View>
           <Text style={item.state === 'online' ? styles.online : styles.offline}>
             {item.state === 'online' ? 'Online' : 'Offline'}
           </Text>
@@ -122,6 +124,8 @@ export default function UsersList() {
       </View>
     </Swipeable>
   );
+  
+
 
   return (
     <View style={styles.container}>
@@ -151,67 +155,82 @@ export default function UsersList() {
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 18,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 15,
-  },
-  messageContainer: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  name: {
-    fontSize: 16,
-  },
-  rankname: {
-    fontSize: 16,
-    color: 'blue',
-  },
-  online: {
-    color: 'green',
-  },
-  offline: {
-    color: 'red',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 18,
-    color: '#888',
-  },
-  actionsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  actionButton: {
-    padding: 18,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addAction: {
-    backgroundColor: '#4CAF50',
-  },
-  blockAction: {
-    backgroundColor: '#F44336',
-  },
-  actionText: {
-    color: '#fff',
-    fontSize: 12,
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
+    item: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 18,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+    },
+    avatar: {
+      width: 50,
+      height: 50,
+      borderRadius: 15,
+    },
+    messageContainer: {
+      flex: 1,
+      marginLeft: 10,
+      justifyContent: 'center',
+    },
+    infoContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    name: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      flex: 1,
+      marginRight: 10,
+    },
+    date: {
+      fontSize: 14,
+      color: '#888',
+    },
+    rankname: {
+      fontSize: 16,
+      color: 'blue',
+    },
+    online: {
+      color: 'green',
+      marginTop: 5,
+    },
+    offline: {
+      color: 'red',
+      marginTop: 5,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    emptyText: {
+      fontSize: 18,
+      color: '#888',
+    },
+    actionsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+    },
+    actionButton: {
+      padding: 18,
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    addAction: {
+      backgroundColor: '#4CAF50',
+    },
+    blockAction: {
+      backgroundColor: '#F44336',
+    },
+    actionText: {
+      color: '#fff',
+      fontSize: 12,
+    },
+  });
+  
