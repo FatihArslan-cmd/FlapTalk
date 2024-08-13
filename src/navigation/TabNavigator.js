@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useReducer } from 'react';
 import { Pressable, StyleSheet, View, Text } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Svg, { Path } from 'react-native-svg';
 import Animated, { useAnimatedStyle, withTiming, useDerivedValue } from 'react-native-reanimated';
 import Lottie from 'lottie-react-native';
@@ -8,87 +8,87 @@ import AppHomePage from '../AppHomePage';
 import CommunityScreen from '../CommunityScreen.js/CommunityScreen';
 import CallsScreen from '../CallsScreen/CallsScreen';
 import SettingScreen from '../settings/SettingScreen';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-const Tab = createBottomTabNavigator();
-const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
-const PlaceholderScreen = () => {
-  return (
-    <View style={{ flex: 1, backgroundColor: '#604AE6' }} />
-  );
-};
+const AnimatedSvg = Animated.createAnimatedComponent(Svg);
+const Tab = createMaterialTopTabNavigator();
 
 const TabNavigator = () => {
   return (
-    
-    <View style={{ flex: 1,paddingTop:10 }}>
-    <StatusBar style="auto" />
-    <Tab.Navigator
-      tabBar={(props) => <AnimatedTabBar {...props} />}
-    >
-      <Tab.Screen
-        name="Home"
-        options={{
-          tabBarIcon: ({ ref }) => (
-            <Lottie
-              ref={ref}
-              loop={false}
-              source={require('../../assets/lottie/home.icon.json')}
-              style={styles.icon}
-            />
-          ),
-          headerShown: false
+    <View style={{ flex: 1, paddingTop: 10 }}>
+      <StatusBar style="auto" />
+      <Tab.Navigator
+        tabBar={(props) => <AnimatedTabBar {...props} />}
+        swipeEnabled={true} // Enable swipe gestures
+        tabBarPosition="bottom" // Position the tab bar at the bottom
+        screenOptions={{
+          tabBarShowIcon: true,
+          tabBarShowLabel: false,
+          tabBarStyle: {
+            backgroundColor: '#ffffff',
+          },
+          tabBarIndicatorStyle: {
+            backgroundColor: '#00ae59',
+          },
         }}
-        component={AppHomePage}
-      />
-      
-      <Tab.Screen
-        name="Community"
-        options={{
-          tabBarIcon: ({ ref }) => (
-            <Lottie
-              ref={ref}
-              loop={false}
-              source={require('../../assets/lottie/chat.icon.json')}
-              style={styles.icon}
-            />
-          ),
-          headerShown: false
-        }}
-        component={CommunityScreen}
-      />
-      <Tab.Screen
-        name="Calls"
-        options={{
-          tabBarIcon: ({ ref }) => (
-            <Lottie
-              ref={ref}
-              loop={false}
-              source={require('../../assets/lottie/Call.json')}
-              style={styles.icon}
-            />
-          ),
-          headerShown: false
-        }}
-        component={CallsScreen}
-      />
-      <Tab.Screen
-        name="Settings"
-        options={{
-          tabBarIcon: ({ ref }) => (
-            <Lottie
-              ref={ref}
-              loop={false}
-              source={require('../../assets/lottie/settings.icon.json')}
-              style={styles.icon}
-            />
-          ),
-          headerShown: false
-        }}
-        component={SettingScreen}
-      />
-    </Tab.Navigator>
+      >
+        <Tab.Screen
+          name="Home"
+          component={AppHomePage}
+          options={{
+            tabBarIcon: ({ ref }) => (
+              <Lottie
+                ref={ref}
+                loop={false}
+                source={require('../../assets/lottie/home.icon.json')}
+                style={styles.icon}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Community"
+          component={CommunityScreen}
+          options={{
+            tabBarIcon: ({ ref }) => (
+              <Lottie
+                ref={ref}
+                loop={false}
+                source={require('../../assets/lottie/chat.icon.json')}
+                style={styles.icon}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Calls"
+          component={CallsScreen}
+          options={{
+            tabBarIcon: ({ ref }) => (
+              <Lottie
+                ref={ref}
+                loop={false}
+                source={require('../../assets/lottie/Call.json')}
+                style={styles.icon}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Settings"
+          component={SettingScreen}
+          options={{
+            tabBarIcon: ({ ref }) => (
+              <Lottie
+                ref={ref}
+                loop={false}
+                source={require('../../assets/lottie/settings.icon.json')}
+                style={styles.icon}
+              />
+            ),
+          }}
+        />
+      </Tab.Navigator>
     </View>
   );
 };
@@ -188,7 +188,7 @@ const TabBarComponent = ({ active, options, onLayout, onPress }) => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: 'white',
+    
   },
   activeBackground: {
     position: 'absolute',
