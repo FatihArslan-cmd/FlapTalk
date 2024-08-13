@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, StyleSheet, Text, Dimensions } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Dimensions,Image } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -62,16 +62,16 @@ const ChatRoom = () => {
     return () => fetchMessages();
   }, [chatId, userId]);
 
-  const sendMessage = async (message) => {
-    if (message.trim().length === 0) return;
-
+  const sendMessage = async (messageData) => {
+    if (!messageData.text && !messageData.url) return;
+  
     try {
       await firestore()
         .collection('chats')
         .doc(chatId)
         .collection('messages')
         .add({
-          text: message,
+          ...messageData,
           createdAt: firestore.FieldValue.serverTimestamp(),
           userId: auth().currentUser.uid,
         });
@@ -79,19 +79,33 @@ const ChatRoom = () => {
       console.error('Error sending message:', error);
     }
   };
-
+  
   const renderItem = ({ item }) => {
-    const messageTime = moment(item.createdAt).format('HH:mm'); // Format the time as HH:mm
+    const messageTime = moment(item.createdAt).format('HH:mm');
+  
     return (
       <View style={item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage}>
-        <Text style={styles.messageText}>{item.text} </Text>
-        <Text style={styles.messageTime}>{messageTime} </Text>
+        {item.text ? (
+          <Text style={styles.messageText}>{item.text} </Text>
+        ) : item.url ? (
+          item.type === 'image' ? (
+            <Image source={{ uri: item.url }} style={styles.media} />
+          ) : (
+            <Video
+              source={{ uri: item.url }}
+              style={styles.media}
+              useNativeControls
+            />
+          )
+        ) : null}
+        <Text style={styles.messageTime}> {messageTime} </Text>
       </View>
     );
   };
+  
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="auto" />
       <ChatRoomHeader user={user} chatId={chatId} />
       <FlatList
@@ -103,7 +117,7 @@ const ChatRoom = () => {
         ListEmptyComponent={<Text style={styles.noMessages}>No messages yet</Text>} // Handle empty state
       />
       <MessageInput onSendMessage={sendMessage} />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -124,6 +138,12 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     maxWidth: width * 0.75, // 75% of the screen width
     flexShrink: 1, // Allow the message container to shrink if necessary
+  },
+  media: {
+    width: width * 0.70,
+    height: 200,
+    borderRadius: 10,
+    marginVertical: 5,
   },
   theirMessage: {
     alignSelf: 'flex-start',

@@ -5,8 +5,7 @@ import CustomText from './components/CustomText';
 import { GoogleSignin } from '@react-native-community/google-signin';
 import AuthButton from './AuthButton';
 import auth from '@react-native-firebase/auth';
-import SafeAreaWrapper from './components/SafeAreaWrapper';
-
+import { StatusBar } from 'expo-status-bar';
 const { width, height } = Dimensions.get('window');
 
 const colors = ['#361f34', '#005657', '#ff25ff', '#2c014d', '#fff0d3', '#ff6655'];
@@ -135,6 +134,7 @@ const LoginScreen = () => {
 
   return (
       <Animated.View style={[styles.appContainer, { backgroundColor: interpolateBackgroundColor }]}>
+        <StatusBar style="auto" />
         <AnimatedGradientText text={currentText} textColor={interpolateTextColor} />
         <View style={styles.buttonContainer}>
           <AuthButton
