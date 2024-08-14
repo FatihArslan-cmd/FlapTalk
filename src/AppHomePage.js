@@ -12,7 +12,7 @@ const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFL
 export default function HomeScreen() {
   const [chatList, setChatList] = useState([]);
   const navigation = useNavigation();
-
+  const [searchText, setSearchText] = useState('');
 
   const fetchChatList = async () => {
     try {
@@ -99,14 +99,16 @@ export default function HomeScreen() {
     </TouchableOpacity>
   );
   
-  
-  
+  // Filter chat list based on the search text
+  const filteredChatList = chatList.filter(chat =>
+    chat.username.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
-      <AppHeader showCameraIcon={true} title={'FlapTalk'} textColor={'#00ae59'}/>
+      <AppHeader showCameraIcon={true} title={'FlapTalk'} textColor={'#00ae59'} onSearch={setSearchText}/>
       <FlatList
-        data={chatList}
+        data={filteredChatList} // Use the filtered chat list here
         keyExtractor={(item) => item.friendId}
         renderItem={renderChatItem}
         ListEmptyComponent={() => (

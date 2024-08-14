@@ -120,13 +120,13 @@ const ChatRoom = () => {
                 resizeMode="cover"
               />
             ) : item.type === 'audio' ? (
-              <Text style={styles.audioMessage} onPress={() => playAudio(item.url)}>Audio</Text>
+              <Text style={styles.audioMessage} onPress={() => playAudio(item.url)}>Audio </Text>
             ) : item.type === 'document' ? (
               <Pressable onPress={() => openDocument(item.url)}>
-                <Text style={styles.documentMessage}>{item.name || 'Document'}</Text>
+                <Text style={styles.documentMessage}>{item.name || 'Document'} </Text>
               </Pressable>
             ) : null}
-            <Text style={styles.mediaTime}>{messageTime}</Text>
+            <Text style={styles.mediaTime}>{messageTime} </Text>
           </View>
         ) : null}
       </View>
@@ -222,6 +222,12 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginTop: 5,
     textAlign: 'right',
+  },
+  media: {
+    width: width * 0.70,
+    height: 200,
+    borderRadius: 10,
+    marginVertical: 5,
   },
   noMessages: {
     textAlign: 'center',
