@@ -224,8 +224,8 @@ const MessageInput = ({ onSendMessage }) => {
             {message.length === 0 ? (
               <>
                 <TouchableOpacity onPress={handleDocumentSelect}>
-  <Ionicons name="document-attach" size={28} color="gray" style={styles.icon} />
-</TouchableOpacity>
+                   <Ionicons name="document-attach" size={28} color="gray" style={styles.icon} />
+                </TouchableOpacity>
                 <TouchableOpacity onPress={handleMediaSelect}>
                   <Icon name="photo-camera" size={30} color="gray" style={styles.icon} />
                 </TouchableOpacity>

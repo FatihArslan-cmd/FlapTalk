@@ -6,13 +6,14 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import CustomText from './components/CustomText';
 import AppHeader from "./components/AppHeader";
 import moment from 'moment'; // Import moment for formatting the time
-
+import useDisableBackButton from "./hooks/useDisableBackButton";
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function HomeScreen() {
   const [chatList, setChatList] = useState([]);
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
+  useDisableBackButton();
 
   const fetchChatList = async () => {
     try {

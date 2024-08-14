@@ -59,7 +59,14 @@
     "react-native-web": "~0.19.10",
     "react-native-webrtc": "^124.0.3",
     "react-native-webview": "^13.10.5",
-    "rn-emoji-keyboard": "^1.7.0"
+    "rn-emoji-keyboard": "^1.7.0",
+    "expo-location": "~17.0.1",
+    "expo-camera": "~15.0.14",
+    "expo-contacts": "~13.0.5",
+    "expo-speech": "~12.0.2",
+    "react-native-maps": "1.14.0",
+    "expo-clipboard": "~6.0.3",
+    "expo-battery": "~8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

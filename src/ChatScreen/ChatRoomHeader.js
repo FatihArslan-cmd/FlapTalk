@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -12,6 +12,7 @@ const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFL
 
 const ChatRoomHeader = ({ user, chatId }) => {
   const [userStatus, setUserStatus] = useState(null);
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -31,6 +32,10 @@ const ChatRoomHeader = ({ user, chatId }) => {
 
   const startVideoCall = () => {
     navigation.navigate('VideoCallScreen', { chatId, userId: user.id, isCaller: true });
+  };
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!isDropdownVisible);
   };
 
   return (
@@ -53,9 +58,28 @@ const ChatRoomHeader = ({ user, chatId }) => {
             <TouchableOpacity>
               <Icon name="call" size={28} color="black" style={styles.inputIcon} />
             </TouchableOpacity>
-            <MaterialCommunityIcons name="dots-vertical" size={28} color="black" style={styles.inputIcon} />
+            <TouchableOpacity onPress={toggleDropdown}>
+              <MaterialCommunityIcons name="dots-vertical" size={28} color="black" style={styles.inputIcon} />
+            </TouchableOpacity>
           </View>
         </>
+      )}
+
+      {isDropdownVisible && (
+        <View style={styles.dropdown}>
+          <TouchableOpacity style={styles.dropdownItem}>
+            <Octicons name="device-camera" size={24} color="black" />
+            <Text style={styles.dropdownText}>Camera</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dropdownItem}>
+            <MaterialCommunityIcons name="map-marker" size={24} color="black" />
+            <Text style={styles.dropdownText}>Location</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dropdownItem}>
+            <MaterialCommunityIcons name="contacts" size={24} color="black" />
+            <Text style={styles.dropdownText}>Contact</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -66,10 +90,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    paddingTop:25,
+    paddingTop: 25,
     backgroundColor: '#f8f8f8',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    zIndex: 10, // Ensures header is above other components
   },
   inputIcon: {
     margin: width * 0.02,
@@ -93,6 +118,30 @@ const styles = StyleSheet.create({
   },
   onlineStatus: {
     color: 'green',
+    fontSize: 16,
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 60, // Adjust this based on your header height
+    right: 10,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+    zIndex: 20, // Ensures dropdown is above other components
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+  },
+  dropdownText: {
+    marginLeft: 10,
     fontSize: 16,
   },
 });
