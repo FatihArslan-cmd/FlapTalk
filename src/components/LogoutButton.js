@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { GoogleSignin } from '@react-native-community/google-signin';
 import auth from '@react-native-firebase/auth';
-import Button from "./Button";
+import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LogoutButton() {
     const navigation = useNavigation();
     const route = useRoute();
     const [loginMethod, setLoginMethod] = useState(null);
-    const [userInfo, setUserInfo] = useState(route.params?.userInfo);
 
     useEffect(() => {
         const fetchLoginMethod = async () => {
@@ -28,7 +27,6 @@ export default function LogoutButton() {
             } else if (loginMethod === 'google') {
                 await GoogleSignin.configure({});
                 await GoogleSignin.signOut();
-                setUserInfo(null);
             } else {
                 console.log("Unknown login method");
             }
@@ -47,17 +45,28 @@ export default function LogoutButton() {
     };
 
     return (
-        <View style={styles.container}>
-            <Button onPress={handleLogout} text={'Logout'} />
-        </View>
+        <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+            <Icon name="log-out-outline" size={24} color="#f44336" />
+            <View style={styles.menuTextContainer}>
+                <Text style={styles.menuLabel}>Çıkış Yap</Text>
+            </View>
+        </TouchableOpacity>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
+    menuItem: {
+        flexDirection: 'row',
         alignItems: 'center',
-        padding: 16,
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+    menuTextContainer: {
+        marginLeft: 20,
+    },
+    menuLabel: {
+        fontSize: 16,
+        color: '#333',
     },
 });
