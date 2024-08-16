@@ -1,23 +1,23 @@
 import React from 'react';
-import { View, Image, StyleSheet, Dimensions,TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const ProfileIconWithCamera = ({ avatarUri, onCameraPress }) => {
+const ProfileIconWithCamera = ({ avatarUri, onCameraPress, avatarSize }) => {
   return (
     <View style={styles.container}>
-      <View style={styles.profileContainer}>
-      <TouchableOpacity onPress={onCameraPress}>
-        <Image 
-          source={avatarUri ? { uri: avatarUri } : {uri: 'https://github.com/bhavik66/react-native-firebase-chat/blob/master/src/img/profile.png?raw=true'}}
-          style={styles.profileIcon}
-        />
-         </TouchableOpacity>
-        <View style={styles.cameraContainer}>
+      <View style={[styles.profileContainer, { width: avatarSize, height: avatarSize }]}>
+        <TouchableOpacity onPress={onCameraPress}>
+          <Image
+            source={avatarUri ? { uri: avatarUri } : { uri: 'https://github.com/bhavik66/react-native-firebase-chat/blob/master/src/img/profile.png?raw=true' }}
+            style={[styles.profileIcon, { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 }]}
+          />
+        </TouchableOpacity>
+        <View style={[styles.cameraContainer, { width: avatarSize * 0.3, height: avatarSize * 0.3, borderRadius: (avatarSize * 0.3) / 2 }]}>
           <TouchableOpacity onPress={onCameraPress}>
-            <Image 
+            <Image
               source={require('../../assets/photo-camera-interface-symbol-for-button.png')}
-              style={styles.cameraIcon}
+              style={[styles.cameraIcon, { width: avatarSize * 0.3, height: avatarSize * 0.3 }]}
             />
           </TouchableOpacity>
         </View>
@@ -35,24 +35,18 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   profileIcon: {
-    width: height * 0.18,
-    height: height * 0.18,
-    borderRadius: (height * 0.12) / 2,
+    resizeMode: 'cover',
   },
   cameraContainer: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    width: width * 0.08,
-    height: width * 0.08,
-    borderRadius: (width * 0.08) / 2,
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cameraIcon: {
-    width: width * 0.08,
-    height: width * 0.08,
+    resizeMode: 'cover',
   },
 });
 

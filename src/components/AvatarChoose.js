@@ -88,7 +88,8 @@ export default function AvatarChoose({ onAvatarSelect }) {
     <View style={styles.container}>
       <ProfileIconWithCamera 
         avatarUri={selectedAvatar.uri} 
-        onCameraPress={openModal} 
+        onCameraPress={openModal}
+        avatarSize={120}
       />
 
       <Modal visible={modalVisible} animationType="slide">

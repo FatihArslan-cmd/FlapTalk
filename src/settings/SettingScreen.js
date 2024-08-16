@@ -52,7 +52,7 @@ export default function SettingScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.profileContainer}>
-          <ProfileIconWithCamera avatarUri={userData.avatar} />
+          <ProfileIconWithCamera avatarUri={userData.avatar}   avatarSize={100}/>
           <View style={styles.userInfo}>
             <Text style={styles.username}>{userData.username}</Text>
             <Text style={styles.about}>{userData.about}</Text>
