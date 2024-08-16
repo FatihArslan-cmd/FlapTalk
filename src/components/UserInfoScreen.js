@@ -11,7 +11,6 @@ import AvatarChoose from './AvatarChoose';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClearButton from './renderClearButton';
 import Button from './Button';
-import { defaultAvatar } from './AvatarChoose'; // Import the defaultAvatar
 
 const { width, height } = Dimensions.get('window');
 
