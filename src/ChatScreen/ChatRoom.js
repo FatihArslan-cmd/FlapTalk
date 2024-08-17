@@ -11,6 +11,7 @@ import moment from 'moment';
 import FullScreenImageModal from './FullScreenImageModal';
 import * as Clipboard from 'expo-clipboard'; // Import Clipboard API
 import { Ionicons } from '@expo/vector-icons';
+import * as Speech from 'expo-speech'; // Import Speech API
 
 const { width } = Dimensions.get('window');
 
@@ -84,7 +85,23 @@ const ChatRoom = () => {
       console.error('Error sending message:', error);
     }
   };
-
+  const renderMessageText = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+  
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <TouchableOpacity key={index} onPress={() => Linking.openURL(part)}>
+            <Text style={styles.link}>{part} </Text>
+          </TouchableOpacity>
+        );
+      } else {
+        return <Text key={index} style={styles.messageText}>{part} </Text>;
+      }
+    });
+  };
+  
   const handleLongPress = (message) => {
     setSelectedMessage(message);
     setIsModalVisible(true);
@@ -94,6 +111,7 @@ const ChatRoom = () => {
     Clipboard.setString(selectedMessage.text);
     setIsModalVisible(false);
   };
+
 
   const handleDelete = async () => {
     try {
@@ -109,10 +127,14 @@ const ChatRoom = () => {
     }
   };
 
+
   const handleVoice = () => {
-    // Add functionality for voice message here
+    if (selectedMessage && selectedMessage.text) {
+      Speech.speak(selectedMessage.text); // Use the Speech API to read the message aloud
+    }
     setIsModalVisible(false);
   };
+
 
   const renderItem = ({ item }) => {
     const messageTime = moment(item.createdAt).format('HH:mm');
@@ -123,7 +145,7 @@ const ChatRoom = () => {
         <View style={[item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage, { backgroundColor }]}>
           {item.text ? (
             <View style={styles.textContainer}>
-              <Text style={styles.messageText}>{item.text}</Text>
+              <Text style={styles.messageText}>{renderMessageText(item.text)}</Text>
               <Text style={styles.messageTime}>{messageTime}</Text>
             </View>
           ) : item.url ? (
@@ -200,7 +222,6 @@ const ChatRoom = () => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
