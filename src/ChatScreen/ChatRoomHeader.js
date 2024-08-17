@@ -48,7 +48,7 @@ const ChatRoomHeader = ({ user, chatId }) => {
         <>
           <Image source={{ uri: user.avatar || defaultAvatar }} style={styles.avatar} />
           <Text style={styles.username}>
-            {user.username} 
+            {user.username}  
             {userStatus === 'online' && <Text style={styles.onlineStatus}> (Online) </Text>}
           </Text>
           <View style={styles.iconContainer}>

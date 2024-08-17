@@ -8,8 +8,6 @@ import PhoneLoginScreen from '../phoneLoginScreen/PhoneLoginScreen';
 import UserInfoScreen from '../components/UserInfoScreen';
 import EmailLoginScreen from '../EmailScreen/EmailLoginScreen';
 import EmailSignupScreen from '../EmailScreen/EmailSignupScreen';
-import ChatScreen from '../ChatScreen/ChatScreen';
-import UsersList from '../ChatScreen/UsersList';
 import TabNavigator from './TabNavigator';
 import ChatRoom from '../ChatScreen/ChatRoom';
 import VideoCallScreen from '../CallsScreen/VideoCallScreen';
@@ -50,8 +48,6 @@ const Navigation = () => {
         <Stack.Screen name="UserInfoScreen" component={UserInfoScreen} options={{ headerShown: false }} />
         <Stack.Screen name="EmailLogin" component={EmailLoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="EmailSignup" component={EmailSignupScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="UsersList" component={UsersList} options={{ headerShown: false }} />
         <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }} />
         <Stack.Screen name="VideoCallScreen" component={VideoCallScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
