@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, StyleSheet, Text, Dimensions, Image, TouchableOpacity, Linking, Alert, Modal, Pressable } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Dimensions, Image, TouchableOpacity, Linking, Modal, Pressable, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import { Ionicons } from '@expo/vector-icons'; // Updated: Imported icons
 import ChatRoomHeader from './ChatRoomHeader';
 import { StatusBar } from 'expo-status-bar';
 import { Video } from 'expo-av';
@@ -11,7 +10,7 @@ import MessageInput from './MessageInput';
 import moment from 'moment';
 import FullScreenImageModal from './FullScreenImageModal';
 import * as Clipboard from 'expo-clipboard'; // Import Clipboard API
-import { MaterialIcons } from '@expo/vector-icons'; // Import icons from Material Icons
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -21,9 +20,8 @@ const ChatRoom = () => {
   const [messages, setMessages] = useState([]);
   const [user, setUser] = useState(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState(null); // For storing the selected message
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState(null);
   const flatListRef = useRef(null);
 
   useEffect(() => {
@@ -87,45 +85,33 @@ const ChatRoom = () => {
     }
   };
 
-  const copyToClipboard = (text) => {
-    Clipboard.setStringAsync(text);
-    Alert.alert('Copied to Clipboard', 'The message has been copied to your clipboard.');
+  const handleLongPress = (message) => {
+    setSelectedMessage(message);
+    setIsModalVisible(true);
   };
 
-  const deleteMessage = async (messageId) => {
+  const handleCopy = () => {
+    Clipboard.setString(selectedMessage.text);
+    setIsModalVisible(false);
+  };
+
+  const handleDelete = async () => {
     try {
       await firestore()
         .collection('chats')
         .doc(chatId)
         .collection('messages')
-        .doc(messageId)
+        .doc(selectedMessage.id)
         .delete();
-      Alert.alert('Deleted', 'The message has been deleted.');
+      setIsModalVisible(false);
     } catch (error) {
       console.error('Error deleting message:', error);
     }
   };
 
-  const handleLongPress = (message) => {
-    setSelectedMessage(message);
-    setModalVisible(true);
-  };
-
-  const renderMessageText = (text) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const parts = text.split(urlRegex);
-
-    return parts.map((part, index) => {
-      if (urlRegex.test(part)) {
-        return (
-          <TouchableOpacity key={index} onPress={() => Linking.openURL(part)}>
-            <Text style={styles.link}>{part} </Text>
-          </TouchableOpacity>
-        );
-      } else {
-        return <Text key={index} style={styles.messageText}>{part} </Text>;
-      }
-    });
+  const handleVoice = () => {
+    // Add functionality for voice message here
+    setIsModalVisible(false);
   };
 
   const renderItem = ({ item }) => {
@@ -137,8 +123,8 @@ const ChatRoom = () => {
         <View style={[item.userId === auth().currentUser.uid ? styles.myMessage : styles.theirMessage, { backgroundColor }]}>
           {item.text ? (
             <View style={styles.textContainer}>
-              <Text style={styles.messageText}>{renderMessageText(item.text)} </Text>
-              <Text style={styles.messageTime}>{messageTime} </Text>
+              <Text style={styles.messageText}>{item.text}</Text>
+              <Text style={styles.messageTime}>{messageTime}</Text>
             </View>
           ) : item.url ? (
             <View>
@@ -154,13 +140,13 @@ const ChatRoom = () => {
                   resizeMode="cover"
                 />
               ) : item.type === 'audio' ? (
-                <Text style={styles.audioMessage} onPress={() => playAudio(item.url)}>Audio </Text>
+                <Text style={styles.audioMessage} onPress={() => playAudio(item.url)}>Audio</Text>
               ) : item.type === 'document' ? (
                 <Pressable onPress={() => openDocument(item.url)}>
-                  <Text style={styles.documentMessage}>{item.name || 'Document'} </Text>
+                  <Text style={styles.documentMessage}>{item.name || 'Document'}</Text>
                 </Pressable>
               ) : null}
-              <Text style={styles.mediaTime}>{messageTime} </Text>
+              <Text style={styles.mediaTime}>{messageTime}</Text>
             </View>
           ) : null}
         </View>
@@ -178,7 +164,7 @@ const ChatRoom = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.messagesContainer}
-        ListEmptyComponent={<Text style={styles.noMessages}>No messages yet </Text>}
+        ListEmptyComponent={<Text style={styles.noMessages}>No messages yet</Text>}
       />
       <MessageInput onSendMessage={sendMessage} />
       {selectedImageUrl && (
@@ -188,38 +174,33 @@ const ChatRoom = () => {
           onClose={() => setSelectedImageUrl(null)}
         />
       )}
-      {selectedMessage && (
-        <Modal
-          transparent={true}
-          visible={modalVisible}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Pressable onPress={() => { copyToClipboard(selectedMessage.text); setModalVisible(false); }}>
-                <MaterialIcons name="content-copy" size={30} color="black" />
-                <Text style={styles.modalText}>Copy </Text>
-              </Pressable>
-              <Pressable onPress={() => { deleteMessage(selectedMessage.id); setModalVisible(false); }}>
-                <MaterialIcons name="delete" size={30} color="black" />
-                <Text style={styles.modalText}>Delete </Text>
-              </Pressable>
-              <Pressable onPress={() => { /* Handle voice action */ setModalVisible(false); }}>
-                <MaterialIcons name="mic" size={30} color="black" />
-                <Text style={styles.modalText}>Voice </Text>
-              </Pressable>
-              <Pressable onPress={() => setModalVisible(false)}>
-              <Ionicons name="close-outline" size={30} color="black" />
-              <Text style={styles.modalText}>Close </Text>
+      <Modal
+        visible={isModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <Pressable style={styles.modalContainer} onPress={() => setIsModalVisible(false)}>
+          <View style={styles.modalContent}>
+            <Pressable onPress={handleCopy}>
+              <Ionicons name="copy-outline" size={30} color="black" />
+              <Text style={styles.modalText}>Copy</Text>
             </Pressable>
-            </View>
+            <Pressable onPress={handleDelete}>
+              <Ionicons name="trash-outline" size={30} color="red" />
+              <Text style={styles.modalText}>Delete</Text>
+            </Pressable>
+            <Pressable onPress={handleVoice}>
+              <Ionicons name="mic-outline" size={30} color="black" />
+              <Text style={styles.modalText}>Voice</Text>
+            </Pressable>
           </View>
-        </Modal>
-      )}
+        </Pressable>
+      </Modal>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
