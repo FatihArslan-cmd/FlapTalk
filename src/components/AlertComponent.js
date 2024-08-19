@@ -16,9 +16,7 @@ const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmTe
       onRequestClose={onClose}
     >
       <View style={styles.centeredView}>
-        {/* Arka planı blur yapmak için BlurView kullanımı */}
         <BlurView intensity={50} style={styles.absolute} tint="dark" />
-        {/* Modal açıldığında gri arka plan ve beyaz içerik için StatusBar'ı ayarla */}
         {visible && <StatusBar style="light" backgroundColor="rgba(0,0,0,0.5)" translucent />}
         <View style={styles.modalView}>
           <CustomText fontFamily={'pop'} style={styles.modalTitle}>{title}</CustomText>
@@ -30,7 +28,6 @@ const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmTe
           </View>
         </View>
       </View>
-      {/* Modal kapandığında eski duruma dön */}
       {!visible && <StatusBar style="dark" backgroundColor="#FFFFFF" translucent />}
     </Modal>
   );

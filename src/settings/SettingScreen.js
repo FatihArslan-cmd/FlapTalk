@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, TextInput, Alert } from "react-native";
+import React, { useState, useEffect, useContext, useMemo } from "react";
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, TextInput, Share } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import useDisableBackButton from "../hooks/useDisableBackButton";
 import LogoutButton from "../components/LogoutButton";
-import LoadingOverlay from "../components/LoadingOverlay";
 import ProfileIconWithCamera from "../components/ProfileIconWithCamera";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/AuthContext";
@@ -11,26 +10,28 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import CustomText from "../components/CustomText";
 import AppHeader from "../components/AppHeader";
+import { debounce } from 'lodash';  // Import debounce from lodash
+import AlertComponent from '../components/AlertComponent';  // Import your AlertComponent
+import useAlert from '../hooks/useAlert';  // Import your custom hook
+
 const { width } = Dimensions.get('window');
 
 export default function SettingScreen() {
   const { user } = useContext(AuthContext);
   const [userData, setUserData] = useState({ username: '', about: '', avatar: '' });
-  const [loading, setLoading] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
   const [searchText, setSearchText] = useState('');
   const navigation = useNavigation();
+  const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();  // Use your custom hook
   useDisableBackButton();
 
   useEffect(() => {
     if (user) {
-      setLoading(true);
       const fetchUserData = async () => {
         const userDoc = await firestore().collection('users').doc(user.uid).get();
         if (userDoc.exists) {
           setUserData(userDoc.data());
         }
-        setLoading(false);
       };
       fetchUserData();
     }
@@ -39,7 +40,7 @@ export default function SettingScreen() {
   const handleImagePicker = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission Denied', 'Permission to access the media library is required.');
+      showAlert('Permission Denied', 'Permission to access the media library is required.');
       return;
     }
 
@@ -57,7 +58,6 @@ export default function SettingScreen() {
   };
 
   const handleUpdateProfile = async () => {
-    setLoading(true);
     try {
       const usernameSnapshot = await firestore()
         .collection('users')
@@ -65,8 +65,8 @@ export default function SettingScreen() {
         .get();
 
       if (!usernameSnapshot.empty && usernameSnapshot.docs[0].id !== user.uid) {
-        Alert.alert('Error', 'This username is already taken. Please choose another one.');
-        setLoading(false);
+        // Use custom alert
+        showAlert('Error', 'This username is already taken. Please choose another one.');
         return;
       }
 
@@ -75,25 +75,36 @@ export default function SettingScreen() {
         about: userData.about.trim(),
         avatar: userData.avatar,
       });
-      Alert.alert('Profile Updated', 'Your profile has been successfully updated.');
-      setIsChanged(false);
+      // Use custom alert for success
+      showAlert('Profile Updated', 'Your profile has been successfully updated.', () => {
+        setIsChanged(false);
+      });
     } catch (error) {
-      Alert.alert('Error', 'There was an error updating your profile. Please try again.');
+      // Use custom alert for error
+      showAlert('Error', 'There was an error updating your profile. Please try again.');
     }
-    setLoading(false);
   };
-
-  if (!userData) {
-    return <LoadingOverlay visible={loading} />;
-  }
 
   const handleInputChange = (field, value) => {
     setUserData({ ...userData, [field]: value });
     setIsChanged(true);
   };
 
+  const debouncedSearch = useMemo(() => debounce(setSearchText, 300), []);
+
   const handleSearch = (text) => {
-    setSearchText(text.toLowerCase());
+    debouncedSearch(text.toLowerCase());
+  };
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Check out this amazing app!`,
+        url: 'https://your-app-url.com', // Replace with your app's URL
+      });
+    } catch (error) {
+      showAlert('Error', 'There was an error sharing the app.');
+    }
   };
 
   const menuItems = [
@@ -106,75 +117,99 @@ export default function SettingScreen() {
     { icon: 'people-outline', label: 'Arkadaş davet et', subLabel: 'Arkadaşlarını davet et' },
     { icon: 'globe-outline', label: 'Uygulama dili', subLabel: 'Türkçe (cihaz dili)' },
     { icon: 'help-circle-outline', label: 'Yardım', subLabel: 'Destek alın, geri bildirim gönderin' },
+    // Add the Share menu item
+    { icon: 'share-outline', label: 'Uygulamayı Paylaş', subLabel: 'Arkadaşlarınla paylaş' },
   ];
 
-  const filteredMenuItems = menuItems.filter(item =>
+  const filteredMenuItems = useMemo(() => menuItems.filter(item =>
     item.label.toLowerCase().includes(searchText) || item.subLabel.toLowerCase().includes(searchText)
+  ), [searchText]);
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={() => {
+        if (item.label === 'Uygulamayı Paylaş') {
+          handleShare();
+        } else {
+          // Handle other menu items
+        }
+      }}
+    >
+      <Icon name={item.icon} size={28} color="#4CAF50" />
+      <View style={styles.menuTextContainer}>
+        <CustomText fontFamily={'pop'} style={styles.menuLabel}>{item.label}</CustomText>
+        <CustomText fontFamily={'pop'} style={styles.menuSubLabel}>{item.subLabel}</CustomText>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
       <AppHeader title={'Settings'} onSearch={handleSearch} />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.profileContainer}>
-          <ProfileIconWithCamera
-            avatarUri={userData.avatar}
-            onCameraPress={handleImagePicker}
-            avatarSize={100}
-          />
-          <View style={styles.userInfo}>
-            <View style={styles.usernameContainer}>
-              <TextInput
-                style={styles.usernameInput}
-                value={userData.username}
-                onChangeText={(text) => handleInputChange('username', text)}
-                placeholder="Username"
+      <FlatList
+        data={filteredMenuItems}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+        ListHeaderComponent={
+          <>
+            <View style={styles.profileContainer}>
+              <ProfileIconWithCamera
+                avatarUri={userData.avatar}
+                onCameraPress={handleImagePicker}
+                avatarSize={100}
               />
-              <Icon name="pencil-outline" size={20} color="#888" style={styles.editIcon} />
+              <View style={styles.userInfo}>
+                <View style={styles.usernameContainer}>
+                  <TextInput
+                    style={styles.usernameInput}
+                    value={userData.username}
+                    onChangeText={(text) => handleInputChange('username', text)}
+                    placeholder="Username"
+                  />
+                  <Icon name="pencil-outline" size={20} color="#888" style={styles.editIcon} />
+                </View>
+                <TextInput
+                  style={styles.aboutInput}
+                  value={userData.about}
+                  onChangeText={(text) => handleInputChange('about', text)}
+                  placeholder="About"
+                  multiline
+                />
+              </View>
             </View>
-            <TextInput
-              style={styles.aboutInput}
-              value={userData.about}
-              onChangeText={(text) => handleInputChange('about', text)}
-              placeholder="About"
-              multiline
-            />
-          </View>
-        </View>
-        {isChanged && (
-          <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile}>
-            <Text style={styles.updateButtonText}>Update Profile</Text>
-          </TouchableOpacity>
-        )}
-        {filteredMenuItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.menuItem}>
-            <Icon name={item.icon} size={28} color="#4CAF50" />
-            <View style={styles.menuTextContainer}>
-              <CustomText fontFamily={'pop'} style={styles.menuLabel}>{item.label}</CustomText>
-              <CustomText fontFamily={'pop'} style={styles.menuSubLabel}>{item.subLabel}</CustomText>
-            </View>
-          </TouchableOpacity>
-        ))}
-        <LogoutButton />
-      </ScrollView>
+            {isChanged && (
+              <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile}>
+                <Text style={styles.updateButtonText}>Update Profile</Text>
+              </TouchableOpacity>
+            )}
+          </>
+        }
+        ListFooterComponent={<LogoutButton />}
+      />
+      {/* Use AlertComponent with custom hook */}
+      <AlertComponent
+        visible={isVisible}
+        onClose={hideAlert}
+        title={title}
+        message={message}
+        onConfirm={confirmAlert}
+        confirmText="OK"
+      />
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  scrollContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 30,
+    paddingHorizontal: 20,
   },
   userInfo: {
     marginLeft: 15,
@@ -185,7 +220,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   usernameInput: {
-    fontSize: 20,
+    fontSize:  20,
     fontWeight: 'bold',
     color: '#333',
     borderBottomWidth: 1,
@@ -210,6 +245,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 30,
+    marginHorizontal: 20,
   },
   updateButtonText: {
     color: '#fff',
@@ -220,6 +256,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },

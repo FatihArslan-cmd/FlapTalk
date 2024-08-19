@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
+        paddingHorizontal: 20,
     },
     menuTextContainer: {
         marginLeft: 20,
