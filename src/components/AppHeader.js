@@ -5,44 +5,32 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useFocusEffect } from '@react-navigation/native';
 import CustomText from './CustomText';
 import ClearButton from './renderClearButton';
-import ModalContainer from '../document/ModalContainer';
 
 const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
 
-  // Reset search mode when navigating away
   useFocusEffect(
     useCallback(() => {
-      return () => {
-        setIsSearching(false);
-        setSearchText('');
-      };
+      setSearchText('');
+      setIsSearching(false);
+      if (onSearch) onSearch(''); 
     }, [])
   );
 
   const handleSearchTextChange = (text) => {
     setSearchText(text);
-    onSearch(text);
+    if (onSearch) onSearch(text); 
   };
 
   const handleClearSearch = () => {
     setSearchText('');
-    onSearch('');
+    if (onSearch) onSearch(''); 
   };
 
   const handleBackPress = () => {
     setIsSearching(false);
     handleClearSearch();
-  };
-
-  const handleMenuPress = (option) => {
-    if (option === 'Introduction') {
-      setModalVisible(true);
-    } else if (option === 'About') {
-      // Handle "About" option
-    }
   };
 
   return (
@@ -79,11 +67,10 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
           </View>
         </>
       )}
-
-      <ModalContainer visible={modalVisible} onClose={() => setModalVisible(false)} />
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   header: {

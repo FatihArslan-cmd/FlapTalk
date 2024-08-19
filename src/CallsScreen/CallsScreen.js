@@ -1,10 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import AppHeader from '../components/AppHeader'
 
 const CallsScreen = () => {
   return (
     <View>
-      <Text>CallsScreen</Text>
+     <AppHeader title={'Calls'}/>
     </View>
   )
 }

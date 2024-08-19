@@ -3,10 +3,9 @@ import NetInfo from '@react-native-community/netinfo';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import CustomText from '../components/CustomText';
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar, Platform } from 'react-native';
 export const NetworkContext = createContext();
 
-// Create NetworkProvider component
 export const NetworkProvider = ({ children }) => {
   const [isOnline, setIsOnline] = useState(true);
   const [showNotification, setShowNotification] = useState(false);
@@ -49,7 +48,6 @@ export const NetworkProvider = ({ children }) => {
           inputRange: [0, 1],
           outputRange: ['red', 'green'],
         }) }]}>
-            <StatusBar style="auto" />
           <CustomText fontFamily={'pop'} style={styles.notificationText}>{notificationText}</CustomText>
         </Animatable.View>
       )}
@@ -60,11 +58,11 @@ export const NetworkProvider = ({ children }) => {
 const styles = StyleSheet.create({
   notification: {
     position: 'absolute',
-    top: 0,
+    top: Platform.OS === 'android' ? StatusBar.currentHeight : 0, // Adjust for Android
     left: 0,
     right: 0,
     padding: 10,
-    paddingTop:15,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 15, // Add padding for Android status bar
     justifyContent: 'center',
     alignItems: 'center',
   },

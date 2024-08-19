@@ -10,6 +10,7 @@ import { AuthContext } from "../context/AuthContext";
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import CustomText from "../components/CustomText";
+import AppHeader from "../components/AppHeader";
 const { width } = Dimensions.get('window');
 
 export default function SettingScreen() {
@@ -17,6 +18,7 @@ export default function SettingScreen() {
   const [userData, setUserData] = useState({ username: '', about: '', avatar: '' });
   const [loading, setLoading] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const navigation = useNavigation();
   useDisableBackButton();
 
@@ -57,7 +59,6 @@ export default function SettingScreen() {
   const handleUpdateProfile = async () => {
     setLoading(true);
     try {
-      // Check for username uniqueness
       const usernameSnapshot = await firestore()
         .collection('users')
         .where('username', '==', userData.username.trim())
@@ -69,7 +70,6 @@ export default function SettingScreen() {
         return;
       }
 
-      // Proceed with the update if username is unique
       await firestore().collection('users').doc(user.uid).update({
         username: userData.username.trim(),
         about: userData.about.trim(),
@@ -92,6 +92,10 @@ export default function SettingScreen() {
     setIsChanged(true);
   };
 
+  const handleSearch = (text) => {
+    setSearchText(text.toLowerCase());
+  };
+
   const menuItems = [
     { icon: 'key-outline', label: 'Hesap', subLabel: 'Güvenlik bildirimleri, numara değiştirme' },
     { icon: 'lock-closed-outline', label: 'Gizlilik', subLabel: 'Kişileri engelleme, süreli mesajlar' },
@@ -104,8 +108,13 @@ export default function SettingScreen() {
     { icon: 'help-circle-outline', label: 'Yardım', subLabel: 'Destek alın, geri bildirim gönderin' },
   ];
 
+  const filteredMenuItems = menuItems.filter(item =>
+    item.label.toLowerCase().includes(searchText) || item.subLabel.toLowerCase().includes(searchText)
+  );
+
   return (
     <View style={styles.container}>
+      <AppHeader title={'Settings'} onSearch={handleSearch} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.profileContainer}>
           <ProfileIconWithCamera
@@ -137,7 +146,7 @@ export default function SettingScreen() {
             <Text style={styles.updateButtonText}>Update Profile</Text>
           </TouchableOpacity>
         )}
-        {menuItems.map((item, index) => (
+        {filteredMenuItems.map((item, index) => (
           <TouchableOpacity key={index} style={styles.menuItem}>
             <Icon name={item.icon} size={28} color="#4CAF50" />
             <View style={styles.menuTextContainer}>

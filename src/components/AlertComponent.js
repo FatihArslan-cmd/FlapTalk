@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Modal, View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import CustomText from './CustomText';
 import { StatusBar } from 'expo-status-bar';
+import { BlurView } from 'expo-blur';
 
 const { width, height } = Dimensions.get('window');
 
@@ -15,6 +16,8 @@ const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmTe
       onRequestClose={onClose}
     >
       <View style={styles.centeredView}>
+        {/* Arka planı blur yapmak için BlurView kullanımı */}
+        <BlurView intensity={50} style={styles.absolute} tint="dark" />
         {/* Modal açıldığında gri arka plan ve beyaz içerik için StatusBar'ı ayarla */}
         {visible && <StatusBar style="light" backgroundColor="rgba(0,0,0,0.5)" translucent />}
         <View style={styles.modalView}>
@@ -39,6 +42,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  absolute: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
   },
   modalView: {
     margin: width * 0.05,
