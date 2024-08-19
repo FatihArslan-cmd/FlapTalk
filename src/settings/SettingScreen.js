@@ -9,7 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/AuthContext";
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-
+import CustomText from "../components/CustomText";
 const { width } = Dimensions.get('window');
 
 export default function SettingScreen() {
@@ -139,10 +139,10 @@ export default function SettingScreen() {
         )}
         {menuItems.map((item, index) => (
           <TouchableOpacity key={index} style={styles.menuItem}>
-            <Icon name={item.icon} size={24} color="#4CAF50" />
+            <Icon name={item.icon} size={28} color="#4CAF50" />
             <View style={styles.menuTextContainer}>
-              <Text style={styles.menuLabel}>{item.label}</Text>
-              <Text style={styles.menuSubLabel}>{item.subLabel}</Text>
+              <CustomText fontFamily={'pop'} style={styles.menuLabel}>{item.label}</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.menuSubLabel}>{item.subLabel}</CustomText>
             </View>
           </TouchableOpacity>
         ))}

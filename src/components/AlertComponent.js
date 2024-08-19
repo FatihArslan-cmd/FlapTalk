@@ -1,9 +1,12 @@
-import React from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { Modal, View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import CustomText from './CustomText';
+import { StatusBar } from 'expo-status-bar';
 
 const { width, height } = Dimensions.get('window');
 
 const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmText }) => {
+
   return (
     <Modal
       animationType="fade"
@@ -12,16 +15,20 @@ const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmTe
       onRequestClose={onClose}
     >
       <View style={styles.centeredView}>
+        {/* Modal açıldığında gri arka plan ve beyaz içerik için StatusBar'ı ayarla */}
+        {visible && <StatusBar style="light" backgroundColor="rgba(0,0,0,0.5)" translucent />}
         <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>{title} </Text>
-          <Text style={styles.modalMessage}>{message} </Text>
+          <CustomText fontFamily={'pop'} style={styles.modalTitle}>{title}</CustomText>
+          <CustomText fontFamily={'pop'} style={styles.modalMessage}>{message}</CustomText>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={onConfirm}>
-              <Text style={styles.buttonText}>{confirmText} </Text>
+              <CustomText fontFamily={'pop'} style={styles.buttonText}>{confirmText}</CustomText>
             </TouchableOpacity>
           </View>
         </View>
       </View>
+      {/* Modal kapandığında eski duruma dön */}
+      {!visible && <StatusBar style="dark" backgroundColor="#FFFFFF" translucent />}
     </Modal>
   );
 };
@@ -37,7 +44,7 @@ const styles = StyleSheet.create({
     margin: width * 0.05,
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: width * 0.08,
+    padding: width * 0.09,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -50,7 +57,6 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: width * 0.060,
-    fontWeight: 'bold',
     marginBottom: height * 0.02,
   },
   modalMessage: {
@@ -74,7 +80,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontWeight: 'bold',
   },
 });
 

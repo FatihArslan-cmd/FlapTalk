@@ -5,7 +5,7 @@ import { GoogleSignin } from '@react-native-community/google-signin';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import CustomText from "./CustomText";
 export default function LogoutButton() {
     const navigation = useNavigation();
     const route = useRoute();
@@ -46,9 +46,9 @@ export default function LogoutButton() {
 
     return (
         <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-            <Icon name="log-out-outline" size={24} color="#f44336" />
+            <Icon name="log-out-outline" size={28} color="#f44336" />
             <View style={styles.menuTextContainer}>
-                <Text style={styles.menuLabel}>Çıkış Yap</Text>
+                <CustomText fontFamily={'pop'} style={styles.menuLabel}>Çıkış Yap</CustomText>
             </View>
         </TouchableOpacity>
     );

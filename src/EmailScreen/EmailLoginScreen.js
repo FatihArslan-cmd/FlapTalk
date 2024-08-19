@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import SafeAreaWrapper from '../components/SafeAreaWrapper';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ClearButton from '../components/renderClearButton';
