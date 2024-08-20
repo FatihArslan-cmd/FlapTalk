@@ -1,85 +1,82 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import CustomText from './components/CustomText';
 import AppHeader from "./components/AppHeader";
 import moment from 'moment'; 
 import useDisableBackButton from "./hooks/useDisableBackButton";
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
+import SkeletonPlaceholder from "../Skeleton";
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function HomeScreen() {
   const [chatList, setChatList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   useDisableBackButton();
 
-  const fetchChatList = async () => {
-    try {
-      const currentUser = auth().currentUser.uid;
-      const chatListSnapshot = await firestore().collection('friends')
-        .where('userId', '==', currentUser)
-        .get();
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('friends')
+      .where('userId', '==', auth().currentUser.uid)
+      .onSnapshot(async snapshot => {
+        setLoading(true);
 
-      const chatListData = await Promise.all(chatListSnapshot.docs.map(async doc => {
-        const data = doc.data();
-        const friendSnapshot = await firestore().collection('users').doc(data.friendId).get();
-        const friendData = friendSnapshot.data();
+        const chatListData = await Promise.all(snapshot.docs.map(async doc => {
+          const data = doc.data();
+          const friendSnapshot = await firestore().collection('users').doc(data.friendId).get();
+          const friendData = friendSnapshot.data();
 
-        const chatId = [auth().currentUser.uid, data.friendId].sort().join('_');
-        const messagesSnapshot = await firestore()
-          .collection('chats')
-          .doc(chatId)
-          .collection('messages')
-          .orderBy('createdAt', 'desc')
-          .limit(1)
-          .get();
+          const chatId = [auth().currentUser.uid, data.friendId].sort().join('_');
+          const messagesSnapshot = await firestore()
+            .collection('chats')
+            .doc(chatId)
+            .collection('messages')
+            .orderBy('createdAt', 'desc')
+            .limit(1)
+            .get();
 
-        const latestMessageData = messagesSnapshot.docs.length > 0 
-          ? messagesSnapshot.docs[0].data() 
-          : { text: 'No messages yet', createdAt: null, type: 'text' };
+          const latestMessageData = messagesSnapshot.docs.length > 0 
+            ? messagesSnapshot.docs[0].data() 
+            : { text: 'No messages yet', createdAt: null, type: 'text' };
 
-        let latestMessage = '';
-        
-        if (latestMessageData.type === 'image') {
-          latestMessage = 'Image';
-        } else if (latestMessageData.type === 'video') {
-          latestMessage = 'Video';
-        } else if (latestMessageData.type === 'audio') {
-          latestMessage = 'Audio';
-        } else {
-          latestMessage = latestMessageData.text.length > 40 
-            ? latestMessageData.text.substring(0, 40) + '...' 
-            : latestMessageData.text;
-        }
-        const latestMessageTime = latestMessageData.createdAt 
-          ? moment(latestMessageData.createdAt.toDate()).format('HH:mm') 
-          : '';
+          let latestMessage = '';
+          if (latestMessageData.type === 'image') {
+            latestMessage = 'Image';
+          } else if (latestMessageData.type === 'video') {
+            latestMessage = 'Video';
+          } else if (latestMessageData.type === 'audio') {
+            latestMessage = 'Audio';
+          } else {
+            latestMessage = latestMessageData.text.length > 40 
+              ? latestMessageData.text.substring(0, 40) + '...' 
+              : latestMessageData.text;
+          }
 
-        return {
-          friendId: data.friendId,
-          avatar: friendData.avatar || defaultAvatar,
-          username: friendData.username,
-          latestMessage: latestMessage,
-          latestMessageTime: latestMessageTime,
-        };
-      }));
+          const latestMessageTime = latestMessageData.createdAt 
+            ? moment(latestMessageData.createdAt.toDate()).format('HH:mm') 
+            : '';
 
-      setChatList(chatListData);
-    } catch (error) {
-      console.error('Error fetching chat list:', error);
-    }
-  };
+          return {
+            friendId: data.friendId,
+            avatar: friendData.avatar || defaultAvatar,
+            username: friendData.username,
+            latestMessage: latestMessage,
+            latestMessageTime: latestMessageTime,
+          };
+        }));
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchChatList();
-    }, [])
-  );
+        setChatList(chatListData);
+        setLoading(false);
+      });
+
+    return () => unsubscribe(); // Clean up the listener on unmount
+  }, []);
 
   const startChat = (userId) => {
     const chatId = [auth().currentUser.uid, userId].sort().join('_');
@@ -90,7 +87,6 @@ export default function HomeScreen() {
     try {
       const currentUser = auth().currentUser.uid;
 
-      // Remove friend
       await firestore()
         .collection('friends')
         .where('userId', '==', currentUser)
@@ -102,7 +98,6 @@ export default function HomeScreen() {
           });
         });
 
-      // Delete chat messages
       const chatId = [currentUser, friendId].sort().join('_');
       const chatMessages = await firestore()
         .collection('chats')
@@ -112,8 +107,6 @@ export default function HomeScreen() {
       chatMessages.forEach(async doc => {
         await doc.ref.delete();
       });
-
-      fetchChatList(); // Refresh the chat list
 
       Alert.alert('Success', 'Friend removed and chat deleted.');
     } catch (error) {
@@ -130,15 +123,25 @@ export default function HomeScreen() {
     </View>
   );
 
+  const renderSkeletonItem = () => (
+    <View style={styles.item}>
+      <SkeletonPlaceholder width={50} height={50} borderRadius={15} />
+      <View style={styles.messageContainer}>
+        <SkeletonPlaceholder width={100} height={20} borderRadius={4} />
+        <SkeletonPlaceholder width={150} height={15} borderRadius={4} />
+      </View>
+    </View>
+  );
+
   const renderChatItem = ({ item }) => (
     <Swipeable renderRightActions={() => renderRightActions(item.friendId)}>
       <TouchableOpacity style={styles.item} onPress={() => startChat(item.friendId)}>
         <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
         <View style={styles.messageContainer}>
-          <CustomText fontFamily={'pop'} style={styles.name}>{item.username} </CustomText>
+          <CustomText fontFamily={'pop'} style={styles.name}>{item.username}</CustomText>
           <View style={styles.latestMessageContainer}>
-            <CustomText fontFamily={'lato-bold'} style={styles.latestMessage}> {item.latestMessage} </CustomText>
-            <CustomText fontFamily={'lato-bold'} style={styles.latestMessageTime}>{item.latestMessageTime} </CustomText>
+            <CustomText fontFamily={'lato-bold'} style={styles.latestMessage}>{item.latestMessage}</CustomText>
+            <CustomText fontFamily={'lato-bold'} style={styles.latestMessageTime}>{item.latestMessageTime}</CustomText>
           </View>
         </View>
       </TouchableOpacity>
@@ -152,16 +155,24 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <AppHeader title={'FlapTalk'} textColor={'#00ae59'} onSearch={setSearchText} />
-      <FlatList
-        data={filteredChatList}
-        keyExtractor={(item) => item.friendId}
-        renderItem={renderChatItem}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No chats found</Text>
-          </View>
-        )}
-      />
+      {loading ? (
+        <FlatList
+          data={[...Array(10).keys()]}
+          keyExtractor={(item) => item.toString()}
+          renderItem={renderSkeletonItem}
+        />
+      ) : (
+        <FlatList
+          data={filteredChatList}
+          keyExtractor={(item) => item.friendId}
+          renderItem={renderChatItem}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No chats found</Text>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 }
@@ -217,19 +228,24 @@ const styles = StyleSheet.create({
   actionsContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FF3B30',
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 5,
-    marginLeft: 10,
+    width: 75,
   },
   deleteAction: {
+    backgroundColor: '#ff0000',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 80,
+    width: 75,
+    height: '100%',
   },
   actionText: {
     color: '#fff',
     fontSize: 12,
   },
+  skeleton: {
+    marginVertical: 10,
+    marginHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#eaeaea',
+  },
 });
+

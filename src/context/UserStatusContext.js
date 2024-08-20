@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
-import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import NetInfo from '@react-native-community/netinfo';
 import { firebase } from '@react-native-firebase/auth';
