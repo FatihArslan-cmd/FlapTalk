@@ -60,34 +60,43 @@ export default function UsersList() {
   const addFriend = async (friendId) => {
     try {
       const currentUser = auth().currentUser.uid;
-
+  
       // Check if the friend is already added
       const friendsQuerySnapshot = await firestore()
         .collection('friends')
         .where('userId', '==', currentUser)
         .where('friendId', '==', friendId)
         .get();
-
+  
       if (!friendsQuerySnapshot.empty) {
         setAlertMessage('This user is already in your friend list.');
         setAlertVisible(true);
         return;
       }
-
-      // Add friend to Firestore
+  
+      // Add friend to Firestore for the current user
       await firestore().collection('friends').add({
         userId: currentUser,
         friendId,
         avatar: filteredUsers.find(user => user.id === friendId).avatar || defaultAvatar,
         time: new Date().toISOString(),
       });
-
+  
+      // Add the current user as a friend for the other user
+      await firestore().collection('friends').add({
+        userId: friendId,
+        friendId: currentUser,
+        avatar: auth().currentUser.photoURL || defaultAvatar, // Assuming the current user's avatar is available here
+        time: new Date().toISOString(),
+      });
+  
       setAlertMessage('This user has been added to your friend list.');
       setAlertVisible(true);
     } catch (error) {
       console.error('Error adding friend:', error);
     }
   };
+  
 
   const blockUser = async (userId) => {
     setAlertMessage('This user has been blocked.');

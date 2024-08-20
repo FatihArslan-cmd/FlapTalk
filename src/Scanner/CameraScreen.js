@@ -35,31 +35,39 @@ export default function CameraScreen({ navigation }) {
         .collection("users")
         .where("username", "==", data)
         .get();
-
+  
       if (!usersSnapshot.empty) {
         // If the user is found, add them as a friend
         const friendId = usersSnapshot.docs[0].id;
         const currentUser = auth().currentUser.uid;
-
+  
         // Check if the friend is already added
         const friendsQuerySnapshot = await firestore()
           .collection("friends")
           .where("userId", "==", currentUser)
           .where("friendId", "==", friendId)
           .get();
-
+  
         if (!friendsQuerySnapshot.empty) {
           setAlertTitle('Friend Exists');
           setAlertMessage('This user is already in your friend list.');
         } else {
-          // Add friend to Firestore
+          // Add friend to Firestore for the current user
           await firestore().collection("friends").add({
             userId: currentUser,
             friendId,
             avatar: usersSnapshot.docs[0].data().avatar || defaultAvatar,
             time: new Date().toISOString(),
           });
-
+  
+          // Add the current user as a friend for the other user
+          await firestore().collection("friends").add({
+            userId: friendId,
+            friendId: currentUser,
+            avatar: auth().currentUser.photoURL || defaultAvatar, // Assuming the current user's avatar is available here
+            time: new Date().toISOString(),
+          });
+  
           setAlertTitle('Friend Added');
           setAlertMessage('This user has been added to your friend list.');
         }
@@ -75,6 +83,7 @@ export default function CameraScreen({ navigation }) {
       setAlertVisible(true);
     }
   };
+  
 
   const handleAlertConfirm = () => {
     setAlertVisible(false);
