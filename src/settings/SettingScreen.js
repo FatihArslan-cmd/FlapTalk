@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo } from "react";
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, TextInput, Share } from "react-native";
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, TextInput, Share, Modal } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import useDisableBackButton from "../hooks/useDisableBackButton";
 import LogoutButton from "../components/LogoutButton";
@@ -10,9 +10,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import CustomText from "../components/CustomText";
 import AppHeader from "../components/AppHeader";
-import { debounce } from 'lodash';  // Import debounce from lodash
-import AlertComponent from '../components/AlertComponent';  // Import your AlertComponent
-import useAlert from '../hooks/useAlert';  // Import your custom hook
+import { debounce } from 'lodash';
+import AlertComponent from '../components/AlertComponent';
+import useAlert from '../hooks/useAlert';
+import { Barcode } from 'expo-barcode-generator';
 
 const { width } = Dimensions.get('window');
 
@@ -21,8 +22,9 @@ export default function SettingScreen() {
   const [userData, setUserData] = useState({ username: '', about: '', avatar: '' });
   const [isChanged, setIsChanged] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [barcodeVisible, setBarcodeVisible] = useState(false);  // State to control barcode modal visibility
   const navigation = useNavigation();
-  const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();  // Use your custom hook
+  const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
   useDisableBackButton();
 
   useEffect(() => {
@@ -65,7 +67,6 @@ export default function SettingScreen() {
         .get();
 
       if (!usernameSnapshot.empty && usernameSnapshot.docs[0].id !== user.uid) {
-        // Use custom alert
         showAlert('Error', 'This username is already taken. Please choose another one.');
         return;
       }
@@ -75,12 +76,10 @@ export default function SettingScreen() {
         about: userData.about.trim(),
         avatar: userData.avatar,
       });
-      // Use custom alert for success
       showAlert('Profile Updated', 'Your profile has been successfully updated.', () => {
         setIsChanged(false);
       });
     } catch (error) {
-      // Use custom alert for error
       showAlert('Error', 'There was an error updating your profile. Please try again.');
     }
   };
@@ -100,11 +99,15 @@ export default function SettingScreen() {
     try {
       await Share.share({
         message: `Check out this amazing app!`,
-        url: 'https://your-app-url.com', // Replace with your app's URL
+        url: 'https://your-app-url.com',
       });
     } catch (error) {
       showAlert('Error', 'There was an error sharing the app.');
     }
+  };
+
+  const handleInviteFriend = () => {
+    setBarcodeVisible(true);  // Show the barcode modal when "Arkadaş davet et" is pressed
   };
 
   const menuItems = [
@@ -117,7 +120,6 @@ export default function SettingScreen() {
     { icon: 'people-outline', label: 'Arkadaş davet et', subLabel: 'Arkadaşlarını davet et' },
     { icon: 'globe-outline', label: 'Uygulama dili', subLabel: 'Türkçe (cihaz dili)' },
     { icon: 'help-circle-outline', label: 'Yardım', subLabel: 'Destek alın, geri bildirim gönderin' },
-    // Add the Share menu item
     { icon: 'share-outline', label: 'Uygulamayı Paylaş', subLabel: 'Arkadaşlarınla paylaş' },
   ];
 
@@ -129,7 +131,9 @@ export default function SettingScreen() {
     <TouchableOpacity
       style={styles.menuItem}
       onPress={() => {
-        if (item.label === 'Uygulamayı Paylaş') {
+        if (item.label === 'Arkadaş davet et') {
+          handleInviteFriend();
+        } else if (item.label === 'Uygulamayı Paylaş') {
           handleShare();
         } else {
           // Handle other menu items
@@ -187,14 +191,41 @@ export default function SettingScreen() {
         }
         ListFooterComponent={<LogoutButton />}
       />
-      {/* Use AlertComponent with custom hook */}
+      {/* Barcode Modal */}
+      <Modal
+        visible={barcodeVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setBarcodeVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Arkadaşına Davet Et</Text>
+            <Barcode
+              value={userData.username}
+              options={{
+                format: 'CODE128',
+                background: '#fff',
+                lineColor: '#000',
+              }}
+              width={2}
+              height={100}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setBarcodeVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Kapat</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <AlertComponent
         visible={isVisible}
         onClose={hideAlert}
+        onConfirm={confirmAlert}
         title={title}
         message={message}
-        onConfirm={confirmAlert}
-        confirmText="OK"
       />
     </View>
   );
@@ -203,72 +234,86 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 20,
+    margin: 20,
   },
   userInfo: {
-    marginLeft: 15,
-    flex: 1,
+    marginLeft: 20,
   },
   usernameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   usernameInput: {
-    fontSize:  20,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    marginBottom: 10,
-    flex: 1,
   },
   editIcon: {
     marginLeft: 10,
   },
   aboutInput: {
-    fontSize: 14,
+    marginTop: 10,
+    fontSize: 16,
     color: '#666',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    paddingVertical: 5,
-    paddingHorizontal: 0,
   },
   updateButton: {
     backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 10,
+    padding: 10,
+    margin: 20,
+    borderRadius: 5,
     alignItems: 'center',
-    marginBottom: 30,
-    marginHorizontal: 20,
   },
   updateButtonText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#eee',
   },
   menuTextContainer: {
-    marginLeft: 20,
+    marginLeft: 15,
   },
   menuLabel: {
     fontSize: 16,
-    color: '#333',
   },
   menuSubLabel: {
     fontSize: 12,
-    color: '#888',
+    color: '#999',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: width * 0.8,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#4CAF50',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
