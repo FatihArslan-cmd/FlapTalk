@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Text } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import Header from './Header';
@@ -9,7 +9,7 @@ import LoadingOverlay from '../components/LoadingOverlay';
 import Button from '../components/Button';
 import AlertComponent from '../components/AlertComponent';
 import CustomText from '../components/CustomText';
-
+import useAlert from '../hooks/useAlert'; // Import your custom hook
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,11 +21,9 @@ const PhoneLoginScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
   const inputRefs = useRef([]);
   const navigation = useNavigation();
+  const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert(); // Use the custom hook
 
   function onAuthStateChanged(user) {
     if (user) {
@@ -38,22 +36,7 @@ const PhoneLoginScreen = () => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  const showAlert = (title, message) => {
-    setAlertTitle(title);
-    setAlertMessage(message);
-    setAlertVisible(true);
-  };
-
-  const handleCloseAlert = () => {
-    setAlertVisible(false);
-  };
-
-  const handleConfirmAlert = () => {
-    setAlertVisible(false);
-    // Additional confirmation logic if needed
-  };
-
-  async function signInWithPhoneNumber() {
+  const signInWithPhoneNumber = async () => {
     if (phoneNumber.trim() === '') {
       showAlert('Hata', 'Lütfen telefon numaranızı girin.');
       return;
@@ -68,20 +51,19 @@ const PhoneLoginScreen = () => {
       setLoading(true);
       const confirmation = await auth().signInWithPhoneNumber(`+${callingCode}${phoneNumber}`);
       setConfirm(confirmation);
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
       if (error.code === 'auth/too-many-requests') {
         showAlert('Hata', 'Bu cihazdan yapılan istekler alışılmadık bir etkinlik nedeniyle engellendi. Lütfen daha sonra tekrar deneyin.');
       } else {
         showAlert('Hata', 'Telefon numarası doğrulaması başarısız.');
         console.log(error);
       }
+    } finally {
+      setLoading(false);
     }
-  }
-  
+  };
 
-  async function confirmCode() {
+  const confirmCode = async () => {
     try {
       const fullCode = code.join('');
       if (fullCode.length !== 6) {
@@ -91,10 +73,8 @@ const PhoneLoginScreen = () => {
       setLoading(true);
       const userCredential = await confirm.confirm(fullCode);
       setUserInfo(userCredential.user);
-      setLoading(false);
       navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'phone' });
     } catch (error) {
-      setLoading(false);
       if (error.code === 'auth/invalid-verification-code') {
         showAlert('Hata', 'Geçersiz doğrulama kodu.');
       } else if (error.code === 'auth/too-many-requests') {
@@ -103,10 +83,10 @@ const PhoneLoginScreen = () => {
         showAlert('Hata', 'Doğrulama kodu doğrulaması başarısız.');
         console.log(error);
       }
+    } finally {
+      setLoading(false);
     }
-  }
-  
-  
+  };
 
   return (
     <View style={styles.container}>
@@ -131,18 +111,22 @@ const PhoneLoginScreen = () => {
       ) : (
         <>
           <Header color='#00ae59' text="Numaranız Doğrulanıyor"/>
-          <CustomText fontFamily={'lato'} style={styles.verificationInfoText}>+{callingCode} {phoneNumber} numaralı telefona gönderilen kodu aşağıdaki bölmeye yazınız. </CustomText>
-          <CustomText fontFamily={'lato'} style={styles.wrongNumberText}>Numara yanlış mı? </CustomText>
+          <CustomText fontFamily={'lato'} style={styles.verificationInfoText}>
+            +{callingCode} {phoneNumber} numaralı telefona gönderilen kodu aşağıdaki bölmeye yazınız.
+          </CustomText>
+          <CustomText fontFamily={'lato'} style={styles.wrongNumberText}>
+            Numara yanlış mı?
+          </CustomText>
           <CodeInput code={code} setCode={setCode} inputRefs={inputRefs} />
           <Button margin={15} onPress={confirmCode} text="Onayla " />
         </>
       )}
       <AlertComponent
-        visible={alertVisible}
-        onClose={handleCloseAlert}
-        title={alertTitle}
-        message={alertMessage}
-        onConfirm={handleConfirmAlert}
+        visible={isVisible}
+        onClose={hideAlert}
+        title={title}
+        message={message}
+        onConfirm={confirmAlert}
         confirmText="Tamam"
       />
     </View>
@@ -176,7 +160,5 @@ const styles = StyleSheet.create({
     color: '#5eb2ce',
   },
 });
-
-
 
 export default PhoneLoginScreen;

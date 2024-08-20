@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, TextInput, StyleSheet, Dimensions } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getCurrentDate } from '../utils/date';
@@ -11,6 +11,7 @@ import AvatarChoose from './AvatarChoose';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClearButton from './renderClearButton';
 import Button from './Button';
+import useAlert from '../hooks/useAlert';
 
 const { width, height } = Dimensions.get('window');
 
@@ -18,14 +19,12 @@ const UserInfoScreen = ({ route }) => {
   const { uid, loginMethod } = route.params;
   const [username, setUsername] = useState('');
   const [about, setAbout] = useState('');
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState('');
   const [avatar, setAvatar] = useState('');
 
   const navigation = useNavigation();
+  const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -47,16 +46,13 @@ const UserInfoScreen = ({ route }) => {
       const storeLoginMethod = async () => {
         await AsyncStorage.setItem('loginMethod', loginMethod);
       };
-      console.log(loginMethod)
       storeLoginMethod();
     }, [loginMethod])
   );
 
   const handleSave = async () => {
     if (!username.trim()) {
-      setAlertTitle('Uyarı');
-      setAlertMessage('Lütfen tüm alanları doldurun.');
-      setAlertVisible(true);
+      showAlert('Uyarı', 'Lütfen tüm alanları doldurun.');
       return;
     }
   
@@ -69,9 +65,7 @@ const UserInfoScreen = ({ route }) => {
         .get();
   
       if (!usernameSnapshot.empty && usernameSnapshot.docs[0].id !== uid) {
-        setAlertTitle('Hata');
-        setAlertMessage('Bu kullanıcı adı zaten alınmış. Lütfen başka bir kullanıcı adı seçin.');
-        setAlertVisible(true);
+        showAlert('Hata', 'Bu kullanıcı adı zaten alınmış. Lütfen başka bir kullanıcı adı seçin.');
         setLoading(false);
         return;
       }
@@ -111,9 +105,9 @@ const UserInfoScreen = ({ route }) => {
           style={styles.input}
           placeholder="Kullanıcı Adı"
           value={username}
-          onChangeText={setUsername}
+          onChangeText={(text) => setUsername(text.slice(0, 16))} 
         />
-        <ClearButton value={username} setValue={setUsername} />
+        <ClearButton value={username} setValue={(text) => setUsername(text.slice(0, 16))} />
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -127,11 +121,11 @@ const UserInfoScreen = ({ route }) => {
       <AvatarChoose onAvatarSelect={handleAvatarSelect} />
       <Button onPress={handleSave} text={'Kaydet'}/>
       <AlertComponent
-        visible={alertVisible}
-        onClose={() => setAlertVisible(false)}
-        title={alertTitle}
-        message={alertMessage}
-        onConfirm={() => setAlertVisible(false)}
+        visible={isVisible}
+        onClose={hideAlert}
+        title={title}
+        message={message}
+        onConfirm={confirmAlert}
         confirmText="Tamam"
       />
       <LoadingOverlay visible={loading} />
@@ -145,10 +139,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: height * 0.1,
     backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: height * 0.04,
-    color: '#008000',
   },
   subtitle: {
     fontSize: height * 0.025,
@@ -170,18 +160,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: height * 0.05,
-  },
-  button: {
-    backgroundColor: '#008000',
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.1,
-    borderRadius: 16,
-    marginTop: 'auto',
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: height * 0.02,
   },
 });
 

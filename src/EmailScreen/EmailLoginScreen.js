@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { View, StyleSheet, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
@@ -7,9 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ClearButton from '../components/renderClearButton';
-import AlertComponent from '../components/AlertComponent';
 import CustomText from '../components/CustomText';
 import LoadingOverlay from '../components/LoadingOverlay';
+import useAlert from '../hooks/useAlert'; // Import your custom hook
 
 const { width } = Dimensions.get('window');
 
@@ -19,28 +19,20 @@ const EmailLoginScreen = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert(); // Use the custom hook
   
   const handleForgotPassword = async () => {
     if (!email) {
-      setAlertTitle('Validation Error');
-      setAlertMessage('Please enter your email address.');
-      setAlertVisible(true);
+      showAlert('Validation Error', 'Please enter your email address.');
       return;
     }
 
     try {
       await firebase.auth().sendPasswordResetEmail(email);
-      setAlertTitle('Success');
-      setAlertMessage('Password reset email sent.');
-      setAlertVisible(true);
+      showAlert('Success', 'Password reset email sent.');
     } catch (error) {
-      setAlertTitle('Error');
-      setAlertMessage('Failed to send password reset email. Please try again.');
-      setAlertVisible(true);
+      showAlert('Error', 'Failed to send password reset email. Please try again.');
     }
   };
 
@@ -61,9 +53,7 @@ const EmailLoginScreen = () => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setAlertTitle('Validation Error');
-      setAlertMessage('Please fill in all fields.');
-      setAlertVisible(true);
+      showAlert('Validation Error', 'Please fill in all fields.');
       return;
     }
 
@@ -73,9 +63,7 @@ const EmailLoginScreen = () => {
       const user = userCredential.user;
 
       if (!user.emailVerified) {
-        setAlertTitle('Email Not Verified');
-        setAlertMessage('Please verify your email before logging in.');
-        setAlertVisible(true);
+        showAlert('Email Not Verified', 'Please verify your email before logging in.');
         return;
       }
 
@@ -87,82 +75,78 @@ const EmailLoginScreen = () => {
 
       navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'email' });
     } catch (error) {
+      let errorMessage = 'Something went wrong. Please try again.';
       if (error.code === 'auth/invalid-email') {
-        setAlertTitle('Login Error');
-        setAlertMessage('That email address is invalid.');
+        errorMessage = 'That email address is invalid.';
       } else if (error.code === 'auth/user-not-found') {
-        setAlertTitle('Login Error');
-        setAlertMessage('No user found with that email address.');
+        errorMessage = 'No user found with that email address.';
       } else if (error.code === 'auth/wrong-password') {
-        setAlertTitle('Login Error');
-        setAlertMessage('Incorrect password.');
-      } else {
-        setAlertTitle('Login Error');
-        setAlertMessage('Something went wrong. Please try again.');
+        errorMessage = 'Incorrect password.';
       }
-      setAlertVisible(true);
+      showAlert('Login Error', errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-      <Animatable.View style={styles.container} animation="fadeInDownBig" duration={600}>
-        <CustomText fontFamily={'pop'} style={styles.title}>Log In</CustomText>
-        <View style={styles.inputWrapper}>
-          <Icon name="email" size={20} color="#888" style={styles.inputIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <ClearButton value={email} setValue={setEmail} />
-        </View>
-        <View style={styles.inputWrapper}>
-          <Icon name="lock" size={20} color="#888" style={styles.inputIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconWrapper}>
-            <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color="#888" />
-          </TouchableOpacity>
-          <ClearButton value={password} setValue={setPassword} />
-        </View>
-        <View style={styles.rememberMeContainer}>
-          <TouchableOpacity onPress={() => setRememberMe(!rememberMe)}>
-            <Icon name={rememberMe ? 'check-box' : 'check-box-outline-blank'} size={24} color="#888" />
-          </TouchableOpacity>
-          <CustomText fontFamily={'pop'} style={styles.rememberMeText}>Remember me</CustomText>
-        </View>
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Icon name="login" size={20} color="#fff" style={styles.buttonIcon} />
-          <CustomText fontFamily={'pop'} style={styles.buttonText}>Log In</CustomText>
+    <Animatable.View style={styles.container} animation="fadeInDownBig" duration={600}>
+      <CustomText fontFamily={'pop'} style={styles.title}>Log In</CustomText>
+      <View style={styles.inputWrapper}>
+        <Icon name="email" size={20} color="#888" style={styles.inputIcon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <ClearButton value={email} setValue={setEmail} />
+      </View>
+      <View style={styles.inputWrapper}>
+        <Icon name="lock" size={20} color="#888" style={styles.inputIcon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconWrapper}>
+          <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color="#888" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
-          <Icon name="help-outline" size={20} color="#005657" style={styles.forgotPasswordIcon} />
-          <CustomText fontFamily={'pop'} style={styles.forgotPasswordText}>Forgot Password?</CustomText>
+        <ClearButton value={password} setValue={setPassword} />
+      </View>
+      <View style={styles.rememberMeContainer}>
+        <TouchableOpacity onPress={() => setRememberMe(!rememberMe)}>
+          <Icon name={rememberMe ? 'check-box' : 'check-box-outline-blank'} size={24} color="#888" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('EmailSignup')} style={styles.linkWrapper}>
-          <Icon name="person-add" size={20} color="#005657" style={styles.linkIcon} />
-          <CustomText fontFamily={'pop'} style={styles.link}>Don't have an account? Sign Up</CustomText>
-        </TouchableOpacity>
+        <CustomText fontFamily={'pop'} style={styles.rememberMeText}>Remember me</CustomText>
+      </View>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Icon name="login" size={20} color="#fff" style={styles.buttonIcon} />
+        <CustomText fontFamily={'pop'} style={styles.buttonText}>Log In</CustomText>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
+        <Icon name="help-outline" size={20} color="#005657" style={styles.forgotPasswordIcon} />
+        <CustomText fontFamily={'pop'} style={styles.forgotPasswordText}>Forgot Password?</CustomText>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('EmailSignup')} style={styles.linkWrapper}>
+        <Icon name="person-add" size={20} color="#005657" style={styles.linkIcon} />
+        <CustomText fontFamily={'pop'} style={styles.link}>Don't have an account? Sign Up</CustomText>
+      </TouchableOpacity>
+      {isVisible && (
         <AlertComponent
-          visible={alertVisible}
-          onClose={() => setAlertVisible(false)}
-          title={alertTitle}
-          message={alertMessage}
-          onConfirm={() => setAlertVisible(false)}
+          visible={isVisible}
+          onClose={hideAlert}
+          title={title}
+          message={message}
+          onConfirm={confirmAlert}
           confirmText="OK"
         />
-        <LoadingOverlay visible={loading} />
-      </Animatable.View>
-
+      )}
+      <LoadingOverlay visible={loading} />
+    </Animatable.View>
   );
 };
 
