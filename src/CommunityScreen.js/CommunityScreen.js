@@ -129,7 +129,7 @@ export default function UsersList() {
 
   return (
     <View style={styles.container}>
-      <AppHeader title="Find Friends" textColor="black" showCameraIcon={false} onSearch={setSearchText} />
+      <AppHeader showCameraIcon={true} title="Find Friends" textColor="black"  onSearch={setSearchText} />
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => item.id}
