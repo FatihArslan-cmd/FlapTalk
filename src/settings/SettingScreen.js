@@ -60,6 +60,11 @@ export default function SettingScreen() {
   };
 
   const handleUpdateProfile = async () => {
+    if (!userData.username.trim()) {
+      showAlert('Error', 'Username cannot be empty.');
+      return;
+    }
+
     try {
       const usernameSnapshot = await firestore()
         .collection('users')
@@ -85,6 +90,9 @@ export default function SettingScreen() {
   };
 
   const handleInputChange = (field, value) => {
+    if (field === 'username' && value.length > 16) {
+      return; // Limit the length of username to 16 characters
+    }
     setUserData({ ...userData, [field]: value });
     setIsChanged(true);
   };
@@ -170,6 +178,7 @@ export default function SettingScreen() {
                     value={userData.username}
                     onChangeText={(text) => handleInputChange('username', text)}
                     placeholder="Username"
+                    maxLength={16}  // Limit the input length to 16 characters
                   />
                   <Icon name="pencil-outline" size={20} color="#888" style={styles.editIcon} />
                 </View>

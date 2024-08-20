@@ -2,13 +2,14 @@ import React, { useState, useCallback } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import CustomText from './CustomText';
 import ClearButton from './renderClearButton';
 
 const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const navigation = useNavigation();
 
   useFocusEffect(
     useCallback(() => {
@@ -31,6 +32,10 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
   const handleBackPress = () => {
     setIsSearching(false);
     handleClearSearch();
+  };
+
+  const handleCameraPress = () => {
+    navigation.navigate('CameraScreen'); // Navigates to the CameraScreen
   };
 
   return (
@@ -56,7 +61,9 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
           </CustomText>
           <View style={styles.iconContainer}>
             {showCameraIcon && (
-              <MaterialCommunityIcons name="camera" size={28} color="black" style={styles.inputIcon} />
+              <TouchableOpacity onPress={handleCameraPress}>
+                <MaterialCommunityIcons name="camera" size={28} color="black" style={styles.inputIcon} />
+              </TouchableOpacity>
             )}
             <TouchableOpacity onPress={() => setIsSearching(true)}>
               <Icon name="search" size={28} color="black" style={styles.inputIcon} />
@@ -70,6 +77,7 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
     </View>
   );
 };
+
 
 
 const styles = StyleSheet.create({

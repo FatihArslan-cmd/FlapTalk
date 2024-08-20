@@ -11,6 +11,7 @@ import EmailSignupScreen from '../EmailScreen/EmailSignupScreen';
 import TabNavigator from './TabNavigator';
 import ChatRoom from '../ChatScreen/ChatRoom';
 import VideoCallScreen from '../CallsScreen/VideoCallScreen';
+import CameraScreen from '../Scanner/CameraScreen';
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -50,6 +51,7 @@ const Navigation = () => {
         <Stack.Screen name="EmailSignup" component={EmailSignupScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }} />
         <Stack.Screen name="VideoCallScreen" component={VideoCallScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CameraScreen" component={CameraScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

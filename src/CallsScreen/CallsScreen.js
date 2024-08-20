@@ -4,7 +4,8 @@ import AppHeader from '../components/AppHeader'
 
 const CallsScreen = () => {
   return (
-    <View>
+    <View style={{flex:1,    backgroundColor: '#fff',
+    }}>
      <AppHeader title={'Calls'}/>
     </View>
   )

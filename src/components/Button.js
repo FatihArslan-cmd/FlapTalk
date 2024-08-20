@@ -2,11 +2,11 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import CustomText from './CustomText';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const Button = ({ onPress, text, margin = 0, fontFamily = 'pop' }) => {
+const Button = ({ onPress, text, margin = 0,marginTop=0, fontFamily = 'pop' }) => {
   return (
-    <TouchableOpacity style={[styles.button, { margin }]} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, { margin,marginTop }]} onPress={onPress}>
       <CustomText style={styles.buttonText} fontFamily={fontFamily}>
         {text}
       </CustomText>
@@ -17,7 +17,7 @@ const Button = ({ onPress, text, margin = 0, fontFamily = 'pop' }) => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#00ae59',
-    paddingVertical: height * 0.02,
+    paddingVertical: 10, // Fixed padding value for better consistency
     paddingHorizontal: width * 0.1,
     borderRadius: 16,
     alignItems: 'center',
