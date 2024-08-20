@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { CameraView, Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
-import Button from "../components/Button";
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
 import CustomText from "../components/CustomText";
 import AlertComponent from "../components/AlertComponent";
 
@@ -26,11 +27,53 @@ export default function CameraScreen({ navigation }) {
     getCameraPermissions();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
-    setAlertTitle('Barcode Scanned');
-    setAlertMessage(`Bar code with type ${type} and data ${data} has been scanned!`);
-    setAlertVisible(true);
+    try {
+      // Check if the scanned data (username) exists in the database
+      const usersSnapshot = await firestore()
+        .collection("users")
+        .where("username", "==", data)
+        .get();
+
+      if (!usersSnapshot.empty) {
+        // If the user is found, add them as a friend
+        const friendId = usersSnapshot.docs[0].id;
+        const currentUser = auth().currentUser.uid;
+
+        // Check if the friend is already added
+        const friendsQuerySnapshot = await firestore()
+          .collection("friends")
+          .where("userId", "==", currentUser)
+          .where("friendId", "==", friendId)
+          .get();
+
+        if (!friendsQuerySnapshot.empty) {
+          setAlertTitle('Friend Exists');
+          setAlertMessage('This user is already in your friend list.');
+        } else {
+          // Add friend to Firestore
+          await firestore().collection("friends").add({
+            userId: currentUser,
+            friendId,
+            avatar: usersSnapshot.docs[0].data().avatar || defaultAvatar,
+            time: new Date().toISOString(),
+          });
+
+          setAlertTitle('Friend Added');
+          setAlertMessage('This user has been added to your friend list.');
+        }
+      } else {
+        setAlertTitle('User Not Found');
+        setAlertMessage(`No user with username ${data} found.`);
+      }
+    } catch (error) {
+      console.error("Error adding friend:", error);
+      setAlertTitle('Error');
+      setAlertMessage('An error occurred while trying to add the friend.');
+    } finally {
+      setAlertVisible(true);
+    }
   };
 
   const handleAlertConfirm = () => {
@@ -39,15 +82,15 @@ export default function CameraScreen({ navigation }) {
   };
 
   const toggleCameraFacing = () => {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
+    setFacing((current) => (current === "back" ? "front" : "back"));
   };
 
   const toggleTorch = () => {
-    setTorchEnabled(prevState => !prevState); // Toggle the torch state
+    setTorchEnabled((prevState) => !prevState); // Toggle the torch state
   };
 
   const handleZoomIn = () => {
-    setZoom(prevZoom => {
+    setZoom((prevZoom) => {
       const newZoom = Math.min(prevZoom + 0.1, 1); // Increase zoom but limit to 1 (max zoom)
       setZoomText(`${(newZoom * 10).toFixed(1)}x`); // Update zoom level text
       return newZoom;
@@ -55,7 +98,7 @@ export default function CameraScreen({ navigation }) {
   };
 
   const handleZoomOut = () => {
-    setZoom(prevZoom => {
+    setZoom((prevZoom) => {
       const newZoom = Math.max(prevZoom - 0.1, 0); // Decrease zoom but limit to 0 (min zoom)
       setZoomText(`${(newZoom * 10).toFixed(1)}x`); // Update zoom level text
       return newZoom;
@@ -63,7 +106,7 @@ export default function CameraScreen({ navigation }) {
   };
 
   if (hasPermission === null) {
-    return <Text>Requesting camera permission...</Text>;
+    return
   }
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
@@ -74,7 +117,7 @@ export default function CameraScreen({ navigation }) {
       <CameraView
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
         barcodeScannerSettings={{
-          barcodeTypes: ["qr", "pdf417"],
+          barCodeTypes: ["qr", "pdf417", "code128"],
         }}
         style={StyleSheet.absoluteFillObject}
         facing={facing}
@@ -85,13 +128,11 @@ export default function CameraScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={32} color="white" />
         </TouchableOpacity>
-        <CustomText fontFamily={'pop'} style={styles.scanText}>Scan your friend's QR</CustomText>
+        <CustomText fontFamily={"pop"} style={styles.scanText}>Scan your friend's QR</CustomText>
         <TouchableOpacity onPress={toggleCameraFacing} style={styles.flipButton}>
           <Ionicons name="camera-reverse" size={32} color="white" />
         </TouchableOpacity>
       </View>
-
-     
 
       <View style={styles.zoomContainer}>
         <TouchableOpacity onPress={handleZoomOut} style={styles.zoomButton}>
@@ -116,9 +157,7 @@ export default function CameraScreen({ navigation }) {
         <View style={[styles.dash, styles.dashBottomLeft]} />
         <View style={[styles.dash, styles.dashBottomRight]} />
       </View>
-      {scanned && (
-        <Button marginTop={"auto"} text={"Scan Again"} onPress={() => setScanned(false)} />
-      )}
+     
       <AlertComponent
         visible={alertVisible}
         onClose={() => setAlertVisible(false)}
