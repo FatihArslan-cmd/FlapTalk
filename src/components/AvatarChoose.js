@@ -30,10 +30,8 @@ const avatars = [
   { id: 'gallery', type: 'button' } // Özel buton için eklenen öğe
 ];
 
-const defaultAvatar = "file:///data/user/0/com.fatih145911.FlapTalk/cache/ImagePicker/5d3f60eb-b1db-40d4-a463-41a3e091b1a6.jpeg";
-
-export default function AvatarChoose({ onAvatarSelect }) {
-  const [selectedAvatar, setSelectedAvatar] = useState(defaultAvatar);
+const AvatarChoose = ({ onAvatarSelect, initialAvatar }) => {
+  const [selectedAvatar, setSelectedAvatar] = useState(initialAvatar);
   const [modalVisible, setModalVisible] = useState(false);
 
   const openModal = () => {
@@ -47,9 +45,9 @@ export default function AvatarChoose({ onAvatarSelect }) {
   };
 
   const cancelSelection = () => {
-    setSelectedAvatar(defaultAvatar);
+    setSelectedAvatar(initialAvatar);
     setModalVisible(false);
-    onAvatarSelect(defaultAvatar);
+    onAvatarSelect(initialAvatar);
   };
 
   const pickImageFromGallery = async () => {
@@ -78,7 +76,7 @@ export default function AvatarChoose({ onAvatarSelect }) {
     }
 
     return (
-      <TouchableOpacity >
+      <TouchableOpacity onPress={() => selectAvatar(item)}>
         <Image source={item} style={styles.avatar} />
       </TouchableOpacity>
     );
@@ -131,3 +129,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+
+export default AvatarChoose;

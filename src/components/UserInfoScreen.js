@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClearButton from './renderClearButton';
 import Button from './Button';
 import useAlert from '../hooks/useAlert';
+
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
@@ -24,6 +25,7 @@ const UserInfoScreen = ({ route }) => {
 
   const navigation = useNavigation();
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
+
   useEffect(() => {
     return () => {
       const clearSession = async () => {
@@ -42,7 +44,7 @@ const UserInfoScreen = ({ route }) => {
         setUsername(userData.username || '');
         setAbout(userData.about || '');
         setDate(userData.date || '');
-        setAvatar(userData.avatar || '');
+        setAvatar(userData.avatar || ''); // Set the avatar state
       }
     };
 
@@ -126,7 +128,7 @@ const UserInfoScreen = ({ route }) => {
         />
         <ClearButton value={about} setValue={setAbout} />
       </View>
-      <AvatarChoose onAvatarSelect={handleAvatarSelect} />
+      <AvatarChoose initialAvatar={avatar} onAvatarSelect={handleAvatarSelect} />
       <Button onPress={handleSave} text={'Kaydet'}/>
       <AlertComponent
         visible={isVisible}
