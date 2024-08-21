@@ -10,7 +10,7 @@ import ClearButton from '../components/renderClearButton';
 import CustomText from '../components/CustomText';
 import LoadingOverlay from '../components/LoadingOverlay';
 import useAlert from '../hooks/useAlert'; // Import your custom hook
-
+import AlertComponent from '../components/AlertComponent';
 const { width } = Dimensions.get('window');
 
 const EmailSignupScreen = () => {

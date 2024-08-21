@@ -12,7 +12,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClearButton from './renderClearButton';
 import Button from './Button';
 import useAlert from '../hooks/useAlert';
-
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
@@ -25,7 +24,16 @@ const UserInfoScreen = ({ route }) => {
 
   const navigation = useNavigation();
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
-
+  useEffect(() => {
+    return () => {
+      const clearSession = async () => {
+        await AsyncStorage.removeItem('userToken');
+        await AsyncStorage.removeItem('uid');
+      };
+      clearSession();
+    };
+  }, []);
+  
   useEffect(() => {
     const fetchUserInfo = async () => {
       const userDoc = await firestore().collection('users').doc(uid).get();

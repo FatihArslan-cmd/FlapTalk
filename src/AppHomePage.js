@@ -23,60 +23,88 @@ export default function HomeScreen() {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('friends')
-      .where('userId', '==', auth().currentUser.uid)
+      .where('userId', '==', auth().currentUser?.uid)
       .onSnapshot(async snapshot => {
         setLoading(true);
-
-        const chatListData = await Promise.all(snapshot.docs.map(async doc => {
-          const data = doc.data();
-          const friendSnapshot = await firestore().collection('users').doc(data.friendId).get();
-          const friendData = friendSnapshot.data();
-
-          const chatId = [auth().currentUser.uid, data.friendId].sort().join('_');
-          const messagesSnapshot = await firestore()
-            .collection('chats')
-            .doc(chatId)
-            .collection('messages')
-            .orderBy('createdAt', 'desc')
-            .limit(1)
-            .get();
-
-          const latestMessageData = messagesSnapshot.docs.length > 0 
-            ? messagesSnapshot.docs[0].data() 
-            : { text: 'No messages yet', createdAt: null, type: 'text' };
-
-          let latestMessage = '';
-          if (latestMessageData.type === 'image') {
-            latestMessage = 'Image';
-          } else if (latestMessageData.type === 'video') {
-            latestMessage = 'Video';
-          } else if (latestMessageData.type === 'audio') {
-            latestMessage = 'Audio';
-          } else {
-            latestMessage = latestMessageData.text.length > 40 
-              ? latestMessageData.text.substring(0, 40) + '...' 
-              : latestMessageData.text;
+        try {
+          const currentUser = auth().currentUser;
+  
+          if (!currentUser) {
+            // If the user is not logged in, navigate to the login screen
+            navigation.navigate('LoginScreen');
+            return;
           }
-
-          const latestMessageTime = latestMessageData.createdAt 
-            ? moment(latestMessageData.createdAt.toDate()).format('HH:mm') 
-            : '';
-
-          return {
-            friendId: data.friendId,
-            avatar: friendData.avatar || defaultAvatar,
-            username: friendData.username,
-            latestMessage: latestMessage,
-            latestMessageTime: latestMessageTime,
-          };
-        }));
-
-        setChatList(chatListData);
-        setLoading(false);
+  
+          const currentUserData = await firestore().collection('users').doc(currentUser.uid).get();
+          const currentUserProfile = currentUserData.data();
+  
+          if (!currentUserProfile || !currentUserProfile.username) {
+            // If the user's username is missing, navigate to the login screen
+            navigation.navigate('LoginScreen');
+            return;
+          }
+  
+          const chatListData = await Promise.all(snapshot.docs.map(async doc => {
+            const data = doc.data();
+            const friendSnapshot = await firestore().collection('users').doc(data.friendId).get();
+            const friendData = friendSnapshot.data();
+  
+            if (!friendData) return null; // Handle potential null data
+  
+            const chatId = [currentUser.uid, data.friendId].sort().join('_');
+            const messagesSnapshot = await firestore()
+              .collection('chats')
+              .doc(chatId)
+              .collection('messages')
+              .orderBy('createdAt', 'desc')
+              .limit(1)
+              .get();
+  
+            const latestMessageData = messagesSnapshot.docs.length > 0 
+              ? messagesSnapshot.docs[0].data() 
+              : { text: 'No messages yet', createdAt: null, type: 'text' };
+  
+            let latestMessage = '';
+            if (latestMessageData.type === 'image') {
+              latestMessage = 'Image';
+            } else if (latestMessageData.type === 'video') {
+              latestMessage = 'Video';
+            } else if (latestMessageData.type === 'audio') {
+              latestMessage = 'Audio';
+            } else {
+              latestMessage = latestMessageData.text.length > 40 
+                ? latestMessageData.text.substring(0, 40) + '...' 
+                : latestMessageData.text;
+            }
+  
+            const latestMessageTime = latestMessageData.createdAt 
+              ? moment(latestMessageData.createdAt.toDate()).format('HH:mm') 
+              : '';
+  
+            return {
+              friendId: data.friendId,
+              avatar: friendData.avatar || defaultAvatar,
+              username: friendData.username,
+              latestMessage: latestMessage,
+              latestMessageTime: latestMessageTime,
+            };
+          }));
+  
+          // Filter out any null values in the chatListData
+          setChatList(chatListData.filter(item => item !== null));
+        } catch (error) {
+          console.error('Error fetching chat list:', error);
+          Alert.alert('Error', 'An error occurred while loading the chat list.');
+        } finally {
+          setLoading(false);
+        }
       });
-
+  
     return () => unsubscribe(); // Clean up the listener on unmount
-  }, []);
+  }, [navigation]);
+  
+  
+  
 
   const startChat = (userId) => {
     const chatId = [auth().currentUser.uid, userId].sort().join('_');
@@ -231,6 +259,7 @@ const styles = StyleSheet.create({
     width: 75,
   },
   deleteAction: {
+    borderRadius:20,
     backgroundColor: '#ff0000',
     justifyContent: 'center',
     alignItems: 'center',

@@ -24,16 +24,21 @@ export default function UsersList() {
       const currentUser = auth().currentUser.uid;
       const usersCollection = await firestore().collection('users').get();
       const fetchedUsers = usersCollection.docs
-        .map(doc => ({ ...doc.data(), id: doc.id }))
+        .map(doc => ({
+          ...doc.data(),
+          id: doc.id,
+          avatar: doc.data().avatar || defaultAvatar, // Ensure avatar is set
+        }))
         .filter(user => user.id !== currentUser)
         .sort((a, b) => (b.state === 'online') - (a.state === 'online'));
-
+  
       setUsers(fetchedUsers);
       setFilteredUsers(fetchedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
   };
+  
 
   useFocusEffect(
     useCallback(() => {
