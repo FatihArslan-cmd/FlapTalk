@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
+import React, { useState, useEffect, useContext, useMemo,useRef } from "react";
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, TextInput, Share, Modal } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import useDisableBackButton from "../hooks/useDisableBackButton";
@@ -14,7 +14,7 @@ import { debounce } from 'lodash';
 import AlertComponent from '../components/AlertComponent';
 import useAlert from '../hooks/useAlert';
 import { Barcode } from 'expo-barcode-generator';
-
+import LanguageSelector from "./LanguageSelectionModal";
 const { width } = Dimensions.get('window');
 
 export default function SettingScreen() {
@@ -24,6 +24,8 @@ export default function SettingScreen() {
   const [searchText, setSearchText] = useState('');
   const [barcodeVisible, setBarcodeVisible] = useState(false);  // State to control barcode modal visibility
   const navigation = useNavigation();
+  const languageSelectorRef = useRef();
+
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
   useDisableBackButton();
 
@@ -143,6 +145,8 @@ export default function SettingScreen() {
           handleInviteFriend();
         } else if (item.label === 'Uygulamayı Paylaş') {
           handleShare();
+        }else if (item.label === 'Uygulama dili') {
+          languageSelectorRef.current.openModal();
         } else {
           // Handle other menu items
         }
@@ -229,6 +233,8 @@ export default function SettingScreen() {
           </View>
         </View>
       </Modal>
+      <LanguageSelector ref={languageSelectorRef} />
+
       <AlertComponent
         visible={isVisible}
         onClose={hideAlert}
