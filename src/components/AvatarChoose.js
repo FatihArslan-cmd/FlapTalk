@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, FlatList, TouchableOpacity, Modal, Dimensions } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Button from '../../src/components/Button';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import ProfileIconWithCamera from './ProfileIconWithCamera';
-
+import FastImage from 'react-native-fast-image';
 const { width, height } = Dimensions.get('window');
 
 const avatars = [
@@ -77,7 +77,7 @@ const AvatarChoose = ({ onAvatarSelect, initialAvatar }) => {
 
     return (
       <TouchableOpacity onPress={() => selectAvatar(item)}>
-        <Image source={item} style={styles.avatar} />
+        <FastImage source={item} style={styles.avatar}  resizeMode={FastImage.resizeMode.cover}/>
       </TouchableOpacity>
     );
   };

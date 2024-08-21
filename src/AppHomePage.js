@@ -10,6 +10,7 @@ import useDisableBackButton from "./hooks/useDisableBackButton";
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import SkeletonPlaceholder from "../Skeleton";
+import FastImage from 'react-native-fast-image';
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
@@ -164,7 +165,11 @@ export default function HomeScreen() {
   const renderChatItem = ({ item }) => (
     <Swipeable renderRightActions={() => renderRightActions(item.friendId)}>
       <TouchableOpacity style={styles.item} onPress={() => startChat(item.friendId)}>
-        <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
+        <FastImage 
+          source={{ uri: item.avatar || defaultAvatar }} 
+          style={styles.avatar} 
+          resizeMode={FastImage.resizeMode.cover}
+        />
         <View style={styles.messageContainer}>
           <CustomText fontFamily={'pop'} style={styles.name}>{item.username}</CustomText>
           <View style={styles.latestMessageContainer}>
@@ -204,6 +209,7 @@ export default function HomeScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

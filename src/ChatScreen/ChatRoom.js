@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, StyleSheet, Text, Dimensions, Image, TouchableOpacity, Linking, Modal, Pressable, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Dimensions, TouchableOpacity, Linking, Modal, Pressable } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -12,6 +12,7 @@ import FullScreenImageModal from './FullScreenImageModal';
 import * as Clipboard from 'expo-clipboard'; // Import Clipboard API
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech'; // Import Speech API
+import FastImage from 'react-native-fast-image'; // Import FastImage
 
 const { width } = Dimensions.get('window');
 
@@ -85,10 +86,11 @@ const ChatRoom = () => {
       console.error('Error sending message:', error);
     }
   };
+
   const renderMessageText = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const parts = text.split(urlRegex);
-  
+
     return parts.map((part, index) => {
       if (urlRegex.test(part)) {
         return (
@@ -101,7 +103,7 @@ const ChatRoom = () => {
       }
     });
   };
-  
+
   const handleLongPress = (message) => {
     setSelectedMessage(message);
     setIsModalVisible(true);
@@ -111,7 +113,6 @@ const ChatRoom = () => {
     Clipboard.setString(selectedMessage.text);
     setIsModalVisible(false);
   };
-
 
   const handleDelete = async () => {
     try {
@@ -127,14 +128,12 @@ const ChatRoom = () => {
     }
   };
 
-
   const handleVoice = () => {
     if (selectedMessage && selectedMessage.text) {
       Speech.speak(selectedMessage.text); // Use the Speech API to read the message aloud
     }
     setIsModalVisible(false);
   };
-
 
   const renderItem = ({ item }) => {
     const messageTime = moment(item.createdAt).format('HH:mm');
@@ -152,7 +151,7 @@ const ChatRoom = () => {
             <View>
               {item.type === 'image' ? (
                 <TouchableOpacity onPress={() => setSelectedImageUrl(item.url)}>
-                  <Image source={{ uri: item.url }} style={styles.media} />
+                  <FastImage source={{ uri: item.url }} style={styles.media} resizeMode={FastImage.resizeMode.cover} />
                 </TouchableOpacity>
               ) : item.type === 'video' ? (
                 <Video

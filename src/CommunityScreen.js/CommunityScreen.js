@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import AppHeader from "../components/AppHeader";
 import AlertComponent from "../components/AlertComponent";
 import { calculateMembershipDuration } from "../utils/calculateMembershipDuration ";
+import FastImage from "react-native-fast-image";
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function UsersList() {
@@ -124,8 +125,8 @@ export default function UsersList() {
   const renderItem = ({ item }) => (
     <Swipeable renderRightActions={() => renderRightActions(item)}>
       <View style={styles.item}>
-        <Image source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} />
-        <View style={styles.messageContainer}>
+      <FastImage source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} resizeMode={FastImage.resizeMode.cover} />
+      <View style={styles.messageContainer}>
           <View style={styles.infoContainer}>
             <Text style={styles.name}>{item.username}</Text>
             <Text style={styles.date}>{`Member since ${calculateMembershipDuration(item.date)} `}</Text>
