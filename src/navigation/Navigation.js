@@ -14,6 +14,7 @@ import VideoCallScreen from '../CallsScreen/VideoCallScreen';
 import CameraScreen from '../Scanner/CameraScreen';
 import HelpScreen from '../settings/HelpScreen';
 import AppInfo from '../settings/AppInfo';
+import ChatSettingsScreen from '../settings/ChatSettingScreen';
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -56,6 +57,7 @@ const Navigation = () => {
         <Stack.Screen name="CameraScreen" component={CameraScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HelpScreen" component={HelpScreen} options={{ headerShown: false }} />
         <Stack.Screen name="AppInfo" component={AppInfo} options={{ headerShown: false }} />
+        <Stack.Screen name="ChatSettingScreen" component={ChatSettingsScreen} options={{ headerShown: false }} />
 
       </Stack.Navigator>
     </NavigationContainer>

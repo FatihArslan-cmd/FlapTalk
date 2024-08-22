@@ -149,6 +149,8 @@ export default function SettingScreen() {
           languageSelectorRef.current.openModal();
         }else if (item.label === 'Yardım') {
           navigation.navigate('HelpScreen');
+        }else if (item.label === 'Sohbetler') {
+          navigation.navigate('ChatSettingScreen');
         } else {
           // Handle other menu items
         }
