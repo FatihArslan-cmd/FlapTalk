@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { Modal, View, StyleSheet, TouchableOpacity, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import CustomText from './CustomText';
 import { StatusBar } from 'expo-status-bar';
 import { BlurView } from 'expo-blur';
@@ -15,19 +15,25 @@ const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmTe
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.centeredView}>
-        <BlurView intensity={50} style={styles.absolute} tint="dark" />
-        {visible && <StatusBar style="light" backgroundColor="rgba(0,0,0,0.5)" translucent />}
-        <View style={styles.modalView}>
-          <CustomText fontFamily={'pop'} style={styles.modalTitle}>{title}</CustomText>
-          <CustomText fontFamily={'pop'} style={styles.modalMessage}>{message}</CustomText>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={onConfirm}>
-              <CustomText fontFamily={'pop'} style={styles.buttonText}>{confirmText}</CustomText>
-            </TouchableOpacity>
-          </View>
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.centeredView}>
+          <BlurView intensity={50} style={styles.absolute} tint="dark" />
+          {visible && <StatusBar style="light" backgroundColor="rgba(0,0,0,0.5)" translucent />}
+          
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <View style={styles.modalView}>
+              <CustomText fontFamily={'pop'} style={styles.modalTitle}>{title}</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.modalMessage}>{message}</CustomText>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button} onPress={onConfirm}>
+                  <CustomText fontFamily={'pop'} style={styles.buttonText}>{confirmText}</CustomText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+          
         </View>
-      </View>
+      </TouchableWithoutFeedback>
       {!visible && <StatusBar style="dark" backgroundColor="#FFFFFF" translucent />}
     </Modal>
   );

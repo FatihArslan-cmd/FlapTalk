@@ -183,7 +183,7 @@ export default function SettingScreen() {
                     style={styles.usernameInput}
                     value={userData.username}
                     onChangeText={(text) => handleInputChange('username', text)}
-                    placeholder="Username"
+                    placeholder="Username "
                     maxLength={16}  // Limit the input length to 16 characters
                   />
                   <Icon name="pencil-outline" size={20} color="#888" style={styles.editIcon} />
@@ -243,6 +243,7 @@ export default function SettingScreen() {
         onConfirm={confirmAlert}
         title={title}
         message={message}
+        confirmText="OK"
       />
     </View>
   );
