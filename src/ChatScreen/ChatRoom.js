@@ -13,6 +13,7 @@ import * as Clipboard from 'expo-clipboard'; // Import Clipboard API
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech'; // Import Speech API
 import FastImage from 'react-native-fast-image'; // Import FastImage
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const { width } = Dimensions.get('window');
 
@@ -24,9 +25,12 @@ const ChatRoom = () => {
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [backgroundColor, setBackgroundColor] = useState('#f8f8f8'); // Default background color
+
   const flatListRef = useRef(null);
 
   useEffect(() => {
+    // Fetch user and messages
     const fetchUser = async () => {
       try {
         const userDoc = await firestore().collection('users').doc(userId).get();
@@ -65,6 +69,20 @@ const ChatRoom = () => {
       );
 
     fetchUser();
+
+    // Fetch background color from AsyncStorage
+    const getBackgroundColor = async () => {
+      try {
+        const storedColor = await AsyncStorage.getItem('selectedColor');
+        if (storedColor) {
+          setBackgroundColor(storedColor);
+        }
+      } catch (error) {
+        console.error('Error fetching background color:', error);
+      }
+    };
+
+    getBackgroundColor(); // Fetch color when the component mounts
 
     return () => fetchMessages();
   }, [chatId, userId]);
@@ -176,7 +194,7 @@ const ChatRoom = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       <StatusBar style="auto" />
       <ChatRoomHeader user={user} chatId={chatId} />
       <FlatList
@@ -221,6 +239,7 @@ const ChatRoom = () => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
