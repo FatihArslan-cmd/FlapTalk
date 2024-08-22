@@ -254,7 +254,7 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor:'#FAF9F6'
   },
   profileContainer: {
     flexDirection: 'row',

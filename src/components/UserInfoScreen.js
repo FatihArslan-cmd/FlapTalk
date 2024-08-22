@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: height * 0.1,
-    backgroundColor: '#fff',
+    backgroundColor:'#FAF9F6'
   },
   subtitle: {
     fontSize: height * 0.025,

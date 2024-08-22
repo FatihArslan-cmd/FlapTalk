@@ -56,7 +56,7 @@ const HelpScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor:'#FAF9F6'
   },
   contentContainer: {
     paddingHorizontal: 10,

@@ -172,7 +172,7 @@ export default function UsersList() {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#fff',
+      backgroundColor:'#FAF9F6',
     },
     item: {
       flexDirection: 'row',

@@ -151,6 +151,7 @@ const ChatSettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:'#FAF9F6'
   },
   contentContainer: {
     paddingHorizontal: 10,
