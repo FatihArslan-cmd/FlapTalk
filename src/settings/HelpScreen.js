@@ -1,23 +1,24 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, ScrollView, Linking } from 'react-native';
-import { Foundation, Ionicons,MaterialCommunityIcons } from '@expo/vector-icons'; // İkonlar için
+import { Foundation, Ionicons, MaterialCommunityIcons, Entypo } from '@expo/vector-icons';
 import SettingsHeader from './SettingsHeader';
 import CustomText from '../components/CustomText';
-import { Entypo } from '@expo/vector-icons';
+
 const HelpScreen = ({ navigation }) => {
   const handleComplaintPress = () => {
-    const email = 'fatiharslan1459@gmail.com'; // Kendi e-posta adresinizi buraya koyun
+    const email = 'fatiharslan1459@gmail.com'; // Replace with your email
     const subject = 'Kanalla ilgili şikayet';
     const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
     Linking.openURL(mailtoUrl);
   };
-  const handleComplaintPressGetHelp = () => {
-    const email = 'fatiharslan1459@gmail.com'; // Kendi e-posta adresinizi buraya koyun
-    const subject = 'Yardıma  ihtiyacım var';
 
+  const handleComplaintPressGetHelp = () => {
+    const email = 'fatiharslan1459@gmail.com'; // Replace with your email
+    const subject = 'Yardıma ihtiyacım var';
     const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
     Linking.openURL(mailtoUrl);
   };
+
   return (
     <View style={styles.container}>
       <SettingsHeader title="Yardım" onBackPress={() => navigation.goBack()} />
@@ -41,7 +42,9 @@ const HelpScreen = ({ navigation }) => {
           <CustomText fontFamily={'pop'} style={styles.menuText}>Kanalla ilgili şikayetler</CustomText>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity 
+          style={styles.menuItem} 
+          onPress={() => navigation.navigate('AppInfo')}>
           <MaterialCommunityIcons name="information-outline" size={24} color="gray" style={styles.icon} />
           <CustomText fontFamily={'pop'} style={styles.menuText}>Uygulama bilgileri</CustomText>
         </TouchableOpacity>
