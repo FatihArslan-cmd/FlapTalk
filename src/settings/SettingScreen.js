@@ -147,6 +147,8 @@ export default function SettingScreen() {
           handleShare();
         }else if (item.label === 'Uygulama dili') {
           languageSelectorRef.current.openModal();
+        }else if (item.label === 'Yardım') {
+          navigation.navigate('HelpScreen');
         } else {
           // Handle other menu items
         }

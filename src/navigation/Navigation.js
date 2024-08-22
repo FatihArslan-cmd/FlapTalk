@@ -12,6 +12,7 @@ import TabNavigator from './TabNavigator';
 import ChatRoom from '../ChatScreen/ChatRoom';
 import VideoCallScreen from '../CallsScreen/VideoCallScreen';
 import CameraScreen from '../Scanner/CameraScreen';
+import HelpScreen from '../settings/HelpScreen';
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -52,6 +53,8 @@ const Navigation = () => {
         <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }} />
         <Stack.Screen name="VideoCallScreen" component={VideoCallScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CameraScreen" component={CameraScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="HelpScreen" component={HelpScreen} options={{ headerShown: false }} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
