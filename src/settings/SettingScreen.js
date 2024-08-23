@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: 20,
+    margin: 15,
   },
   userInfo: {
     marginLeft: 20,
