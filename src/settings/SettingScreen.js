@@ -151,6 +151,8 @@ export default function SettingScreen() {
           navigation.navigate('HelpScreen');
         }else if (item.label === 'Sohbetler') {
           navigation.navigate('ChatSettingScreen');
+        }else if (item.label === 'Favoriler') {
+          navigation.navigate('FavoritesScreen');
         } else {
           // Handle other menu items
         }
