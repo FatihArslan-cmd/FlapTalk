@@ -6,7 +6,7 @@ import { GoogleSignin } from '@react-native-community/google-signin';
 import AuthButton from './AuthButton';
 import auth from '@react-native-firebase/auth';
 import { StatusBar } from 'expo-status-bar';
-
+import useNavigationBarSync from './hooks/useNavigationBarSync';
 const { width, height } = Dimensions.get('window');
 
 const colors = ['#361f34', '#005657', '#ff25ff', '#2c014d', '#fff0d3', '#ff6655'];
@@ -37,8 +37,7 @@ const LoginScreen = () => {
   const [showGoogleBounce, setShowGoogleBounce] = useState(false);
   const [showPhoneBounce, setShowPhoneBounce] = useState(false);
   const [showEmailBounce, setShowEmailBounce] = useState(false);
-  
-  const backgroundColor = useRef(new Animated.Value(0)).current;
+  useNavigationBarSync('black')
   const textColor = useRef(new Animated.Value(0)).current;
   const animation = useRef(new Animated.Value(0)).current;
 
@@ -121,7 +120,7 @@ const LoginScreen = () => {
       setShowEmailBounce(false);
       navigation.navigate('EmailLogin');
       setIsAnimating(false);
-    }, 1000);
+    }, 666);
   };
 
   const handlePhonePress = () => {
@@ -131,7 +130,7 @@ const LoginScreen = () => {
       setShowPhoneBounce(false);
       navigation.navigate('PhoneLoginScreen');
       setIsAnimating(false);
-    }, 1000);
+    }, 666);
   };
 
   const handleGooglePress = () => {
@@ -141,7 +140,7 @@ const LoginScreen = () => {
       setShowGoogleBounce(false);
       await signIn();
       setIsAnimating(false);
-    }, 1000);
+    }, 666);
   };
 
   return (

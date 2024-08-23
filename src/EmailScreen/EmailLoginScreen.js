@@ -11,6 +11,7 @@ import CustomText from '../components/CustomText';
 import LoadingOverlay from '../components/LoadingOverlay';
 import useAlert from '../hooks/useAlert'; // Import your custom hook
 import AlertComponent from '../components/AlertComponent';
+import useNavigationBarSync from '../hooks/useNavigationBarSync';
 const { width } = Dimensions.get('window');
 
 const EmailLoginScreen = () => {
@@ -21,7 +22,9 @@ const EmailLoginScreen = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert(); // Use the custom hook
-  
+  const backgroundColor = styles.container.backgroundColor; 
+  useNavigationBarSync(backgroundColor); 
+
   const handleForgotPassword = async () => {
     if (!email) {
       showAlert('Validation Error', 'Please enter your email address.');

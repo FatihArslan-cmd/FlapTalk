@@ -11,7 +11,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import SkeletonPlaceholder from "../Skeleton";
 import FastImage from 'react-native-fast-image';
-
+import useNavigationBarSync from "./hooks/useNavigationBarSync";
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function HomeScreen() {
@@ -19,6 +19,8 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
+  const backgroundColor = styles.container.backgroundColor; 
+  useNavigationBarSync(backgroundColor); 
   useDisableBackButton();
 
   useEffect(() => {

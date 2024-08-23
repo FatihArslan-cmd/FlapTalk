@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClearButton from './renderClearButton';
 import Button from './Button';
 import useAlert from '../hooks/useAlert';
-
+import useNavigationBarSync from '../hooks/useNavigationBarSync';
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
@@ -22,7 +22,8 @@ const UserInfoScreen = ({ route }) => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState('');
   const [avatar, setAvatar] = useState('');
-
+  const backgroundColor = styles.container.backgroundColor; 
+  useNavigationBarSync(backgroundColor); 
   const navigation = useNavigation();
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
 
