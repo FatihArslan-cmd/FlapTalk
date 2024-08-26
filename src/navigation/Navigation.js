@@ -16,6 +16,7 @@ import HelpScreen from '../settings/HelpScreen';
 import AppInfo from '../settings/AppInfo';
 import ChatSettingsScreen from '../settings/ChatSettingScreen';
 import FavoritesScreen from '../settings/FavoritesScreen';
+import AccountScreen from '../settings/AccountScreen';
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -60,7 +61,7 @@ const Navigation = () => {
         <Stack.Screen name="AppInfo" component={AppInfo} options={{ headerShown: false }} />
         <Stack.Screen name="ChatSettingScreen" component={ChatSettingsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} options={{ headerShown: false }} />
-
+        <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
