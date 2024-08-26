@@ -39,7 +39,7 @@ const AccountScreen = ({ navigation }) => {
             if (error.code === 'auth/requires-recent-login') {
               setAlertProps({
                 title: 'Reauthentication Required',
-                message: 'Please reauthenticate and try again.',
+                message: 'Please re-login to delete the account',
                 confirmText: 'OK',
                 onConfirm: () => {
                   setAlertVisible(false);

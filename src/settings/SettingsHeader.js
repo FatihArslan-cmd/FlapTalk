@@ -24,10 +24,9 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     paddingRight: 10,
-    
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
   },
 });
 

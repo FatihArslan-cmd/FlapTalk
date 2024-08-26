@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -7,13 +7,15 @@ import SettingsHeader from './SettingsHeader';
 import CustomText from '../components/CustomText';
 import FastImage from 'react-native-fast-image';
 import AlertComponent from '../components/AlertComponent';
-
+import SkeletonPlaceholder from '../../Skeleton'; // Import the SkeletonPlaceholder
+import DraggableFlatList from 'react-native-draggable-flatlist';
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 const FavoritesScreen = ({ navigation }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [friends, setFriends] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [loading, setLoading] = useState(true); // Added loading state
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
@@ -63,6 +65,7 @@ const FavoritesScreen = ({ navigation }) => {
       const currentUser = auth().currentUser;
       if (!currentUser) return;
 
+      setLoading(true); // Start loading
       try {
         const favoritesSnapshot = await firestore()
           .collection('favorites')
@@ -83,6 +86,8 @@ const FavoritesScreen = ({ navigation }) => {
         setFavorites(favoritesList);
       } catch (error) {
         console.error('Error fetching favorites:', error);
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
 
@@ -130,23 +135,39 @@ const FavoritesScreen = ({ navigation }) => {
     </TouchableOpacity>
   ), [handleAddFavorite]);
 
-  const renderFavoriteItem = useMemo(() => ({ item }) => (
-    <View style={styles.friendItem}>
+  const renderFavoriteItem = useMemo(() => ({ item, drag }) => (
+    <TouchableOpacity
+      style={styles.friendItem}
+      onLongPress={drag}
+      delayLongPress={200}
+    >
       <FastImage
         source={{ uri: item.avatar || defaultAvatar }}
         style={styles.avatar}
         resizeMode={FastImage.resizeMode.cover}
       />
       <CustomText fontFamily="pop" style={styles.friendName}>{item.username}</CustomText>
-    </View>
+    </TouchableOpacity>
   ), []);
+
+  // Render the skeleton loader if loading is true
+  const renderSkeletonPlaceholder = useMemo(() => (
+    <View style={styles.friendItem}>
+    <SkeletonPlaceholder width={50} height={50} borderRadius={15} />
+    <View style={styles.messageContainer}>
+      <SkeletonPlaceholder width={100} height={20} borderRadius={4} />
+      <SkeletonPlaceholder width={150} height={15} borderRadius={4} />
+    </View>
+  </View>
+  ), [width]);
 
   return (
     <View style={styles.container}>
       <SettingsHeader title="Favorites" onBackPress={handleBackPress} />
-      <FlatList
+      <DraggableFlatList
         data={favorites}
         keyExtractor={(item) => item.id}
+        onDragEnd={({ data }) => setFavorites(data)}
         renderItem={renderFavoriteItem}
         ListHeaderComponent={() => (
           <View>
@@ -166,7 +187,13 @@ const FavoritesScreen = ({ navigation }) => {
             </View>
           </View>
         )}
-        ListEmptyComponent={<CustomText fontFamily={'pop'} style={styles.emptyText}>No favorites found</CustomText>}
+        ListEmptyComponent={
+          loading ? (
+            renderSkeletonPlaceholder // Show skeleton placeholders while loading
+          ) : (
+            <CustomText fontFamily={'pop'} style={styles.emptyText}>No favorites found</CustomText>
+          )
+        }
         ListFooterComponent={() => (
           <View>
             <TouchableOpacity style={styles.addFavoriteButton} onPress={toggleModal}>
@@ -211,22 +238,21 @@ const styles = StyleSheet.create({
   favoritesTitle: { fontSize: 24, marginTop: 10, fontWeight: 'bold' },
   favoritesDescription: { fontSize: 16, textAlign: 'center', color: '#666', marginTop: 10 },
   favoritesList: { marginTop: 30 },
-  favoritesListTitle: { fontSize: 22, fontWeight: 'bold',marginVertical:20 },
+  favoritesListTitle: { fontSize: 22, fontWeight: 'bold', marginVertical: 20 },
   addFavoriteButton: { flexDirection: 'row', alignItems: 'center', marginTop: 20 },
   addFavoriteText: { fontSize: 18, color: 'green', marginLeft: 10 },
-  modalContainer: { flex: 1, padding: 20, backgroundColor: '#f5f5f5' },
-  modalTitle: { fontSize: 20, textAlign: 'center', marginBottom: 20 },
-  friendItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, },
-  friendName: { fontSize: 18, marginLeft: 10 },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'grey',
+  modalContainer: { flex: 1, padding: 20, justifyContent: 'center', backgroundColor: '#fff' },
+  modalTitle: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
+  closeButton: { marginTop: 20, alignSelf: 'center' },
+  closeButtonText: { fontSize: 18, color: 'red' },
+  friendItem: { flexDirection: 'row', alignItems: 'center', marginVertical: 10 },
+  avatar: { width: 55, height: 55, borderRadius: 55, marginRight: 10 },
+  friendName: { fontSize: 20, fontWeight: 'bold' },
+  emptyText: { fontSize: 18, textAlign: 'center', marginTop: 20, color: '#666' },
+  messageContainer: {
+    flex: 1,
+    marginLeft: 10,
   },
-  emptyText: { fontSize: 16, textAlign: 'center', color: '#666' },
-  closeButton: { marginTop: 20, padding: 10, backgroundColor: '#2196F3', borderRadius: 5 },
-  closeButtonText: { color: '#fff', textAlign: 'center' },
 });
 
 export default FavoritesScreen;

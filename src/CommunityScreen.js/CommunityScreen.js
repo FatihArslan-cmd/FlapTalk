@@ -6,6 +6,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AppHeader from "../components/AppHeader";
+import CustomText from "../components/CustomText";
 import AlertComponent from "../components/AlertComponent";
 import { calculateMembershipDuration } from "../utils/calculateMembershipDuration ";
 import FastImage from "react-native-fast-image";
@@ -114,11 +115,11 @@ export default function UsersList() {
     <View style={styles.actionsContainer}>
       <TouchableOpacity style={[styles.actionButton, styles.addAction]} onPress={() => addFriend(item.id)}>
         <Icon name="person-add-outline" size={24} color="#fff" />
-        <Text style={styles.actionText}>Add Friend </Text>
+        <CustomText fontFamily="pop" style={styles.actionText}>Add Friend </CustomText>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.actionButton, styles.blockAction]} onPress={() => blockUser(item.id)}>
         <Icon name="ban-outline" size={24} color="#fff" />
-        <Text style={styles.actionText}>Block User </Text>
+        <CustomText fontFamily="pop" style={styles.actionText}>Block User </CustomText>
       </TouchableOpacity>
     </View>
   );
@@ -129,14 +130,14 @@ export default function UsersList() {
       <FastImage source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} resizeMode={FastImage.resizeMode.cover} />
       <View style={styles.messageContainer}>
           <View style={styles.infoContainer}>
-            <Text style={styles.name}>{item.username}</Text>
-            <Text style={styles.date}>{`Member since ${calculateMembershipDuration(item.date)} `}</Text>
+            <CustomText fontFamily="pop" style={styles.name}>{item.username}</CustomText>
+            <CustomText fontFamily="pop" style={styles.date}>{`Member since ${calculateMembershipDuration(item.date)} `}</CustomText>
           </View>
-          <Text style={item.state === 'online' ? styles.online : styles.offline}>
+          <CustomText fontFamily="pop" style={item.state === 'online' ? styles.online : styles.offline}>
             {item.state === 'online' ? 'Online' : 'Offline'}
-          </Text>
+          </CustomText>
         </View>
-        <Text style={styles.rankname}>{item.rank || ''}</Text>
+        <CustomText fontFamily="pop" style={styles.rankname}>{item.rank || ''}</CustomText>
       </View>
     </Swipeable>
   );
@@ -153,7 +154,7 @@ export default function UsersList() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No users found </Text>
+            <CustomText fontFamily="pop"  style={styles.emptyText}>No users found </CustomText>
           </View>
         )}
       />
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
       marginRight: 10,
     },
     date: {
-      fontSize: 14,
+      fontSize: 11,
       color: '#888',
     },
     rankname: {
