@@ -55,10 +55,27 @@ const FavoritesScreen = ({ navigation }) => {
     fetchFriends();
   }, []);
 
-  const handleAddFavorite = (friend) => {
-    // Add logic to add the selected friend to your favorites collection in Firestore
-    toggleModal(); // Close the modal after selection
+  const handleAddFavorite = async (friend) => {
+    const currentUser = auth().currentUser;
+    if (!currentUser) return;
+  
+    try {
+      await firestore()
+        .collection('favorites')
+        .add({
+          userId: currentUser.uid,
+          friendId: friend.id,
+          timestamp: firestore.FieldValue.serverTimestamp(),
+        });
+  
+      console.log(`${friend.username} favorilere eklendi!`);
+    } catch (error) {
+      console.error('Favori eklenirken hata oluştu:', error);
+    } finally {
+      toggleModal(); // Seçim sonrası modalı kapat
+    }
   };
+  
 
   const renderFriendItem = ({ item }) => (
     <TouchableOpacity style={styles.friendItem} onPress={() => handleAddFavorite(item)}>
