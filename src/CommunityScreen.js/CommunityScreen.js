@@ -28,7 +28,7 @@ export default function UsersList() {
         .map(doc => ({
           ...doc.data(),
           id: doc.id,
-          avatar: doc.data().avatar || defaultAvatar, // Ensure avatar is set
+          avatar: doc.data().avatar || defaultAvatar, // Ensure avatar is set or fallback to default
         }))
         .filter(user => user.id !== currentUser)
         .sort((a, b) => (b.state === 'online') - (a.state === 'online'));
@@ -39,6 +39,7 @@ export default function UsersList() {
       console.error('Error fetching users:', error);
     }
   };
+  
   
 
   useFocusEffect(
@@ -84,7 +85,7 @@ export default function UsersList() {
       await firestore().collection('friends').add({
         userId: currentUser,
         friendId,
-        avatar: filteredUsers.find(user => user.id === friendId).avatar || defaultAvatar,
+        avatar: filteredUsers.find(user => user.id === friendId).avatar ,
         time: new Date().toISOString(),
       });
   
@@ -92,7 +93,7 @@ export default function UsersList() {
       await firestore().collection('friends').add({
         userId: friendId,
         friendId: currentUser,
-        avatar: auth().currentUser.photoURL || defaultAvatar, // Assuming the current user's avatar is available here
+        avatar: auth().currentUser.photoURL, // Assuming the current user's avatar is available here
         time: new Date().toISOString(),
       });
   

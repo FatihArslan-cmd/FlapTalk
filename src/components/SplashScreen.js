@@ -1,8 +1,7 @@
-import React, { useRef, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Animated } from 'react-native';
+import React, { useRef, useEffect, } from 'react';
+import { View, StyleSheet, Dimensions, Animated,Text } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { Bounce } from 'react-native-animated-spinkit';
-import CustomText from './CustomText';
 
 const { width } = Dimensions.get('window');
 
@@ -34,7 +33,7 @@ const SplashScreenComponent = ({ onAnimationEnd }) => {
           iterationCount="infinite" 
           direction="alternate"
         >
-          <CustomText style={styles.text} fontFamily="pop">FlapTalk</CustomText>
+          <Text style={styles.text} fontFamily="pop">FlapTalk</Text>
         </Animatable.View>
       </Animatable.View>
       <Bounce 
@@ -42,9 +41,9 @@ const SplashScreenComponent = ({ onAnimationEnd }) => {
         color="#FFFFFF" 
         style={styles.spinner}
       />
-      <CustomText style={styles.versionText} fontFamily="pop">
+      <Text style={styles.versionText} fontFamily="pop">
         Version 2.4.3
-      </CustomText>
+      </Text>
     </Animated.View>
   );
 };

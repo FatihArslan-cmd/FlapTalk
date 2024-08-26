@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import * as Font from 'expo-font';
-import LoadingOverlay from './LoadingOverlay';
+import SkeletonPlaceholder from '../../Skeleton'; // Import the SkeletonPlaceholder component
 
 const CustomText = ({ children, style, fontFamily }) => {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -22,7 +22,11 @@ const CustomText = ({ children, style, fontFamily }) => {
   }, []);
 
   if (!fontsLoaded) {
-    return <LoadingOverlay visible={true} />;
+    return (
+      <View style={style}>
+        <SkeletonPlaceholder width={100} height={20} borderRadius={4} />
+      </View>
+    );
   }
 
   return (
