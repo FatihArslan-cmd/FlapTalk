@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Modal, View, StyleSheet, TouchableOpacity, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import CustomText from './CustomText';
 import { StatusBar } from 'expo-status-bar';
@@ -6,7 +6,22 @@ import { BlurView } from 'expo-blur';
 
 const { width, height } = Dimensions.get('window');
 
-const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmText }) => {
+const AlertComponent = ({
+  visible,
+  onClose,
+  title,
+  message,
+  onConfirm,
+  confirmText,
+  cancelText = 'Cancel', // Optional cancel button text
+  onCancel, // Optional cancel button action
+  modalStyle = {}, // Allow custom styles
+  buttonStyle = {},
+  confirmButtonStyle = {},
+  cancelButtonStyle = {},
+  confirmTextStyle = {},
+  cancelTextStyle = {}
+}) => {
 
   return (
     <Modal
@@ -19,19 +34,34 @@ const AlertComponent = ({ visible, onClose, title, message, onConfirm, confirmTe
         <View style={styles.centeredView}>
           <BlurView intensity={50} style={styles.absolute} tint="dark" />
           {visible && <StatusBar style="light" backgroundColor="rgba(0,0,0,0.5)" translucent />}
-          
+
           <TouchableWithoutFeedback onPress={() => {}}>
-            <View style={styles.modalView}>
+            <View style={[styles.modalView, modalStyle]}>
               <CustomText fontFamily={'pop'} style={styles.modalTitle}>{title}</CustomText>
               <CustomText fontFamily={'pop'} style={styles.modalMessage}>{message}</CustomText>
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={onConfirm}>
-                  <CustomText fontFamily={'pop'} style={styles.buttonText}>{confirmText}</CustomText>
+                {onCancel && (
+                  <TouchableOpacity 
+                    style={[styles.button, styles.cancelButton, cancelButtonStyle]} 
+                    onPress={onCancel}
+                    accessibilityLabel="Cancel"
+                    accessibilityRole="button"
+                  >
+                    <CustomText fontFamily={'pop'} style={[styles.buttonText, cancelTextStyle]}>{cancelText}</CustomText>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity 
+                  style={[styles.button, confirmButtonStyle]} 
+                  onPress={onConfirm}
+                  accessibilityLabel="Confirm"
+                  accessibilityRole="button"
+                >
+                  <CustomText fontFamily={'pop'} style={[styles.buttonText, confirmTextStyle]}>{confirmText}</CustomText>
                 </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
-          
+
         </View>
       </TouchableWithoutFeedback>
       {!visible && <StatusBar style="dark" backgroundColor="#FFFFFF" translucent />}
@@ -91,9 +121,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     fontSize: width * 0.040,
   },
+  cancelButton: {
+    backgroundColor: 'red',
+  },
   buttonText: {
     color: 'white',
   },
 });
 
-export default AlertComponent;
+export default memo(AlertComponent);
