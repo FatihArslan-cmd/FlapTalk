@@ -17,6 +17,7 @@ const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFL
 export default function HomeScreen() {
   const [chatList, setChatList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('All'); // Add state for the selected filter
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const backgroundColor = styles.container.backgroundColor; 
@@ -190,6 +191,20 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <AppHeader title={'FlapTalk'} textColor={'#00ae59'} onSearch={setSearchText} />
+      <View style={styles.filterContainer}>
+        <TouchableOpacity 
+          style={[styles.filterButton, filter === 'All' && styles.activeFilterButton]}
+          onPress={() => setFilter('All')}
+        >
+          <Text style={[styles.filterText, filter === 'All' && styles.activeFilterText]}>All</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.filterButton, filter === 'Favorites' && styles.activeFilterButton]}
+          onPress={() => setFilter('Favorites')}
+        >
+          <Text style={[styles.filterText, filter === 'Favorites' && styles.activeFilterText]}>Favorites</Text>
+        </TouchableOpacity>
+      </View>
       {loading ? (
         <FlatList
           data={[...Array(10).keys()]}
@@ -216,30 +231,13 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#FAF9F6'
-
+    backgroundColor:'#FAF9F6',
   },
   item: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 18,
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-  },
-  latestMessageContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  latestMessage: {
-    color: '#666',
-    fontSize: 14,
-    flex: 1,
-  },
-  latestMessageTime: {
-    color: '#888',
-    fontSize: 12,
-    marginLeft: 10,
   },
   avatar: {
     width: 50,
@@ -247,43 +245,74 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   messageContainer: {
-    flex: 1,
     marginLeft: 10,
+    flex: 1,
   },
   name: {
+    fontSize: 18,
+    color: '#333',
+  },
+  latestMessageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  latestMessage: {
+    fontSize: 14,
+    color: '#999',
+  },
+  latestMessageTime: {
+    fontSize: 12,
+    color: '#999',
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#FAF9F6',
+  },
+  filterButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  activeFilterButton: {
+    backgroundColor: '#00ae59',
+  },
+  filterText: {
     fontSize: 16,
+    color: '#00ae59',
+  },
+  activeFilterText: {
+    color: '#fff',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 20,
   },
   emptyText: {
     fontSize: 18,
-    color: '#888',
+    color: '#999',
   },
   actionsContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 75,
+    width: 100,
+    backgroundColor: '#FF3B30',
+    borderRadius: 5,
+    margin: 10,
   },
   deleteAction: {
-    borderRadius:20,
-    backgroundColor: '#ff0000',
+    backgroundColor: '#FF3B30',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 75,
-    height: '100%',
+    borderRadius: 5,
+    padding: 10,
   },
   actionText: {
     color: '#fff',
-    fontSize: 12,
-  },
-  skeleton: {
-    marginVertical: 10,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#eaeaea',
+    fontSize: 16,
+    marginTop: 5,
   },
 });
 

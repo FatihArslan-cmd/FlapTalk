@@ -103,6 +103,7 @@ const VideoCallScreen = ({ route, navigation }) => {
       }
     };
 
+    // Başlatma
     startLocalStream();
 
     if (isCaller) {
@@ -131,7 +132,6 @@ const VideoCallScreen = ({ route, navigation }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

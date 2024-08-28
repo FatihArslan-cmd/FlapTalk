@@ -53,6 +53,7 @@
     "react-native": "0.74.3",
     "react-native-animatable": "^1.4.0",
     "react-native-animated-spinkit": "^1.5.2",
+    "react-native-color-wheel": "^0.1.7",
     "react-native-country-flag": "^2.0.2",
     "react-native-draggable-flatlist": "^4.0.1",
     "react-native-emoji-input": "^1.1.10",
