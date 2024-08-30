@@ -6,27 +6,17 @@ import CustomText from '../components/CustomText';
 const { height: screenHeight } = Dimensions.get('window');
 
 const languages = [
+  { label: 'English', translation: 'İngilizce' },
   { label: 'Türkçe (cihaz dili)', translation: 'Türkçe (cihaz dili)' },
   { label: 'العربية', translation: 'Arapça' },
-  { label: 'Afrikaans', translation: 'Afrikaanca' },
-  { label: 'Shqip', translation: 'Arnavutça' },
-  { label: 'አማርኛ', translation: 'Amharca' },
-  { label: '中文', translation: 'Çince' },
-  { label: 'English', translation: 'İngilizce' },
-  { label: 'Français', translation: 'Fransızca' },
   { label: 'Deutsch', translation: 'Almanca' },
-  { label: 'Español', translation: 'İspanyolca' },
-  { label: 'हिन्दी', translation: 'Hintçe' },
-  { label: 'Italiano', translation: 'İtalyanca' },
-  { label: '日本語', translation: 'Japonca' },
-  { label: '한국어', translation: 'Korece' },
-  { label: 'Português', translation: 'Portekizce' },
-  { label: 'Pусский', translation: 'Rusça' },
-  { label: 'اردو', translation: 'Urduca' },
   { label: 'Ελληνικά', translation: 'Yunanca' },
-  { label: 'עברית', translation: 'İbranice' },
-  { label: 'ไทย', translation: 'Tayca' },
+  { label: 'Español', translation: 'İspanyolca' },
+  { label: 'Français', translation: 'Fransızca' },
+  { label: 'Pусский', translation: 'Rusça' },
+  { label: '中文', translation: 'Çince' }
 ];
+
 
 const LanguageItem = React.memo(({ language, isSelected, onPress }) => (
     <TouchableOpacity style={styles.languageItem} onPress={onPress}>

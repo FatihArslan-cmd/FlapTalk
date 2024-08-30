@@ -48,7 +48,7 @@ export default function LogoutButton() {
         <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
             <Icon name="log-out-outline" size={28} color="#f44336" />
             <View style={styles.menuTextContainer}>
-                <CustomText fontFamily={'pop'} style={styles.menuLabel}>Çıkış Yap</CustomText>
+                <CustomText fontFamily={'pop'} style={styles.menuLabel}>Exit </CustomText>
             </View>
         </TouchableOpacity>
     );

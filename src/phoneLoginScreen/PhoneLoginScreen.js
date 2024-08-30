@@ -38,12 +38,12 @@ const PhoneLoginScreen = () => {
 
   const signInWithPhoneNumber = async () => {
     if (phoneNumber.trim() === '') {
-      showAlert('Hata', 'Lütfen telefon numaranızı girin.');
+      showAlert('Error', 'Please enter your phone number.');
       return;
     }
   
     if (!/^\d+$/.test(phoneNumber)) {
-      showAlert('Hata', 'Geçersiz telefon numarası.');
+      showAlert('Error', 'Invalid phone number.');
       return;
     }
   
@@ -53,9 +53,9 @@ const PhoneLoginScreen = () => {
       setConfirm(confirmation);
     } catch (error) {
       if (error.code === 'auth/too-many-requests') {
-        showAlert('Hata', 'Bu cihazdan yapılan istekler alışılmadık bir etkinlik nedeniyle engellendi. Lütfen daha sonra tekrar deneyin.');
+        showAlert('Error', 'Requests from this device have been blocked due to unusual activity. Please try again later.');
       } else {
-        showAlert('Hata', 'Telefon numarası doğrulaması başarısız.');
+        showAlert('Error', 'Phone number verification failed.');
         console.log(error);
       }
     } finally {
@@ -67,7 +67,7 @@ const PhoneLoginScreen = () => {
     try {
       const fullCode = code.join('');
       if (fullCode.length !== 6) {
-        showAlert('Hata', 'Lütfen 6 haneli doğrulama kodunu girin.');
+        showAlert('Error', 'Please enter the 6-digit verification code.');
         return;
       }
       setLoading(true);
@@ -76,11 +76,11 @@ const PhoneLoginScreen = () => {
       navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'phone' });
     } catch (error) {
       if (error.code === 'auth/invalid-verification-code') {
-        showAlert('Hata', 'Geçersiz doğrulama kodu.');
+        showAlert('Error', 'Invalid verification code.');
       } else if (error.code === 'auth/too-many-requests') {
-        showAlert('Hata', 'Bu cihazdan yapılan istekler alışılmadık bir etkinlik nedeniyle engellendi. Lütfen daha sonra tekrar deneyin.');
+        showAlert('Error', 'Requests from this device have been blocked due to unusual activity. Please try again later.');
       } else {
-        showAlert('Hata', 'Doğrulama kodu doğrulaması başarısız.');
+        showAlert('Error', 'Verification code verification failed.');
         console.log(error);
       }
     } finally {
@@ -93,10 +93,10 @@ const PhoneLoginScreen = () => {
       <LoadingOverlay visible={loading} />
       {!confirm ? (
         <>
-          <Header color='#00ad59' fontFamily='lato-bold' text="Telefon numaranızı girin" />
+          <Header color='#00ad59' fontFamily='lato-bold' text="Enter your phone number" />
           <CustomText fontFamily={'lato'} style={styles.infoText}>
-            Sana doğrulama kodu göndereceğiz.
-            <CustomText fontFamily={'lato'} style={styles.linkText}> Numaram nedir? </CustomText>
+            We will send you a verification code.
+            <CustomText fontFamily={'lato'} style={styles.linkText}> What is my number? </CustomText>
           </CustomText>
           <PhoneInput
             countryCode={countryCode}
@@ -106,19 +106,19 @@ const PhoneLoginScreen = () => {
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
           />
-          <Button onPress={signInWithPhoneNumber} text="İleri " />
+          <Button onPress={signInWithPhoneNumber} text="Next" />
         </>
       ) : (
         <>
-          <Header color='#00ae59' text="Numaranız Doğrulanıyor"/>
+          <Header color='#00ae59' text="Verifying your number"/>
           <CustomText fontFamily={'lato'} style={styles.verificationInfoText}>
-            +{callingCode} {phoneNumber} numaralı telefona gönderilen kodu aşağıdaki bölmeye yazınız.
+            Enter the code sent to +{callingCode} {phoneNumber} below.
           </CustomText>
           <CustomText fontFamily={'lato'} style={styles.wrongNumberText}>
-            Numara yanlış mı?
+            Wrong number?
           </CustomText>
           <CodeInput code={code} setCode={setCode} inputRefs={inputRefs} />
-          <Button margin={15} onPress={confirmCode} text="Onayla " />
+          <Button margin={15} onPress={confirmCode} text="Confirm" />
         </>
       )}
       <AlertComponent
@@ -127,7 +127,7 @@ const PhoneLoginScreen = () => {
         title={title}
         message={message}
         onConfirm={confirmAlert}
-        confirmText="Tamam"
+        confirmText="Okay"
       />
     </View>
   );

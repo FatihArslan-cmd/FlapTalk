@@ -7,17 +7,18 @@ import AuthButton from './AuthButton';
 import auth from '@react-native-firebase/auth';
 import { StatusBar } from 'expo-status-bar';
 import useNavigationBarSync from './hooks/useNavigationBarSync';
+
 const { width, height } = Dimensions.get('window');
 
 const colors = ['#361f34', '#005657', '#ff25ff', '#2c014d', '#fff0d3', '#ff6655'];
 const textColors = ['#e1f1ff', '#ffc480', '#000000', '#3cf467', '#0000ff', '#3c3cd6'];
 const texts = [
-  'Hadi birlikte çalışalım',
-  'Mesajlaşma uygulaması',
+  'Let\'s work together',
+  'Messaging app',
   'FlapTalk',
-  'Birlikte başarıya ulaşalım',
-  'Yeni bir gün, yeni bir başlangıç',
-  'İletişimin yeni adresi',
+  'Let\'s achieve success together',
+  'A new day, a new beginning',
+  'The new address for communication'
 ];
 
 const AnimatedGradientText = ({ text, textColor }) => (
@@ -32,16 +33,16 @@ const LoginScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   
-  const [currentText, setCurrentText] = useState('Hadi birlikte çalışalım');
+  const [currentText, setCurrentText] = useState('Let\'s work together');
   const [isAnimating, setIsAnimating] = useState(false);
   const [showGoogleBounce, setShowGoogleBounce] = useState(false);
   const [showPhoneBounce, setShowPhoneBounce] = useState(false);
   const [showEmailBounce, setShowEmailBounce] = useState(false);
-  useNavigationBarSync('black')
+  useNavigationBarSync('black');
+  
   const textColor = useRef(new Animated.Value(0)).current;
   const animation = useRef(new Animated.Value(0)).current;
 
-  // Define the animations outside of useEffect to ensure they're correctly referenced
   const animations = colors.map((_, index) => {
     return Animated.sequence([
       Animated.parallel([
@@ -69,7 +70,7 @@ const LoginScreen = () => {
 
     return () => {
       if (animationLoop) {
-        animationLoop.stop(); // Cleanup the animation when the screen loses focus
+        animationLoop.stop();
       }
     };
   }, [isFocused]);
@@ -102,12 +103,12 @@ const LoginScreen = () => {
 
   const signIn = async () => {
     try {
-      await GoogleSignin.signOut(); // Sign out the current user
+      await GoogleSignin.signOut(); 
       await GoogleSignin.hasPlayServices();
       const user = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
       const userCredential = await auth().signInWithCredential(googleCredential);
-      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'google' }); // Include loginMethod
+      navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'google' }); 
     } catch (error) {
       console.log(error);
     }
@@ -151,7 +152,7 @@ const LoginScreen = () => {
         <AuthButton
           style={styles.googleButton}
           iconName="google"
-          text="Google ile devam et"
+          text="Continue with Google"
           onPress={isAnimating ? null : handleGooglePress}
           showBounce={showGoogleBounce}
           bounceColor="#2f2f2f"
@@ -160,7 +161,7 @@ const LoginScreen = () => {
         <AuthButton
           style={[styles.twitterButton, isAnimating && { opacity: 0.5 }]}
           iconName="envelope"
-          text="Mail ile devam et"
+          text="Continue with Email"
           onPress={isAnimating ? null : handleTwitterPress}
           bounceColor="#e6e6e6"
           showBounce={showEmailBounce}
@@ -170,7 +171,7 @@ const LoginScreen = () => {
         <AuthButton
           style={styles.button}
           iconName="phone"
-          text="Telefon numarası ile devam et"
+          text="Continue with Phone number"
           onPress={isAnimating ? null : handlePhonePress}
           showBounce={showPhoneBounce}
           disabled={isAnimating}
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: width * 0.08, // Adjust font size based on screen width
+    fontSize: width * 0.08,
     fontWeight: 'bold',
     flexDirection: 'row',
   },
@@ -198,9 +199,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: height * 0.05, // Adjust bottom padding based on screen height
+    bottom: height * 0.05,
     width: '100%',
-    paddingHorizontal: width * 0.05, // Adjust horizontal padding based on screen width
+    paddingHorizontal: width * 0.05,
   },
   googleButton: {
     backgroundColor: '#e6e6e6',

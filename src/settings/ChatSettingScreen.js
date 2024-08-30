@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // AsyncStorage eklendi
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 import CustomText from '../components/CustomText';
 import SettingsHeader from './SettingsHeader';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,12 +17,12 @@ const colors = [
 ];
 
 const ChatSettingsScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const [themeModalVisible, setThemeModalVisible] = useState(false);
   const [wallpaperModalVisible, setWallpaperModalVisible] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState('Varsayılan sistem ayarı');
+  const [selectedTheme, setSelectedTheme] = useState(t('chatSettingsScreen.defaultTheme'));
   const [selectedColor, setSelectedColor] = useState(null);
 
-  // Renk kaydet ve yükle
   useEffect(() => {
     const loadColor = async () => {
       try {
@@ -75,18 +76,18 @@ const ChatSettingsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <SettingsHeader title="Sohbetler" onBackPress={handleBackPress} />
+      <SettingsHeader title={t('chatSettingsScreen.headerTitle')} onBackPress={handleBackPress} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.section}>
-          <CustomText fontFamily={'pop'} style={styles.sectionTitle}>Görüntüleme</CustomText>
+          <CustomText fontFamily={'pop'} style={styles.sectionTitle}>{t('chatSettingsScreen.viewing')}</CustomText>
           <TouchableOpacity style={styles.item} onPress={handleThemePress}>
             <Entypo name="light-up" size={30} color="black" style={styles.icon} />
-            <CustomText fontFamily={'pop'} style={styles.itemText}>Tema</CustomText>
+            <CustomText fontFamily={'pop'} style={styles.itemText}>{t('chatSettingsScreen.theme')}</CustomText>
             <CustomText fontFamily={'pop'} style={styles.itemSubText}>{selectedTheme}</CustomText>
           </TouchableOpacity>
           <TouchableOpacity style={styles.item} onPress={handleWallpaperPress}>
             <Ionicons name="image-outline" size={30} color="black" style={styles.icon} />
-            <CustomText fontFamily={'pop'} style={styles.itemText}>Duvar kağıdı</CustomText>
+            <CustomText fontFamily={'pop'} style={styles.itemText}>{t('chatSettingsScreen.wallpaper')}</CustomText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -100,17 +101,17 @@ const ChatSettingsScreen = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <CustomText fontFamily={'pop'} style={styles.modalTitle}>Tema Seç</CustomText>
-            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection('Açık')}>
+            <CustomText fontFamily={'pop'} style={styles.modalTitle}>{t('chatSettingsScreen.selectTheme')}</CustomText>
+            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection(t('chatSettingsScreen.light'))}>
               <Entypo name="light-up" size={30} color="black" style={styles.modalIcon} />
-              <CustomText fontFamily={'pop'} style={styles.modalItemText}>Açık</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('chatSettingsScreen.light')}</CustomText>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection('Koyu')}>
+            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection(t('chatSettingsScreen.dark'))}>
               <Ionicons name="moon-outline" size={30} color="black" style={styles.modalIcon} />
-              <CustomText fontFamily={'pop'} style={styles.modalItemText}>Koyu</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('chatSettingsScreen.dark')}</CustomText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setThemeModalVisible(false)}>
-              <CustomText fontFamily={'pop'} style={styles.closeButtonText}>Kapat</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.closeButtonText}>{t('chatSettingsScreen.close')}</CustomText>
             </TouchableOpacity>
           </View>
         </View>
@@ -125,7 +126,7 @@ const ChatSettingsScreen = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <CustomText fontFamily={'pop'} style={styles.modalTitle}>Renk Seç</CustomText>
+            <CustomText fontFamily={'pop'} style={styles.modalTitle}>{t('chatSettingsScreen.selectColor')}</CustomText>
             <View style={styles.colorsContainer}>
               {colors.map((color, index) => (
                 <TouchableOpacity
@@ -136,10 +137,10 @@ const ChatSettingsScreen = ({ navigation }) => {
               ))}
             </View>
             <TouchableOpacity style={styles.modalItem} onPress={handleDefaultSelection}>
-              <CustomText fontFamily={'pop'} style={styles.modalItemText}>Varsayılan (Beyaz)</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('chatSettingsScreen.defaultColor')}</CustomText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setWallpaperModalVisible(false)}>
-              <CustomText fontFamily={'pop'} style={styles.closeButtonText}>Kapat</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.closeButtonText}>{t('chatSettingsScreen.close')}</CustomText>
             </TouchableOpacity>
           </View>
         </View>

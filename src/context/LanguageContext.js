@@ -8,7 +8,6 @@ import * as Localization from 'expo-localization';
 import en from '../../assets/lang/en.json';
 import tr from '../../assets/lang/tr.json';
 import ar from '../../assets/lang/ar.json';
-import az from '../../assets/lang/az.json';
 import de from '../../assets/lang/de.json';
 import el from '../../assets/lang/el.json';
 import es from '../../assets/lang/es.json';
@@ -16,13 +15,13 @@ import fr from '../../assets/lang/fr.json';
 import ru from '../../assets/lang/ru.json';
 import zh from '../../assets/lang/zh.json';
 
-const SUPPORTED_LANGUAGES = ['en', 'tr', 'ar', 'az', 'de', 'el', 'es', 'fr', 'ru', 'zh'];
+const SUPPORTED_LANGUAGES = ['en', 'tr', 'ar', 'de', 'el', 'es', 'fr', 'ru', 'zh'];
 const DEFAULT_LANGUAGE = 'en';
 const STORAGE_KEY = 'selectedLanguage';
 
 i18next.use(initReactI18next).init({
   compatibilityJSON: 'v3',
-  resources: { en, tr, ar, az, de, el, es, fr, ru, zh },
+  resources: { en, tr, ar, de, el, es, fr, ru, zh },
   fallbackLng: DEFAULT_LANGUAGE,
   debug: __DEV__,
   interpolation: { escapeValue: false }
