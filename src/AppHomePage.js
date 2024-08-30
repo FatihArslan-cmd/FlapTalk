@@ -16,8 +16,9 @@ const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFL
 
 export default function HomeScreen() {
   const [chatList, setChatList] = useState([]);
+  const [favoritesList, setFavoritesList] = useState([]); // State to store favorites
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('All'); // Add state for the selected filter
+  const [filter, setFilter] = useState('All'); // Filter state
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const backgroundColor = styles.container.backgroundColor; 
@@ -32,29 +33,27 @@ export default function HomeScreen() {
         setLoading(true);
         try {
           const currentUser = auth().currentUser;
-  
+
           if (!currentUser) {
-            // If the user is not logged in, navigate to the login screen
             navigation.navigate('LoginScreen');
             return;
           }
-  
+
           const currentUserData = await firestore().collection('users').doc(currentUser.uid).get();
           const currentUserProfile = currentUserData.data();
-  
+
           if (!currentUserProfile || !currentUserProfile.username) {
-            // If the user's username is missing, navigate to the login screen
             navigation.navigate('LoginScreen');
             return;
           }
-  
-          const chatListData = await Promise.all(snapshot.docs.map(async doc => {
+
+          const friendsListData = await Promise.all(snapshot.docs.map(async doc => {
             const data = doc.data();
             const friendSnapshot = await firestore().collection('users').doc(data.friendId).get();
             const friendData = friendSnapshot.data();
-  
-            if (!friendData) return null; // Handle potential null data
-  
+
+            if (!friendData) return null;
+
             const chatId = [currentUser.uid, data.friendId].sort().join('_');
             const messagesSnapshot = await firestore()
               .collection('chats')
@@ -63,11 +62,11 @@ export default function HomeScreen() {
               .orderBy('createdAt', 'desc')
               .limit(1)
               .get();
-  
+
             const latestMessageData = messagesSnapshot.docs.length > 0 
               ? messagesSnapshot.docs[0].data() 
               : { text: 'No messages yet', createdAt: null, type: 'text' };
-  
+
             let latestMessage = '';
             if (latestMessageData.type === 'image') {
               latestMessage = 'Image';
@@ -80,11 +79,11 @@ export default function HomeScreen() {
                 ? latestMessageData.text.substring(0, 40) + '...' 
                 : latestMessageData.text;
             }
-  
+
             const latestMessageTime = latestMessageData.createdAt 
               ? moment(latestMessageData.createdAt.toDate()).format('HH:mm') 
               : '';
-  
+
             return {
               friendId: data.friendId,
               avatar: friendData.avatar || defaultAvatar,
@@ -93,9 +92,18 @@ export default function HomeScreen() {
               latestMessageTime: latestMessageTime,
             };
           }));
-  
-          // Filter out any null values in the chatListData
-          setChatList(chatListData.filter(item => item !== null));
+
+          const favoritesSnapshot = await firestore()
+            .collection('favorites')
+            .where('userId', '==', currentUser.uid)
+            .get();
+
+          const favoritesList = favoritesSnapshot.docs.map(doc => doc.data().friendId);
+
+          // Set both friends and favorites in state
+          setChatList(friendsListData.filter(item => item !== null));
+          setFavoritesList(favoritesList);
+
         } catch (error) {
           console.error('Error fetching chat list:', error);
           Alert.alert('Error', 'An error occurred while loading the chat list.');
@@ -103,12 +111,9 @@ export default function HomeScreen() {
           setLoading(false);
         }
       });
-  
-    return () => unsubscribe(); // Clean up the listener on unmount
+
+    return () => unsubscribe();
   }, [navigation]);
-  
-  
-  
 
   const startChat = (userId) => {
     const chatId = [auth().currentUser.uid, userId].sort().join('_');
@@ -184,9 +189,13 @@ export default function HomeScreen() {
     </Swipeable>
   );
 
-  const filteredChatList = chatList.filter(chat =>
-    chat.username.toLowerCase().includes(searchText.toLowerCase())
-  );
+  // Filter based on the selected filter and search text
+  const filteredChatList = chatList.filter(chat => {
+    if (filter === 'Favorites') {
+      return favoritesList.includes(chat.friendId);
+    }
+    return chat.username.toLowerCase().includes(searchText.toLowerCase());
+  });
 
   return (
     <View style={styles.container}>
@@ -227,7 +236,6 @@ export default function HomeScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -245,12 +253,13 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   messageContainer: {
-    marginLeft: 10,
     flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
   },
   name: {
     fontSize: 18,
-    color: '#333',
+    fontWeight: '600',
   },
   latestMessageContainer: {
     flexDirection: 'row',
@@ -258,61 +267,55 @@ const styles = StyleSheet.create({
   },
   latestMessage: {
     fontSize: 14,
-    color: '#999',
+    color: '#555',
+    flex: 1,
   },
   latestMessageTime: {
     fontSize: 12,
     color: '#999',
   },
-  filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#FAF9F6',
-  },
-  filterButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-  },
-  activeFilterButton: {
-    backgroundColor: '#00ae59',
-  },
-  filterText: {
-    fontSize: 16,
-    color: '#00ae59',
-  },
-  activeFilterText: {
-    color: '#fff',
-  },
   emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    justifyContent: 'center',
+    padding: 16,
   },
   emptyText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#999',
   },
   actionsContainer: {
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    width: 100,
-    backgroundColor: '#FF3B30',
-    borderRadius: 5,
-    margin: 10,
   },
   deleteAction: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 5,
-    padding: 10,
+    width: 64,
+    height: '100%',
   },
   actionText: {
     color: '#fff',
+    fontSize: 12,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 10,
+  },
+  filterButton: {
+    padding: 10,
+  },
+  filterText: {
     fontSize: 16,
-    marginTop: 5,
+    color: '#555',
+  },
+  activeFilterButton: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#00ae59',
+  },
+  activeFilterText: {
+    color: '#00ae59',
+    fontWeight: '600',
   },
 });
-

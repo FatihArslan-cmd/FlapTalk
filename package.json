@@ -75,7 +75,8 @@
     "react-native-web": "~0.19.10",
     "react-native-webrtc": "^124.0.3",
     "react-native-webview": "^13.10.5",
-    "rn-emoji-keyboard": "^1.7.0"
+    "rn-emoji-keyboard": "^1.7.0",
+    "expo-localization": "~15.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

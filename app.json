@@ -7,6 +7,7 @@
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "@config-plugins/react-native-webrtc",
+      "expo-localization",
       [
         "expo-image-picker",
         {
