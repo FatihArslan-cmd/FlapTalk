@@ -2,7 +2,8 @@ import React, { useRef, useState, useCallback, forwardRef, useContext } from 're
 import { View, TouchableOpacity, Animated, PanResponder, Dimensions, FlatList, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CustomText from '../components/CustomText';
-import LanguageContext from '../context/LanguageContext'; // Import your LanguageContext
+import LanguageContext from '../context/LanguageContext';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
 
 const { height: screenHeight } = Dimensions.get('window');
 
@@ -18,22 +19,27 @@ const languages = [
   { label: '中文', code: 'zh', translation: 'Çince' },
 ];
 
-const LanguageItem = React.memo(({ language, isSelected, onPress }) => (
+const LanguageItem = React.memo(({ language, isSelected, onPress, isDarkMode }) => (
   <TouchableOpacity style={styles.languageItem} onPress={onPress}>
     <View>
-      <CustomText fontFamily={'pop'} style={styles.languageLabel}>{language.label}</CustomText>
-      <CustomText fontFamily={'pop'} style={styles.languageTranslation}>{language.translation}</CustomText>
+      <CustomText fontFamily={'pop'} style={[styles.languageLabel, { color: isDarkMode ? 'white' : 'black' }]}>
+        {language.label}
+      </CustomText>
+      <CustomText fontFamily={'pop'} style={[styles.languageTranslation, { color: isDarkMode ? '#aaa' : '#777' }]}>
+        {language.translation}
+      </CustomText>
     </View>
     <Ionicons
       name={isSelected ? 'ellipse' : 'ellipse-outline'}
       size={24}
-      color={isSelected ? 'green' : 'black'}
+      color={isSelected ? 'green' : isDarkMode ? 'white' : 'black'}
     />
   </TouchableOpacity>
 ));
 
 const LanguageSelector = forwardRef((props, ref) => {
-  const { currentLanguage, changeLanguage } = useContext(LanguageContext); // Access context
+  const { currentLanguage, changeLanguage } = useContext(LanguageContext);
+  const { isDarkMode } = useContext(ThemeContext); // Access ThemeContext
   const [modalVisible, setModalVisible] = useState(false);
   const modalHeight = useRef(new Animated.Value(0)).current;
   const maxModalHeight = screenHeight * 0.75;
@@ -91,7 +97,7 @@ const LanguageSelector = forwardRef((props, ref) => {
 
   const handleLanguageSelect = useCallback(
     (language) => {
-      changeLanguage(language.code); // Use the changeLanguage function from context
+      changeLanguage(language.code);
       closeModal();
     },
     [changeLanguage, closeModal]
@@ -106,13 +112,21 @@ const LanguageSelector = forwardRef((props, ref) => {
       {modalVisible && (
         <>
           <TouchableOpacity style={styles.overlay} onPress={closeModal} activeOpacity={1} />
-          <Animated.View style={[styles.modalContainer, { height: modalHeight }]} {...panResponder.panHandlers}>
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              { height: modalHeight, backgroundColor: isDarkMode ? '#333' : 'white' },
+            ]}
+            {...panResponder.panHandlers}
+          >
             <View style={styles.modalHandle} />
-            <View style={styles.modalHeader}>
+            <View style={[styles.modalHeader, { backgroundColor: isDarkMode ? '#333' : 'white' }]}>
               <TouchableOpacity onPress={closeModal}>
-                <Ionicons name="arrow-back" size={24} color="black" />
+                <Ionicons name="arrow-back" size={24} color={isDarkMode ? 'white' : 'black'} />
               </TouchableOpacity>
-              <CustomText fontFamily={'pop'} style={styles.modalTitle}>Uygulama Dili</CustomText>
+              <CustomText fontFamily={'pop'} style={[styles.modalTitle, { color: isDarkMode ? 'white' : 'black' }]}>
+                Uygulama Dili
+              </CustomText>
             </View>
 
             <FlatList
@@ -121,8 +135,9 @@ const LanguageSelector = forwardRef((props, ref) => {
               renderItem={({ item }) => (
                 <LanguageItem
                   language={item}
-                  isSelected={currentLanguage === item.code} // Compare selected language
+                  isSelected={currentLanguage === item.code}
                   onPress={() => handleLanguageSelect(item)}
+                  isDarkMode={isDarkMode}
                 />
               )}
               contentContainerStyle={styles.languageList}
@@ -150,7 +165,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    backgroundColor: 'white',
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     overflow: 'hidden',
@@ -167,7 +181,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },

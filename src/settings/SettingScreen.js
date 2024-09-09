@@ -6,6 +6,7 @@ import LogoutButton from "../components/LogoutButton";
 import ProfileIconWithCamera from "../components/ProfileIconWithCamera";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/AuthContext";
+import { ThemeContext } from "../context/ThemeContext"; // Import ThemeContext
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import CustomText from "../components/CustomText";
@@ -19,6 +20,7 @@ import { useTranslation } from "react-i18next";
 
 export default function SettingScreen() {
   const { user } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
   const [userData, setUserData] = useState({ username: '', about: '', avatar: '' });
   const [isChanged, setIsChanged] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -133,27 +135,27 @@ export default function SettingScreen() {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.menuItem}
+      style={[styles.menuItem, { borderBottomColor: isDarkMode ? '#333' : '#ddd' }]}
       onPress={item.action}
     >
-      <Icon name={item.icon} size={28} color="#4CAF50" />
+      <Icon name={item.icon} size={28} color={isDarkMode ? 'white' : '#4CAF50'} />
       <View style={styles.menuTextContainer}>
-        <CustomText fontFamily={'pop'} style={styles.menuLabel}>{item.label}</CustomText>
-        <CustomText fontFamily={'pop'} style={styles.menuSubLabel}>{item.subLabel}</CustomText>
+        <CustomText fontFamily={'pop'} style={[styles.menuLabel, { color: isDarkMode ? 'white' : 'black' }]}>{item.label}</CustomText>
+        <CustomText fontFamily={'pop'} style={[styles.menuSubLabel, { color: isDarkMode ? '#E0E0E0' : '#888' }]}>{item.subLabel}</CustomText>
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-         <AppHeader title={t('Settings')} onSearch={handleSearch} />
-        <FlatList
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>
+      <AppHeader title={t('Settings')} onSearch={handleSearch} />
+      <FlatList
         data={dynamicMenuItems}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         ListHeaderComponent={
           <>
-            <View style={styles.profileContainer}>
+            <View style={[styles.profileContainer, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>
               <ProfileIconWithCamera
                 avatarUri={userData.avatar}
                 onCameraPress={handleImagePicker}
@@ -162,22 +164,23 @@ export default function SettingScreen() {
               <View style={styles.userInfo}>
                 <View style={styles.usernameContainer}>
                   <TextInput
-                    style={styles.usernameInput}
+                    style={[styles.usernameInput, { color: isDarkMode ? 'white' : 'black' }]}
                     value={userData.username}
                     onChangeText={(text) => handleInputChange('username', text)}
-                    placeholder="Username "
+                    placeholder="Username"
+                    placeholderTextColor={isDarkMode ? '#888' : '#CCC'}
                     maxLength={16}
                   />
-                  <Icon name="pencil-outline" size={20} color="#888" style={styles.editIcon} />
+                  <Icon name="pencil-outline" size={20} color={isDarkMode ? 'white' : '#888'} style={styles.editIcon} />
                 </View>
                 <TextInput
-                style={styles.aboutInput}
-                value={userData.about}
-                onChangeText={(text) => handleInputChange('about', text)}
-                placeholder={t('About')} // Corrected here
-                multiline
+                  style={[styles.aboutInput, { color: isDarkMode ? '#E0E0E0' : '#888' }]}
+                  value={userData.about}
+                  onChangeText={(text) => handleInputChange('about', text)}
+                  placeholder={t('About')}
+                  placeholderTextColor={isDarkMode ? '#888' : '#CCC'}
+                  multiline
                 />
-
               </View>
             </View>
             {isChanged && (
@@ -189,7 +192,6 @@ export default function SettingScreen() {
         }
         ListFooterComponent={<LogoutButton />}
       />
-      {/* Barcode Modal */}
       <Modal
         visible={barcodeVisible}
         transparent={true}
@@ -197,20 +199,20 @@ export default function SettingScreen() {
         onRequestClose={() => setBarcodeVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{t('invite_friends')}</Text>
+          <View style={[styles.modalContent, { backgroundColor: isDarkMode ? '#333' : '#fff' }]}>
+            <Text style={[styles.modalTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('invite_friends')}</Text>
             <Barcode
               value={userData.username}
               options={{
                 format: 'CODE128',
-                background: '#fff',
-                lineColor: '#000',
+                background: isDarkMode ? '#333' : '#fff',
+                lineColor: isDarkMode ? '#E0E0E0' : '#000',
               }}
               width={2}
               height={100}
             />
             <TouchableOpacity
-              style={styles.closeButton}
+              style={[styles.closeButton, { backgroundColor: isDarkMode ? '#4CAF50' : '#4CAF50' }]}
               onPress={() => setBarcodeVisible(false)}
             >
               <Text style={styles.closeButtonText}>{t('close')}</Text>
@@ -233,13 +235,11 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
   },
   userInfo: {
     flex: 1,
@@ -248,7 +248,6 @@ const styles = StyleSheet.create({
   usernameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
   },
   usernameInput: {
     fontSize: 18,
@@ -257,7 +256,6 @@ const styles = StyleSheet.create({
   },
   aboutInput: {
     fontSize: 14,
-    color: '#888',
     flex: 1,
   },
   editIcon: {
@@ -281,7 +279,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
   },
   menuTextContainer: {
     marginLeft: 16,
@@ -292,7 +289,6 @@ const styles = StyleSheet.create({
   },
   menuSubLabel: {
     fontSize: 14,
-    color: '#888',
   },
   modalContainer: {
     flex: 1,
@@ -301,7 +297,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
     width: '80%',
@@ -314,7 +309,6 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginTop: 16,
-    backgroundColor: '#4CAF50',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 5,

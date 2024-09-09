@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, Modal } from 'react-native';
+import React, { useState, useEffect,useContext } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import firestore from '@react-native-firebase/firestore';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +15,7 @@ const ChatRoomHeader = ({ user, chatId }) => {
   const [userStatus, setUserStatus] = useState(null);
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const navigation = useNavigation();
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
 
   useEffect(() => {
     if (user?.id) {
@@ -39,45 +41,45 @@ const ChatRoomHeader = ({ user, chatId }) => {
   };
 
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { backgroundColor: isDarkMode ? '#1e1e1e' : '#f8f8f8' }]}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Icon name="arrow-back" size={28} color="black" style={styles.backText} />
+        <Icon name="arrow-back" size={28} color={isDarkMode ? 'white' : 'black'} style={styles.backText} />
       </TouchableOpacity>
 
       {user && (
         <>
           <Image source={{ uri: user.avatar || defaultAvatar }} style={styles.avatar} />
-          <Text style={styles.username}>
+          <Text style={[styles.username, { color: isDarkMode ? 'white' : 'black' }]}>
             {user.username}  
             {userStatus === 'online' && <Text style={styles.onlineStatus}> (Online) </Text>}
           </Text>
           <View style={styles.iconContainer}>
             <TouchableOpacity onPress={startVideoCall}>
-              <Octicons name="device-camera-video" size={28} color="black" style={styles.inputIcon} />
+              <Octicons name="device-camera-video" size={28} color={isDarkMode ? 'white' : 'black'} style={styles.inputIcon} />
             </TouchableOpacity>
             <TouchableOpacity>
-              <Icon name="call" size={28} color="black" style={styles.inputIcon} />
+              <Icon name="call" size={28} color={isDarkMode ? 'white' : 'black'} style={styles.inputIcon} />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleDropdown}>
-              <MaterialCommunityIcons name="dots-vertical" size={28} color="black" style={styles.inputIcon} />
+              <MaterialCommunityIcons name="dots-vertical" size={28} color={isDarkMode ? 'white' : 'black'} style={styles.inputIcon} />
             </TouchableOpacity>
           </View>
         </>
       )}
 
       {isDropdownVisible && (
-        <View style={styles.dropdown}>
+        <View style={[styles.dropdown, { backgroundColor: isDarkMode ? '#333' : '#fff' }]}>
           <TouchableOpacity style={styles.dropdownItem}>
-            <Octicons name="device-camera" size={24} color="black" />
-            <Text style={styles.dropdownText}>Camera</Text>
+            <Octicons name="device-camera" size={24} color={isDarkMode ? 'white' : 'black'} />
+            <Text style={[styles.dropdownText, { color: isDarkMode ? 'white' : 'black' }]}>Camera</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.dropdownItem}>
-            <MaterialCommunityIcons name="map-marker" size={24} color="black" />
-            <Text style={styles.dropdownText}>Location</Text>
+            <MaterialCommunityIcons name="map-marker" size={24} color={isDarkMode ? 'white' : 'black'} />
+            <Text style={[styles.dropdownText, { color: isDarkMode ? 'white' : 'black' }]}>Location</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.dropdownItem}>
-            <MaterialCommunityIcons name="contacts" size={24} color="black" />
-            <Text style={styles.dropdownText}>Contact</Text>
+            <MaterialCommunityIcons name="contacts" size={24} color={isDarkMode ? 'white' : 'black'} />
+            <Text style={[styles.dropdownText, { color: isDarkMode ? 'white' : 'black' }]}>Contact</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -91,10 +93,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     paddingTop: 25,
-    backgroundColor: '#f8f8f8',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    zIndex: 10, // Ensures header is above other components
+    zIndex: 10,
   },
   inputIcon: {
     margin: width * 0.02,
@@ -104,7 +105,6 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   backText: {
-    color: '#007AFF',
     marginRight: 10,
   },
   avatar: {
@@ -122,9 +122,8 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: 'absolute',
-    top: 60, // Adjust this based on your header height
+    top: 60,
     right: 10,
-    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
-    zIndex: 20, // Ensures dropdown is above other components
+    zIndex: 20,
   },
   dropdownItem: {
     flexDirection: 'row',

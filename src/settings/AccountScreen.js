@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { firebase } from '@react-native-firebase/auth';
 import SettingsHeader from './SettingsHeader';
@@ -6,12 +6,15 @@ import { AntDesign } from '@expo/vector-icons';
 import CustomText from '../components/CustomText';
 import AlertComponent from '../components/AlertComponent';
 import { useTranslation } from 'react-i18next';
+import { ThemeContext } from '../context/ThemeContext'; // ThemeContext'i ekledik
+
 const AccountScreen = ({ navigation }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertProps, setAlertProps] = useState({});
   const { t } = useTranslation();
+  const { isDarkMode } = useContext(ThemeContext); // Dark theme durumunu kontrol ediyoruz
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -79,11 +82,11 @@ const AccountScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>
       <SettingsHeader title={t('account')} onBackPress={handleBackPress} />
       <TouchableOpacity style={styles.deleteButton} onPress={openConfirmationModal}>
-        <AntDesign name="deleteuser" size={24} color="gray" style={styles.icon} />
-        <CustomText fontFamily={'pop'} style={styles.deleteButtonText}>{t('deleteAccount')}</CustomText>
+        <AntDesign name="deleteuser" size={24} color={isDarkMode ? '#fff' : 'gray'} style={styles.icon} />
+        <CustomText fontFamily={'pop'} style={[styles.deleteButtonText, { color: isDarkMode ? '#fff' : 'black' }]}>{t('deleteAccount')}</CustomText>
       </TouchableOpacity>
 
       <Modal
@@ -93,19 +96,22 @@ const AccountScreen = ({ navigation }) => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <CustomText fontFamily={'pop'} style={styles.modalTitle}>Confirm Account Deletion</CustomText>
-            <CustomText fontFamily={'pop'} style={styles.modalMessage}>
+          <View style={[styles.modalContainer, { backgroundColor: isDarkMode ? '#333' : '#fff' }]}>
+            <CustomText fontFamily={'pop'} style={[styles.modalTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
+              Confirm Account Deletion
+            </CustomText>
+            <CustomText fontFamily={'pop'} style={[styles.modalMessage, { color: isDarkMode ? '#ccc' : '#000' }]}>
               To delete your account, type "CONFIRM" below and press the confirm button.
             </CustomText>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: isDarkMode ? '#222' : '#fff', color: isDarkMode ? '#fff' : '#000' }]}
               placeholder="CONFIRM"
+              placeholderTextColor={isDarkMode ? '#999' : '#aaa'}
               value={confirmationText}
               onChangeText={setConfirmationText}
             />
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+              <TouchableOpacity style={[styles.cancelButton, { backgroundColor: isDarkMode ? '#666' : '#ccc' }]} onPress={() => setModalVisible(false)}>
                 <CustomText fontFamily={'pop'} style={styles.cancelButtonText}>Cancel</CustomText>
               </TouchableOpacity>
               <TouchableOpacity style={styles.confirmButton} onPress={handleDeleteAccount}>
@@ -131,7 +137,6 @@ const AccountScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     padding: 16,
   },
   icon: {
@@ -146,7 +151,6 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     fontSize: 18,
-    color: 'black',
   },
   modalOverlay: {
     flex: 1,
@@ -156,7 +160,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: '80%',
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 20,
     alignItems: 'center',
@@ -188,7 +191,6 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#ccc',
     padding: 15,
     borderRadius: 8,
     marginRight: 10,

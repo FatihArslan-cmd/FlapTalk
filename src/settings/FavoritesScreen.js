@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import firestore from '@react-native-firebase/firestore';
@@ -7,19 +7,22 @@ import SettingsHeader from './SettingsHeader';
 import CustomText from '../components/CustomText';
 import FastImage from 'react-native-fast-image';
 import AlertComponent from '../components/AlertComponent';
-import SkeletonPlaceholder from '../../Skeleton'; // Import the SkeletonPlaceholder
+import SkeletonPlaceholder from '../../Skeleton'; 
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useTranslation } from 'react-i18next';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 const FavoritesScreen = ({ navigation }) => {
+  const { isDarkMode } = useContext(ThemeContext); // Access dark mode state
   const [isModalVisible, setModalVisible] = useState(false);
   const [friends, setFriends] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const [loading, setLoading] = useState(true); // Added loading state
+  const [loading, setLoading] = useState(true);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const { width } = Dimensions.get('window');
 
   const handleBackPress = useCallback(() => {
@@ -66,7 +69,7 @@ const FavoritesScreen = ({ navigation }) => {
       const currentUser = auth().currentUser;
       if (!currentUser) return;
 
-      setLoading(true); // Start loading
+      setLoading(true);
       try {
         const favoritesSnapshot = await firestore()
           .collection('favorites')
@@ -88,7 +91,7 @@ const FavoritesScreen = ({ navigation }) => {
       } catch (error) {
         console.error('Error fetching favorites:', error);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
 
@@ -132,7 +135,7 @@ const FavoritesScreen = ({ navigation }) => {
         style={styles.avatar}
         resizeMode={FastImage.resizeMode.cover}
       />
-      <CustomText fontFamily="pop" style={styles.friendName}>{item.username}</CustomText>
+      <CustomText fontFamily="pop" style={[styles.friendName , { color: isDarkMode ? 'white' : 'black'} ]}>{item.username}</CustomText>
     </TouchableOpacity>
   ), [handleAddFavorite]);
 
@@ -151,19 +154,18 @@ const FavoritesScreen = ({ navigation }) => {
     </TouchableOpacity>
   ), []);
 
-  // Render the skeleton loader if loading is true
   const renderSkeletonPlaceholder = useMemo(() => (
     <View style={styles.friendItem}>
-    <SkeletonPlaceholder width={50} height={50} borderRadius={15} />
-    <View style={styles.messageContainer}>
-      <SkeletonPlaceholder width={100} height={20} borderRadius={4} />
-      <SkeletonPlaceholder width={150} height={15} borderRadius={4} />
+      <SkeletonPlaceholder width={50} height={50} borderRadius={15} />
+      <View style={styles.messageContainer}>
+        <SkeletonPlaceholder width={100} height={20} borderRadius={4} />
+        <SkeletonPlaceholder width={150} height={15} borderRadius={4} />
+      </View>
     </View>
-  </View>
   ), [width]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>
       <SettingsHeader title={t('favorites')} onBackPress={handleBackPress} />
       <DraggableFlatList
         data={favorites}
@@ -178,32 +180,32 @@ const FavoritesScreen = ({ navigation }) => {
                 resizeMode={FastImage.resizeMode.cover}
                 style={[styles.favoritesImage, { width: width * 0.6, height: width * 0.4 }]}
               />
-              <CustomText fontFamily="pop" style={styles.favoritesTitle}>{t('favorites')}</CustomText>
-              <CustomText fontFamily="pop" style={styles.favoritesDescription}>
-              {t('favoritesDescription')}
+              <CustomText fontFamily="pop" style={[styles.favoritesTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('favorites')}</CustomText>
+              <CustomText fontFamily="pop" style={[styles.favoritesDescription, { color: isDarkMode ? '#aaa' : '#666' }]}>
+                {t('favoritesDescription')}
               </CustomText>
             </View>
             <View style={styles.favoritesList}>
-              <CustomText fontFamily="pop" style={styles.favoritesListTitle}>{t('yourFavorites')}</CustomText>
+              <CustomText fontFamily="pop" style={[styles.favoritesListTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('yourFavorites')}</CustomText>
             </View>
           </View>
         )}
         ListEmptyComponent={
           loading ? (
-            renderSkeletonPlaceholder // Show skeleton placeholders while loading
+            renderSkeletonPlaceholder
           ) : (
-            <CustomText fontFamily={'pop'} style={styles.emptyText}>No favorites found</CustomText>
+            <CustomText fontFamily="pop" style={[styles.emptyText, { color: isDarkMode ? '#aaa' : '#666' }]}>No favorites found</CustomText>
           )
         }
         ListFooterComponent={() => (
           <View>
             <TouchableOpacity style={styles.addFavoriteButton} onPress={toggleModal}>
               <Ionicons name="add-circle-outline" size={40} color="green" />
-              <CustomText fontFamily="pop" style={styles.addFavoriteText}>{t('addFavorite')}</CustomText>
+              <CustomText fontFamily="pop" style={[styles.addFavoriteText, { color: isDarkMode ? 'lightgreen' : 'green' }]}>{t('addFavorite')}</CustomText>
             </TouchableOpacity>
             <Modal visible={isModalVisible} animationType="slide">
-              <View style={styles.modalContainer}>
-                <CustomText fontFamily="pop" style={styles.modalTitle}>{t('selectFriend')}</CustomText>
+              <View style={[styles.modalContainer, { backgroundColor: isDarkMode ? '#333' : '#fff' }]}>
+                <CustomText fontFamily="pop" style={[styles.modalTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('selectFriend')}</CustomText>
                 <FlatList
                   data={friends}
                   keyExtractor={(item) => item.id}
@@ -232,24 +234,24 @@ const FavoritesScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1 },
   contentContainer: { paddingHorizontal: 20, paddingBottom: 20 },
   favoritesHeader: { alignItems: 'center', marginVertical: 20 },
   favoritesImage: { borderRadius: 10 },
   favoritesTitle: { fontSize: 24, marginTop: 10, fontWeight: 'bold' },
-  favoritesDescription: { fontSize: 16, textAlign: 'center', color: '#666', marginTop: 10 },
+  favoritesDescription: { fontSize: 16, textAlign: 'center', marginTop: 10 },
   favoritesList: { marginTop: 30 },
   favoritesListTitle: { fontSize: 22, fontWeight: 'bold', marginVertical: 20 },
   addFavoriteButton: { flexDirection: 'row', alignItems: 'center', marginTop: 20 },
-  addFavoriteText: { fontSize: 18, color: 'green', marginLeft: 10 },
-  modalContainer: { flex: 1, padding: 20, justifyContent: 'center', backgroundColor: '#fff' },
+  addFavoriteText: { fontSize: 18, marginLeft: 10 },
+  modalContainer: { flex: 1, padding: 20, justifyContent: 'center' },
   modalTitle: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
   closeButton: { marginTop: 20, alignSelf: 'center' },
   closeButtonText: { fontSize: 18, color: 'red' },
   friendItem: { flexDirection: 'row', alignItems: 'center', marginVertical: 10 },
   avatar: { width: 55, height: 55, borderRadius: 55, marginRight: 10 },
   friendName: { fontSize: 20, fontWeight: 'bold' },
-  emptyText: { fontSize: 18, textAlign: 'center', marginTop: 20, color: '#666' },
+  emptyText: { fontSize: 18, textAlign: 'center', marginTop: 20 },
   messageContainer: {
     flex: 1,
     marginLeft: 10,

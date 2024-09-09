@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Alert, StyleSheet } from 'react-native';
 import Header from '../phoneLoginScreen/Header';
 import CustomText from '../components/CustomText';
 import Button from '../components/Button';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
 
 export default function AppInfo() {
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
   const mitLicenseText = `
 MIT License
 
@@ -26,21 +28,22 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-  `;
+SOFTWARE.`;
 
   const showLicense = () => {
     Alert.alert('MIT License', mitLicenseText);
   };
 
   return (
-    <View style={styles.container}>
-        <View style={{margin:50}}>
-      <Header fontSize={38} fontFamily='pop' text={'FlapTalk'} color='#00ae59' />
-      <CustomText fontFamily='lato-bold' style={styles.versionText}>Version 1.0.1</CustomText>
-      <CustomText fontFamily='lato-bold' style={styles.copyrightText}>
-        Copyright (c) [2024] [Fatih Arslan]
-      </CustomText>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#f7f7f7' }]}>
+      <View style={{ margin: 50 }}>
+        <Header fontSize={38} fontFamily="pop" text={'FlapTalk'} color="#00ae59" />
+        <CustomText fontFamily="lato-bold" style={[styles.versionText, { color: isDarkMode ? 'white' : 'black' }]}>
+          Version 1.0.1
+        </CustomText>
+        <CustomText fontFamily="lato-bold" style={[styles.copyrightText, { color: isDarkMode ? '#E0E0E0' : 'black' }]}>
+          Copyright (c) [2024] [Fatih Arslan]
+        </CustomText>
       </View>
       <Button text="License" onPress={showLicense} style={styles.button} />
     </View>
@@ -53,7 +56,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: '#f7f7f7',
   },
   versionText: {
     textAlign: 'center',

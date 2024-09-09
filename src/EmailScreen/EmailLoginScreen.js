@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
@@ -6,18 +6,19 @@ import '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useTranslation } from 'react-i18next'; // Import useTranslation hook
+import { useTranslation } from 'react-i18next';
 import ClearButton from '../components/renderClearButton';
 import CustomText from '../components/CustomText';
 import LoadingOverlay from '../components/LoadingOverlay';
-import useAlert from '../hooks/useAlert'; // Import your custom hook
+import useAlert from '../hooks/useAlert';
 import AlertComponent from '../components/AlertComponent';
 import useNavigationBarSync from '../hooks/useNavigationBarSync';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
 
 const { width } = Dimensions.get('window');
 
 const EmailLoginScreen = () => {
-  const { t } = useTranslation(); // Initialize translation hook
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +26,9 @@ const EmailLoginScreen = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
-  const backgroundColor = styles.container.backgroundColor;
+  const { isDarkMode } = useContext(ThemeContext); // Access the theme mode
+
+  const backgroundColor = isDarkMode ? '#121212' : '#FAF9F6';
   useNavigationBarSync(backgroundColor);
 
   const handleForgotPassword = async () => {
@@ -96,50 +99,52 @@ const EmailLoginScreen = () => {
   };
 
   return (
-    <Animatable.View style={styles.container} animation="fadeInDownBig" duration={600}>
-      <CustomText fontFamily={'pop'} style={styles.title}>{t('Log In')}</CustomText>
-      <View style={styles.inputWrapper}>
-        <Icon name="email" size={20} color="#888" style={styles.inputIcon} />
+    <Animatable.View style={[styles.container, { backgroundColor }]} animation="fadeInDownBig" duration={600}>
+      <CustomText fontFamily={'pop'} style={[styles.title, { color: isDarkMode ? '#fff' : '#005657' }]}>{t('Log In')}</CustomText>
+      <View style={[styles.inputWrapper, { borderColor: isDarkMode ? '#333' : '#ccc' }]}>
+        <Icon name="email" size={20} color={isDarkMode ? '#aaa' : '#888'} style={styles.inputIcon} />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
           placeholder={t('Email')}
+          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
         <ClearButton value={email} setValue={setEmail} />
       </View>
-      <View style={styles.inputWrapper}>
-        <Icon name="lock" size={20} color="#888" style={styles.inputIcon} />
+      <View style={[styles.inputWrapper, { borderColor: isDarkMode ? '#333' : '#ccc' }]}>
+        <Icon name="lock" size={20} color={isDarkMode ? '#aaa' : '#888'} style={styles.inputIcon} />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
           placeholder={t('Password')}
+          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconWrapper}>
-          <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color="#888" />
+          <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color={isDarkMode ? '#aaa' : '#888'} />
         </TouchableOpacity>
         <ClearButton value={password} setValue={setPassword} />
       </View>
       <View style={styles.rememberMeContainer}>
         <TouchableOpacity onPress={() => setRememberMe(!rememberMe)}>
-          <Icon name={rememberMe ? 'check-box' : 'check-box-outline-blank'} size={24} color="#888" />
+          <Icon name={rememberMe ? 'check-box' : 'check-box-outline-blank'} size={24} color={isDarkMode ? '#aaa' : '#888'} />
         </TouchableOpacity>
-        <CustomText fontFamily={'pop'} style={styles.rememberMeText}>{t('Remember me')}</CustomText>
+        <CustomText fontFamily={'pop'} style={[styles.rememberMeText, { color: isDarkMode ? '#aaa' : '#888' }]}>{t('Remember me')}</CustomText>
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: isDarkMode ? '#005657' : '#00ae59' }]} onPress={handleLogin}>
         <Icon name="login" size={20} color="#fff" style={styles.buttonIcon} />
         <CustomText fontFamily={'pop'} style={styles.buttonText}>{t('Log In')}</CustomText>
       </TouchableOpacity>
       <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
-        <Icon name="help-outline" size={20} color="#005657" style={styles.forgotPasswordIcon} />
-        <CustomText fontFamily={'pop'} style={styles.forgotPasswordText}>{t('Forgot Password?')}</CustomText>
+        <Icon name="help-outline" size={20} color={isDarkMode ? '#00ae59' : '#005657'} style={styles.forgotPasswordIcon} />
+        <CustomText fontFamily={'pop'} style={[styles.forgotPasswordText, { color: isDarkMode ? '#00ae59' : '#005657' }]}>{t('Forgot Password?')}</CustomText>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('EmailSignup')} style={styles.linkWrapper}>
-        <Icon name="person-add" size={20} color="#005657" style={styles.linkIcon} />
-        <CustomText fontFamily={'pop'} style={styles.link}>{t("Don't have an account? Sign Up")}</CustomText>
+        <Icon name="person-add" size={20} color={isDarkMode ? '#00ae59' : '#005657'} style={styles.linkIcon} />
+        <CustomText fontFamily={'pop'} style={[styles.link, { color: isDarkMode ? '#00ae59' : '#005657' }]}>{t("Don't have an account? Sign Up")}</CustomText>
       </TouchableOpacity>
       {isVisible && (
         <AlertComponent
@@ -161,18 +166,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor:'#FAF9F6',
     padding: width * 0.05,
   },
   title: {
     fontSize: width * 0.08,
     marginBottom: 20,
-    color: '#005657',
   },
   inputWrapper: {
     width: width * 0.9,
     height: 50,
-    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
@@ -189,22 +191,39 @@ const styles = StyleSheet.create({
   iconWrapper: {
     padding: 5,
   },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  rememberMeText: {
+    marginLeft: 10,
+  },
   button: {
     width: width * 0.9,
     height: 50,
-    backgroundColor: '#00ae59',
-    justifyContent: 'center',
-    alignItems: 'center',
     borderRadius: 5,
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
   },
   buttonIcon: {
     marginRight: 10,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  },
+  forgotPassword: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  forgotPasswordIcon: {
+    marginRight: 10,
+  },
+  forgotPasswordText: {
+    textDecorationLine: 'underline',
   },
   linkWrapper: {
     flexDirection: 'row',
@@ -212,30 +231,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   linkIcon: {
-    marginRight: 5,
+    marginRight: 10,
   },
   link: {
-    color: '#005657',
-  },
-  rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  rememberMeText: {
-    marginLeft: 5,
-    color: '#888',
-  },
-  forgotPassword: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  forgotPasswordIcon: {
-    marginRight: 5,
-  },
-  forgotPasswordText: {
-    color: '#005657',
+    textDecorationLine: 'underline',
   },
 });
 

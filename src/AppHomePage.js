@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -13,6 +13,8 @@ import SkeletonPlaceholder from "../Skeleton";
 import FastImage from 'react-native-fast-image';
 import useNavigationBarSync from "./hooks/useNavigationBarSync";
 import { useTranslation } from "react-i18next";
+import { ThemeContext } from './context/ThemeContext'; // Import ThemeContext
+
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function HomeScreen() {
@@ -23,8 +25,9 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const { t } = useTranslation();
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext to check theme mode
 
-  const backgroundColor = styles.container.backgroundColor; 
+  const backgroundColor = isDarkMode ? '#121212' : '#FAF9F6'; 
   useNavigationBarSync(backgroundColor); 
   useDisableBackButton();
 
@@ -175,17 +178,17 @@ export default function HomeScreen() {
 
   const renderChatItem = ({ item }) => (
     <Swipeable renderRightActions={() => renderRightActions(item.friendId)}>
-      <TouchableOpacity style={styles.item} onPress={() => startChat(item.friendId)}>
+      <TouchableOpacity style={[styles.item, { backgroundColor: isDarkMode ? '#1E1E1E' : '#FFF' }]} onPress={() => startChat(item.friendId)}>
         <FastImage 
           source={{ uri: item.avatar || defaultAvatar }} 
           style={styles.avatar} 
           resizeMode={FastImage.resizeMode.cover}
         />
         <View style={styles.messageContainer}>
-          <CustomText fontFamily={'pop'} style={styles.name}>{item.username}</CustomText>
+          <CustomText fontFamily={'pop'} style={[styles.name, { color: isDarkMode ? 'white' : 'black' }]}>{item.username}</CustomText>
           <View style={styles.latestMessageContainer}>
-            <CustomText fontFamily={'lato-bold'} style={styles.latestMessage}>{item.latestMessage}</CustomText>
-            <CustomText fontFamily={'lato-bold'} style={styles.latestMessageTime}>{item.latestMessageTime}</CustomText>
+            <CustomText fontFamily={'lato-bold'} style={[styles.latestMessage, { color: isDarkMode ? '#E0E0E0' : '#555' }]}>{item.latestMessage}</CustomText>
+            <CustomText fontFamily={'lato-bold'} style={[styles.latestMessageTime, { color: isDarkMode ? '#B0B0B0' : '#999' }]}>{item.latestMessageTime}</CustomText>
           </View>
         </View>
       </TouchableOpacity>
@@ -201,20 +204,20 @@ export default function HomeScreen() {
   });
 
   return (
-    <View style={styles.container}>
-      <AppHeader title={'FlapTalk'} textColor={'#00ae59'} onSearch={setSearchText} />
+    <View style={[styles.container, { backgroundColor }]}>
+      <AppHeader title={'FlapTalk'} textColor={isDarkMode ? '#00ae59' : '#000'} onSearch={setSearchText} />
       <View style={styles.filterContainer}>
         <TouchableOpacity 
           style={[styles.filterButton, filter === 'All' && styles.activeFilterButton]}
           onPress={() => setFilter('All')}
         >
-          <Text style={[styles.filterText, filter === 'All' && styles.activeFilterText]}>{t('All')}</Text>
+          <Text style={[styles.filterText, filter === 'All' && styles.activeFilterText, { color: isDarkMode ? '#E0E0E0' : '#555' }]}>{t('All')}</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={[styles.filterButton, filter === 'Favorites' && styles.activeFilterButton]} 
           onPress={() => setFilter('Favorites')}
         >
-          <Text style={[styles.filterText, filter === 'Favorites' && styles.activeFilterText]}>{t('favorites')}</Text>
+          <Text style={[styles.filterText, filter === 'Favorites' && styles.activeFilterText, { color: isDarkMode ? '#E0E0E0' : '#555' }]}>{t('favorites')}</Text>
         </TouchableOpacity>
       </View>
       <FlatList
@@ -226,10 +229,10 @@ export default function HomeScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#FAF9F6',
   },
   item: {
     flexDirection: 'row',
@@ -257,12 +260,10 @@ const styles = StyleSheet.create({
   },
   latestMessage: {
     fontSize: 14,
-    color: '#555',
     flex: 1,
   },
   latestMessageTime: {
     fontSize: 12,
-    color: '#999',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -283,7 +284,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 64,
     height: '100%',
-    borderRadius:33
+    borderRadius: 33,
   },
   actionText: {
     color: '#fff',
@@ -299,14 +300,12 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 16,
-    color: '#555',
   },
   activeFilterButton: {
     borderBottomWidth: 2,
     borderBottomColor: '#00ae59',
   },
   activeFilterText: {
-    color: '#00ae59',
     fontWeight: '600',
   },
 });

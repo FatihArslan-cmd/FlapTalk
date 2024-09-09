@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, TextInput, StyleSheet, Dimensions } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -13,7 +13,8 @@ import ClearButton from './renderClearButton';
 import Button from './Button';
 import useAlert from '../hooks/useAlert';
 import useNavigationBarSync from '../hooks/useNavigationBarSync';
-import { useTranslation } from 'react-i18next'; // Import useTranslation hook
+import { useTranslation } from 'react-i18next';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,8 +25,9 @@ const UserInfoScreen = ({ route }) => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState('');
   const [avatar, setAvatar] = useState('');
-  const { t } = useTranslation(); // Initialize translation hook
-  const backgroundColor = styles.container.backgroundColor; 
+  const { t } = useTranslation();
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
+  const backgroundColor = isDarkMode ? '#1c1c1c' : '#FAF9F6'; 
   useNavigationBarSync(backgroundColor); 
   const navigation = useNavigation();
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
@@ -48,7 +50,7 @@ const UserInfoScreen = ({ route }) => {
         setUsername(userData.username || '');
         setAbout(userData.about || '');
         setDate(userData.date || '');
-        setAvatar(userData.avatar || ''); // Set the avatar state
+        setAvatar(userData.avatar || '');
       }
     };
 
@@ -85,13 +87,13 @@ const UserInfoScreen = ({ route }) => {
       }
   
       const currentDate = date || getCurrentDate();
-      const aboutText = about.trim() || 'Hey dear, I am new in FlapTalk'; // Default text if 'about' is empty
+      const aboutText = about.trim() || 'Hey dear, I am new in FlapTalk'; 
   
       await firestore().collection('users').doc(uid).set({
         username: username.trim(),
         about: aboutText,
         date: currentDate,
-        avatar: avatar ? (avatar.uri || avatar) : null, // Use defaultAvatar if avatar is not selected
+        avatar: avatar ? (avatar.uri || avatar) : null, 
       });
   
       await AsyncStorage.setItem('userToken', 'logged_in');
@@ -109,24 +111,26 @@ const UserInfoScreen = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Header fontSize={width * 0.07} color='#00ad59' fontFamily='pop' text={t('Profile Information')} />
-      <CustomText fontFamily="loti" style={styles.subtitle}>
+    <View style={[styles.container, { backgroundColor }]}>
+      <Header fontSize={width * 0.07} color={isDarkMode ? '#00ff87' : '#00ad59'} fontFamily='pop' text={t('Profile Information')} />
+      <CustomText fontFamily="loti" style={[styles.subtitle, { color: isDarkMode ? '#ccc' : '#555' }]}>
         {t('Please enter your name and optionally add a profile photo.')}
       </CustomText>
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, { borderColor: isDarkMode ? '#555' : '#ccc' }]}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
           placeholder={t('Username')}
+          placeholderTextColor={isDarkMode ? '#888' : '#ccc'}
           value={username}
           onChangeText={(text) => setUsername(text.slice(0, 16))} 
         />
         <ClearButton value={username} setValue={(text) => setUsername(text.slice(0, 16))} />
       </View>
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, { borderColor: isDarkMode ? '#555' : '#ccc' }]}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
           placeholder={t('About')}
+          placeholderTextColor={isDarkMode ? '#888' : '#ccc'}
           value={about}
           onChangeText={setAbout}
         />
@@ -152,11 +156,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: height * 0.1,
-    backgroundColor:'#FAF9F6'
   },
   subtitle: {
     fontSize: height * 0.025,
-    color: '#555',
     textAlign: 'center',
     marginVertical: height * 0.02,
     paddingHorizontal: width * 0.08,
@@ -166,7 +168,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: height * 0.02,
     width: width * 0.8,
-    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: width * 0.03,

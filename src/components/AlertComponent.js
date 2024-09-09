@@ -1,8 +1,9 @@
-import React, { memo } from 'react';
+import React, { memo, useContext } from 'react';
 import { Modal, View, StyleSheet, TouchableOpacity, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import CustomText from './CustomText';
 import { StatusBar } from 'expo-status-bar';
 import { BlurView } from 'expo-blur';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,6 +23,7 @@ const AlertComponent = ({
   confirmTextStyle = {},
   cancelTextStyle = {}
 }) => {
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
 
   return (
     <Modal
@@ -32,13 +34,13 @@ const AlertComponent = ({
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.centeredView}>
-          <BlurView intensity={50} style={styles.absolute} tint="dark" />
-          {visible && <StatusBar style="light" backgroundColor="rgba(0,0,0,0.5)" translucent />}
+          <BlurView intensity={50} style={styles.absolute} tint={isDarkMode ? 'dark' : 'light'} />
+          {visible && <StatusBar style={isDarkMode ? "light" : "dark"} backgroundColor="rgba(0,0,0,0.5)" translucent />}
 
           <TouchableWithoutFeedback onPress={() => {}}>
-            <View style={[styles.modalView, modalStyle]}>
-              <CustomText fontFamily={'pop'} style={styles.modalTitle}>{title}</CustomText>
-              <CustomText fontFamily={'pop'} style={styles.modalMessage}>{message}</CustomText>
+            <View style={[styles.modalView, modalStyle, { backgroundColor: isDarkMode ? '#333' : 'white' }]}>
+              <CustomText fontFamily={'pop'} style={[styles.modalTitle, { color: isDarkMode ? 'white' : 'black' }]}>{title}</CustomText>
+              <CustomText fontFamily={'pop'} style={[styles.modalMessage, { color: isDarkMode ? '#ccc' : '#555' }]}>{message}</CustomText>
               <View style={styles.buttonContainer}>
                 {onCancel && (
                   <TouchableOpacity 
@@ -64,7 +66,7 @@ const AlertComponent = ({
 
         </View>
       </TouchableWithoutFeedback>
-      {!visible && <StatusBar style="dark" backgroundColor="#FFFFFF" translucent />}
+      {!visible && <StatusBar style={isDarkMode ? "dark" : "light"} backgroundColor="#FFFFFF" translucent />}
     </Modal>
   );
 };
@@ -85,7 +87,6 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: width * 0.05,
-    backgroundColor: 'white',
     borderRadius: 20,
     padding: width * 0.09,
     alignItems: 'center',

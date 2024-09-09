@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
@@ -12,12 +12,13 @@ import LoadingOverlay from '../components/LoadingOverlay';
 import useAlert from '../hooks/useAlert';
 import AlertComponent from '../components/AlertComponent';
 import useNavigationBarSync from '../hooks/useNavigationBarSync';
-import { useTranslation } from 'react-i18next'; // Import useTranslation hook
+import { useTranslation } from 'react-i18next';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
 
 const { width } = Dimensions.get('window');
 
 const EmailSignupScreen = () => {
-  const { t } = useTranslation(); // Initialize translation hook
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +26,8 @@ const EmailSignupScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
-  const backgroundColor = styles.container.backgroundColor;
+  const { isDarkMode } = useContext(ThemeContext); // Access theme context
+  const backgroundColor = isDarkMode ? '#121212' : '#FAF9F6';
   useNavigationBarSync(backgroundColor);
 
   const handleSignUp = async () => {
@@ -44,11 +46,9 @@ const EmailSignupScreen = () => {
       const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
       await firebase.firestore().collection('users').doc(userCredential.user.uid).set({
         email: email,
-        // Add any other user data here
       });
 
       userCredential.user.sendEmailVerification();
-
       showAlert(t('Sign Up Success'), t('Please verify your email address.'));
       navigation.navigate('EmailLogin');
     } catch (error) {
@@ -67,51 +67,54 @@ const EmailSignupScreen = () => {
   };
 
   return (
-    <Animatable.View style={styles.container} animation="fadeInDownBig" duration={600}>
-      <CustomText fontFamily={'pop'} style={styles.title}>{t('Sign Up')}</CustomText>
-      <View style={styles.inputWrapper}>
-        <Icon name="email" size={20} color="#888" style={styles.inputIcon} />
+    <Animatable.View style={[styles.container, { backgroundColor }]} animation="fadeInDownBig" duration={600}>
+      <CustomText fontFamily={'pop'} style={[styles.title, { color: isDarkMode ? '#fff' : '#005657' }]}>{t('Sign Up')}</CustomText>
+      <View style={[styles.inputWrapper, { borderColor: isDarkMode ? '#333' : '#ccc' }]}>
+        <Icon name="email" size={20} color={isDarkMode ? '#aaa' : '#888'} style={styles.inputIcon} />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
           placeholder={t('Email')}
+          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
         <ClearButton value={email} setValue={setEmail} />
       </View>
-      <View style={styles.inputWrapper}>
-        <Icon name="lock" size={20} color="#888" style={styles.inputIcon} />
+      <View style={[styles.inputWrapper, { borderColor: isDarkMode ? '#333' : '#ccc' }]}>
+        <Icon name="lock" size={20} color={isDarkMode ? '#aaa' : '#888'} style={styles.inputIcon} />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
           placeholder={t('Password')}
+          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconWrapper}>
-          <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color="#888" />
+          <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color={isDarkMode ? '#aaa' : '#888'} />
         </TouchableOpacity>
         <ClearButton value={password} setValue={setPassword} />
       </View>
-      <View style={styles.inputWrapper}>
-        <Icon name="lock" size={20} color="#888" style={styles.inputIcon} />
+      <View style={[styles.inputWrapper, { borderColor: isDarkMode ? '#333' : '#ccc' }]}>
+        <Icon name="lock" size={20} color={isDarkMode ? '#aaa' : '#888'} style={styles.inputIcon} />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
           placeholder={t('Confirm Password')}
+          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           secureTextEntry={!showPassword}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
         />
         <ClearButton value={confirmPassword} setValue={setConfirmPassword} />
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: isDarkMode ? '#005657' : '#00ae59' }]} onPress={handleSignUp}>
         <Icon name="person-add" size={20} color="#fff" style={styles.buttonIcon} />
         <CustomText fontFamily={'pop'} style={styles.buttonText}>{t('Sign Up')}</CustomText>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('EmailLogin')} style={styles.linkWrapper}>
-        <Icon name="login" size={20} color="#005657" style={styles.linkIcon} />
-        <CustomText fontFamily={'pop'} style={styles.link}>{t('Already have an account? Log In')}</CustomText>
+        <Icon name="login" size={20} color={isDarkMode ? '#00ae59' : '#005657'} style={styles.linkIcon} />
+        <CustomText fontFamily={'pop'} style={[styles.link, { color: isDarkMode ? '#00ae59' : '#005657' }]}>{t('Already have an account? Log In')}</CustomText>
       </TouchableOpacity>
       {isVisible && (
         <AlertComponent
@@ -133,18 +136,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor:'#FAF9F6',
     padding: width * 0.05,
   },
   title: {
     fontSize: width * 0.08,
     marginBottom: 20,
-    color: '#005657',
   },
   inputWrapper: {
     width: width * 0.9,
     height: 50,
-    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
@@ -164,19 +164,17 @@ const styles = StyleSheet.create({
   button: {
     width: width * 0.9,
     height: 50,
-    backgroundColor: '#00ae59',
-    justifyContent: 'center',
-    alignItems: 'center',
     borderRadius: 5,
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
   },
   buttonIcon: {
     marginRight: 10,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   linkWrapper: {
     flexDirection: 'row',
@@ -184,10 +182,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   linkIcon: {
-    marginRight: 5,
+    marginRight: 10,
   },
   link: {
-    color: '#005657',
+    textDecorationLine: 'underline',
   },
 });
 

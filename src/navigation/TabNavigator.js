@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useReducer } from 'react';
+import React, { useEffect, useRef, useReducer, useContext } from 'react';
 import { Pressable, StyleSheet, View, Text } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Svg, { Path } from 'react-native-svg';
@@ -9,11 +9,14 @@ import CommunityScreen from '../CommunityScreen.js/CommunityScreen';
 import CallsScreen from '../CallsScreen/CallsScreen';
 import SettingScreen from '../settings/SettingScreen';
 import { StatusBar } from 'expo-status-bar';
+import { ThemeContext } from '../context/ThemeContext'; // Import your theme context
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 const Tab = createMaterialTopTabNavigator();
 
 const TabNavigator = () => {
+  const { isDarkMode } = useContext(ThemeContext); // Access theme context
+
   return (
     <View style={{ flex: 1, paddingTop: 10 }}>
       <StatusBar style="auto" />
@@ -25,7 +28,7 @@ const TabNavigator = () => {
           tabBarShowIcon: true,
           tabBarShowLabel: false,
           tabBarStyle: {
-            backgroundColor: '#ffffff',
+            backgroundColor: isDarkMode ? '#121212' : '#ffffff', // Set background based on theme
           },
           tabBarIndicatorStyle: {
             backgroundColor: '#00ae59',
@@ -41,7 +44,7 @@ const TabNavigator = () => {
                 ref={ref}
                 loop={false}
                 source={require('../../assets/lottie/home.icon.json')}
-                style={styles.icon}
+                style={[styles.icon, { tintColor: isDarkMode ? 'white' : 'black' }]} // Icon color based on theme
               />
             ),
           }}
@@ -55,7 +58,7 @@ const TabNavigator = () => {
                 ref={ref}
                 loop={false}
                 source={require('../../assets/lottie/chat.icon.json')}
-                style={styles.icon}
+                style={[styles.icon, { tintColor: isDarkMode ? 'white' : 'black' }]}
               />
             ),
           }}
@@ -69,7 +72,7 @@ const TabNavigator = () => {
                 ref={ref}
                 loop={false}
                 source={require('../../assets/lottie/Call.json')}
-                style={styles.icon}
+                style={[styles.icon, { tintColor: isDarkMode ? 'white' : 'black' }]}
               />
             ),
           }}
@@ -83,7 +86,7 @@ const TabNavigator = () => {
                 ref={ref}
                 loop={false}
                 source={require('../../assets/lottie/settings.icon.json')}
-                style={styles.icon}
+                style={[styles.icon, { tintColor: isDarkMode ? 'white' : 'black' }]}
               />
             ),
           }}
@@ -94,6 +97,8 @@ const TabNavigator = () => {
 };
 
 const AnimatedTabBar = ({ state: { index: activeIndex, routes }, navigation, descriptors }) => {
+  const { isDarkMode } = useContext(ThemeContext); // Access theme context here as well
+
   const reducer = (state, action) => {
     return [...state, { x: action.x, index: action.index }];
   };
@@ -116,7 +121,7 @@ const AnimatedTabBar = ({ state: { index: activeIndex, routes }, navigation, des
   });
 
   return (
-    <View style={styles.tabBar}>
+    <View style={[styles.tabBar, { backgroundColor: isDarkMode ? '#121212' : '#FAF9F6' }]}>
       <AnimatedSvg
         width={110}
         height={60}
@@ -151,6 +156,7 @@ const AnimatedTabBar = ({ state: { index: activeIndex, routes }, navigation, des
 
 const TabBarComponent = ({ active, options, onLayout, onPress }) => {
   const ref = useRef(null);
+  const { isDarkMode } = useContext(ThemeContext); // Access theme context here as well
 
   useEffect(() => {
     if (active && ref?.current) {
@@ -188,7 +194,7 @@ const TabBarComponent = ({ active, options, onLayout, onPress }) => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor:'#FAF9F6',
+    backgroundColor: '#FAF9F6',
   },
   activeBackground: {
     position: 'absolute',

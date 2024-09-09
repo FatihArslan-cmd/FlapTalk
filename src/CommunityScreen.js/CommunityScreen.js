@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { View, Text, FlatList, StyleSheet, Image, RefreshControl, TouchableOpacity } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -11,6 +11,7 @@ import AlertComponent from "../components/AlertComponent";
 import { calculateMembershipDuration } from "../utils/calculateMembershipDuration ";
 import FastImage from "react-native-fast-image";
 import { useTranslation } from "react-i18next";
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
@@ -23,6 +24,7 @@ export default function UsersList() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const { t } = useTranslation();
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
 
   const fetchUsers = async () => {
     try {
@@ -36,15 +38,13 @@ export default function UsersList() {
         }))
         .filter(user => user.id !== currentUser)
         .sort((a, b) => (b.state === 'online') - (a.state === 'online'));
-  
+
       setUsers(fetchedUsers);
       setFilteredUsers(fetchedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
   };
-  
-  
 
   useFocusEffect(
     useCallback(() => {
@@ -71,28 +71,28 @@ export default function UsersList() {
   const addFriend = async (friendId) => {
     try {
       const currentUser = auth().currentUser.uid;
-  
+
       // Check if the friend is already added
       const friendsQuerySnapshot = await firestore()
         .collection('friends')
         .where('userId', '==', currentUser)
         .where('friendId', '==', friendId)
         .get();
-  
+
       if (!friendsQuerySnapshot.empty) {
         setAlertMessage('This user is already in your friend list.');
         setAlertVisible(true);
         return;
       }
-  
+
       // Add friend to Firestore for the current user
       await firestore().collection('friends').add({
         userId: currentUser,
         friendId,
-        avatar: filteredUsers.find(user => user.id === friendId).avatar ,
+        avatar: filteredUsers.find(user => user.id === friendId).avatar,
         time: new Date().toISOString(),
       });
-  
+
       // Add the current user as a friend for the other user
       await firestore().collection('friends').add({
         userId: friendId,
@@ -100,14 +100,13 @@ export default function UsersList() {
         avatar: auth().currentUser.photoURL, // Assuming the current user's avatar is available here
         time: new Date().toISOString(),
       });
-  
+
       setAlertMessage('This user has been added to your friend list.');
       setAlertVisible(true);
     } catch (error) {
       console.error('Error adding friend:', error);
     }
   };
-  
 
   const blockUser = async (userId) => {
     setAlertMessage('This user has been blocked.');
@@ -129,29 +128,42 @@ export default function UsersList() {
 
   const renderItem = ({ item }) => (
     <Swipeable renderRightActions={() => renderRightActions(item)}>
-      <View style={styles.item}>
-      <FastImage source={{ uri: item.avatar || defaultAvatar }} style={styles.avatar} resizeMode={FastImage.resizeMode.cover} />
-      <View style={styles.messageContainer}>
+      <View style={[styles.item, { backgroundColor: isDarkMode ? '#1E1E1E' : '#FFF' }]}>
+        <FastImage
+          source={{ uri: item.avatar || defaultAvatar }}
+          style={styles.avatar}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+        <View style={styles.messageContainer}>
           <View style={styles.infoContainer}>
-            <CustomText fontFamily="pop" style={styles.name}>{item.username}</CustomText>
-            <CustomText fontFamily="pop" style={styles.date}>
+            <CustomText fontFamily="pop" style={[styles.name, { color: isDarkMode ? 'white' : 'black' }]}>
+              {item.username}
+            </CustomText>
+            <CustomText fontFamily="pop" style={[styles.date, { color: isDarkMode ? '#E0E0E0' : '#888' }]}>
               {`${t('Member since')} ${calculateMembershipDuration(item.date)} `}
             </CustomText>
           </View>
-          <CustomText fontFamily="pop" style={item.state === 'online' ? styles.online : styles.offline}>
-            {item.state === 'online' ? 'Online' : 'Offline'}
+          <CustomText
+            fontFamily="pop"
+            style={item.state === 'online' ? styles.online : styles.offline}>
+            {item.state === 'online' ? t('Online') : t('Offline')}
           </CustomText>
         </View>
-        <CustomText fontFamily="pop" style={styles.rankname}>{item.rank || ''}</CustomText>
+        <CustomText fontFamily="pop" style={[styles.rankname, { color: isDarkMode ? '#87CEEB' : 'blue' }]}>
+          {item.rank || ''}
+        </CustomText>
       </View>
     </Swipeable>
   );
-  
-
 
   return (
-    <View style={styles.container}>
-      <AppHeader showCameraIcon={true} title={t('Find Friends')} textColor="black"  onSearch={setSearchText} />
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#FAF9F6' }]}>
+      <AppHeader
+        showCameraIcon={true}
+        title={t('Find Friends')}
+        textColor={isDarkMode ? 'white' : 'black'}
+        onSearch={setSearchText}
+      />
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => item.id}
@@ -159,7 +171,9 @@ export default function UsersList() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
-            <CustomText fontFamily="pop"  style={styles.emptyText}>No users found </CustomText>
+            <CustomText fontFamily="pop" style={[styles.emptyText, { color: isDarkMode ? '#E0E0E0' : '#888' }]}>
+              {t('No users found')}
+            </CustomText>
           </View>
         )}
       />
@@ -175,84 +189,78 @@ export default function UsersList() {
   );
 }
 
-
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor:'#FAF9F6',
-    },
-    item: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 18,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ccc',
-    },
-    avatar: {
-      width: 50,
-      height: 50,
-      borderRadius: 15,
-    },
-    messageContainer: {
-      flex: 1,
-      marginLeft: 10,
-      justifyContent: 'center',
-    },
-    infoContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    name: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      flex: 1,
-      marginRight: 10,
-    },
-    date: {
-      fontSize: 11,
-      color: '#888',
-    },
-    rankname: {
-      fontSize: 16,
-      color: 'blue',
-    },
-    online: {
-      color: 'green',
-      marginTop: 5,
-    },
-    offline: {
-      color: 'red',
-      marginTop: 5,
-    },
-    emptyContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    emptyText: {
-      fontSize: 18,
-      color: '#888',
-    },
-    actionsContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'flex-end',
-    },
-    actionButton: {
-      padding: 18,
-      borderRadius: 10,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    addAction: {
-      backgroundColor: '#4CAF50',
-    },
-    blockAction: {
-      backgroundColor: '#F44336',
-    },
-    actionText: {
-      color: '#fff',
-      fontSize: 12,
-    },
-  });
-  
+  container: {
+    flex: 1,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 15,
+  },
+  messageContainer: {
+    flex: 1,
+    marginLeft: 10,
+    justifyContent: 'center',
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    flex: 1,
+    marginRight: 10,
+  },
+  date: {
+    fontSize: 11,
+  },
+  rankname: {
+    fontSize: 16,
+  },
+  online: {
+    color: 'green',
+    marginTop: 5,
+  },
+  offline: {
+    color: 'red',
+    marginTop: 5,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  actionButton: {
+    padding: 18,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addAction: {
+    backgroundColor: '#4CAF50',
+  },
+  blockAction: {
+    backgroundColor: '#F44336',
+  },
+  actionText: {
+    color: '#fff',
+    fontSize: 12,
+  },
+});

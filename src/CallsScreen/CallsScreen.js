@@ -1,14 +1,18 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import AppHeader from '../components/AppHeader'
-import { useTranslation } from 'react-i18next'
+import { View } from 'react-native';
+import React, { useContext } from 'react';
+import AppHeader from '../components/AppHeader';
+import { useTranslation } from 'react-i18next';
+import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+
 const CallsScreen = () => {
   const { t } = useTranslation();
-  return (
-    <View style={{flex:1,backgroundColor:'#FAF9F6',}}>
-     <AppHeader title={t('Calls')}/>
-    </View>
-  )
-}
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
 
-export default CallsScreen
+  return (
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#121212' : '#FAF9F6' }}>
+      <AppHeader title={t('Calls')} textColor={isDarkMode ? 'white' : 'black'} />
+    </View>
+  );
+};
+
+export default CallsScreen;
