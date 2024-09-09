@@ -7,19 +7,11 @@ import AuthButton from './AuthButton';
 import auth from '@react-native-firebase/auth';
 import { StatusBar } from 'expo-status-bar';
 import useNavigationBarSync from './hooks/useNavigationBarSync';
-
+import { useTranslation } from 'react-i18next';
 const { width, height } = Dimensions.get('window');
 
 const colors = ['#361f34', '#005657', '#ff25ff', '#2c014d', '#fff0d3', '#ff6655'];
 const textColors = ['#e1f1ff', '#ffc480', '#000000', '#3cf467', '#0000ff', '#3c3cd6'];
-const texts = [
-  'Let\'s work together',
-  'Messaging app',
-  'FlapTalk',
-  'Let\'s achieve success together',
-  'A new day, a new beginning',
-  'The new address for communication'
-];
 
 const AnimatedGradientText = ({ text, textColor }) => (
   <CustomText fontFamily="pop">
@@ -32,13 +24,15 @@ const AnimatedGradientText = ({ text, textColor }) => (
 const LoginScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  
+  const { t } = useTranslation();
+  useNavigationBarSync('black');
+  const texts = t('texts', { returnObjects: true });
+
   const [currentText, setCurrentText] = useState('Let\'s work together');
   const [isAnimating, setIsAnimating] = useState(false);
   const [showGoogleBounce, setShowGoogleBounce] = useState(false);
   const [showPhoneBounce, setShowPhoneBounce] = useState(false);
   const [showEmailBounce, setShowEmailBounce] = useState(false);
-  useNavigationBarSync('black');
   
   const textColor = useRef(new Animated.Value(0)).current;
   const animation = useRef(new Animated.Value(0)).current;
@@ -152,7 +146,7 @@ const LoginScreen = () => {
         <AuthButton
           style={styles.googleButton}
           iconName="google"
-          text="Continue with Google"
+          text={t("googleButton")}
           onPress={isAnimating ? null : handleGooglePress}
           showBounce={showGoogleBounce}
           bounceColor="#2f2f2f"
@@ -161,7 +155,7 @@ const LoginScreen = () => {
         <AuthButton
           style={[styles.twitterButton, isAnimating && { opacity: 0.5 }]}
           iconName="envelope"
-          text="Continue with Email"
+          text={t("twitterButton")}
           onPress={isAnimating ? null : handleTwitterPress}
           bounceColor="#e6e6e6"
           showBounce={showEmailBounce}
@@ -171,7 +165,7 @@ const LoginScreen = () => {
         <AuthButton
           style={styles.button}
           iconName="phone"
-          text="Continue with Phone number"
+          text={t("phoneButton")}
           onPress={isAnimating ? null : handlePhonePress}
           showBounce={showPhoneBounce}
           disabled={isAnimating}

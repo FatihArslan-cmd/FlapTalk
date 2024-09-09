@@ -64,7 +64,7 @@ export default function SettingScreen() {
 
   const handleUpdateProfile = async () => {
     if (!userData.username.trim()) {
-      showAlert('Error', 'Username cannot be empty.');
+      showAlert(t('Error'), t('Username cannot be empty.'));
       return;
     }
 
@@ -146,8 +146,8 @@ export default function SettingScreen() {
 
   return (
     <View style={styles.container}>
-      <AppHeader title={'Settings'} onSearch={handleSearch} />
-      <FlatList
+         <AppHeader title={t('Settings')} onSearch={handleSearch} />
+        <FlatList
         data={dynamicMenuItems}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
@@ -171,17 +171,18 @@ export default function SettingScreen() {
                   <Icon name="pencil-outline" size={20} color="#888" style={styles.editIcon} />
                 </View>
                 <TextInput
-                  style={styles.aboutInput}
-                  value={userData.about}
-                  onChangeText={(text) => handleInputChange('about', text)}
-                  placeholder="About"
-                  multiline
+                style={styles.aboutInput}
+                value={userData.about}
+                onChangeText={(text) => handleInputChange('about', text)}
+                placeholder={t('About')} // Corrected here
+                multiline
                 />
+
               </View>
             </View>
             {isChanged && (
               <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile}>
-                <Text style={styles.updateButtonText}>Update Profile</Text>
+                <Text style={styles.updateButtonText}>{t('update_profile_button')}</Text>
               </TouchableOpacity>
             )}
           </>
@@ -197,7 +198,7 @@ export default function SettingScreen() {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Arkadaşına Davet Et</Text>
+            <Text style={styles.modalTitle}>{t('invite_friends')}</Text>
             <Barcode
               value={userData.username}
               options={{
@@ -212,7 +213,7 @@ export default function SettingScreen() {
               style={styles.closeButton}
               onPress={() => setBarcodeVisible(false)}
             >
-              <Text style={styles.closeButtonText}>Kapat</Text>
+              <Text style={styles.closeButtonText}>{t('close')}</Text>
             </TouchableOpacity>
           </View>
         </View>

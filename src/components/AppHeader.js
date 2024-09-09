@@ -5,11 +5,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import CustomText from './CustomText';
 import ClearButton from './renderClearButton';
-
+import { useTranslation } from 'react-i18next';
 const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState('');
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   useFocusEffect(
     useCallback(() => {
@@ -47,11 +48,12 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
           </TouchableOpacity>
           <Icon name="search" size={28} color="black" style={styles.searchIcon} />
           <TextInput
-            style={styles.textInput}
-            placeholder="Search"
-            value={searchText}
-            onChangeText={handleSearchTextChange}
-          />
+  style={styles.textInput}
+  placeholder={t('Search')}  // 'Search' will be translated based on the user's language preference
+  value={searchText}
+  onChangeText={handleSearchTextChange}
+/>
+
           <ClearButton value={searchText} setValue={handleClearSearch} />
         </View>
       ) : (

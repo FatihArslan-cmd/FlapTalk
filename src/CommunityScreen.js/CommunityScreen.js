@@ -10,6 +10,8 @@ import CustomText from "../components/CustomText";
 import AlertComponent from "../components/AlertComponent";
 import { calculateMembershipDuration } from "../utils/calculateMembershipDuration ";
 import FastImage from "react-native-fast-image";
+import { useTranslation } from "react-i18next";
+
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function UsersList() {
@@ -20,6 +22,7 @@ export default function UsersList() {
   const [alertMessage, setAlertMessage] = useState('');
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
+  const { t } = useTranslation();
 
   const fetchUsers = async () => {
     try {
@@ -115,11 +118,11 @@ export default function UsersList() {
     <View style={styles.actionsContainer}>
       <TouchableOpacity style={[styles.actionButton, styles.addAction]} onPress={() => addFriend(item.id)}>
         <Icon name="person-add-outline" size={24} color="#fff" />
-        <CustomText fontFamily="pop" style={styles.actionText}>Add Friend </CustomText>
+        <CustomText fontFamily="pop" style={styles.actionText}>{t('Add Friend')}</CustomText>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.actionButton, styles.blockAction]} onPress={() => blockUser(item.id)}>
         <Icon name="ban-outline" size={24} color="#fff" />
-        <CustomText fontFamily="pop" style={styles.actionText}>Block User </CustomText>
+        <CustomText fontFamily="pop" style={styles.actionText}>{t('Block User')}</CustomText>
       </TouchableOpacity>
     </View>
   );
@@ -131,7 +134,9 @@ export default function UsersList() {
       <View style={styles.messageContainer}>
           <View style={styles.infoContainer}>
             <CustomText fontFamily="pop" style={styles.name}>{item.username}</CustomText>
-            <CustomText fontFamily="pop" style={styles.date}>{`Member since ${calculateMembershipDuration(item.date)} `}</CustomText>
+            <CustomText fontFamily="pop" style={styles.date}>
+              {`${t('Member since')} ${calculateMembershipDuration(item.date)} `}
+            </CustomText>
           </View>
           <CustomText fontFamily="pop" style={item.state === 'online' ? styles.online : styles.offline}>
             {item.state === 'online' ? 'Online' : 'Offline'}
@@ -146,7 +151,7 @@ export default function UsersList() {
 
   return (
     <View style={styles.container}>
-      <AppHeader showCameraIcon={true} title="Find Friends" textColor="black"  onSearch={setSearchText} />
+      <AppHeader showCameraIcon={true} title={t('Find Friends')} textColor="black"  onSearch={setSearchText} />
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => item.id}

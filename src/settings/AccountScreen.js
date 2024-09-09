@@ -5,12 +5,13 @@ import SettingsHeader from './SettingsHeader';
 import { AntDesign } from '@expo/vector-icons';
 import CustomText from '../components/CustomText';
 import AlertComponent from '../components/AlertComponent';
-
+import { useTranslation } from 'react-i18next';
 const AccountScreen = ({ navigation }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertProps, setAlertProps] = useState({});
+  const { t } = useTranslation();
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -79,10 +80,10 @@ const AccountScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <SettingsHeader title="Account" onBackPress={handleBackPress} />
+      <SettingsHeader title={t('account')} onBackPress={handleBackPress} />
       <TouchableOpacity style={styles.deleteButton} onPress={openConfirmationModal}>
         <AntDesign name="deleteuser" size={24} color="gray" style={styles.icon} />
-        <CustomText fontFamily={'pop'} style={styles.deleteButtonText}>Delete Account</CustomText>
+        <CustomText fontFamily={'pop'} style={styles.deleteButtonText}>{t('deleteAccount')}</CustomText>
       </TouchableOpacity>
 
       <Modal

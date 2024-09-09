@@ -20,7 +20,7 @@ const ChatSettingsScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const [themeModalVisible, setThemeModalVisible] = useState(false);
   const [wallpaperModalVisible, setWallpaperModalVisible] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState(t('chatSettingsScreen.defaultTheme'));
+  const [selectedTheme, setSelectedTheme] = useState();
   const [selectedColor, setSelectedColor] = useState(null);
 
   useEffect(() => {
@@ -76,18 +76,17 @@ const ChatSettingsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <SettingsHeader title={t('chatSettingsScreen.headerTitle')} onBackPress={handleBackPress} />
+      <SettingsHeader title={t('Chats')} onBackPress={handleBackPress} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.section}>
-          <CustomText fontFamily={'pop'} style={styles.sectionTitle}>{t('chatSettingsScreen.viewing')}</CustomText>
           <TouchableOpacity style={styles.item} onPress={handleThemePress}>
             <Entypo name="light-up" size={30} color="black" style={styles.icon} />
-            <CustomText fontFamily={'pop'} style={styles.itemText}>{t('chatSettingsScreen.theme')}</CustomText>
+            <CustomText fontFamily={'pop'} style={styles.itemText}>{t('theme')}</CustomText>
             <CustomText fontFamily={'pop'} style={styles.itemSubText}>{selectedTheme}</CustomText>
           </TouchableOpacity>
           <TouchableOpacity style={styles.item} onPress={handleWallpaperPress}>
             <Ionicons name="image-outline" size={30} color="black" style={styles.icon} />
-            <CustomText fontFamily={'pop'} style={styles.itemText}>{t('chatSettingsScreen.wallpaper')}</CustomText>
+            <CustomText fontFamily={'pop'} style={styles.itemText}>{t('wallpaper')}</CustomText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -101,17 +100,17 @@ const ChatSettingsScreen = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <CustomText fontFamily={'pop'} style={styles.modalTitle}>{t('chatSettingsScreen.selectTheme')}</CustomText>
-            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection(t('chatSettingsScreen.light'))}>
+            <CustomText fontFamily={'pop'} style={styles.modalTitle}>{t('selectTheme')}</CustomText>
+            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection(t('light'))}>
               <Entypo name="light-up" size={30} color="black" style={styles.modalIcon} />
-              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('chatSettingsScreen.light')}</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('light')}</CustomText>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection(t('chatSettingsScreen.dark'))}>
+            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection(t('dark'))}>
               <Ionicons name="moon-outline" size={30} color="black" style={styles.modalIcon} />
-              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('chatSettingsScreen.dark')}</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('dark')}</CustomText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setThemeModalVisible(false)}>
-              <CustomText fontFamily={'pop'} style={styles.closeButtonText}>{t('chatSettingsScreen.close')}</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.closeButtonText}>{t('close')}</CustomText>
             </TouchableOpacity>
           </View>
         </View>
@@ -126,7 +125,7 @@ const ChatSettingsScreen = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <CustomText fontFamily={'pop'} style={styles.modalTitle}>{t('chatSettingsScreen.selectColor')}</CustomText>
+            <CustomText fontFamily={'pop'} style={styles.modalTitle}>{t('selectColor')}</CustomText>
             <View style={styles.colorsContainer}>
               {colors.map((color, index) => (
                 <TouchableOpacity
@@ -137,10 +136,10 @@ const ChatSettingsScreen = ({ navigation }) => {
               ))}
             </View>
             <TouchableOpacity style={styles.modalItem} onPress={handleDefaultSelection}>
-              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('chatSettingsScreen.defaultColor')}</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.modalItemText}>{t('defaultColor')}</CustomText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setWallpaperModalVisible(false)}>
-              <CustomText fontFamily={'pop'} style={styles.closeButtonText}>{t('chatSettingsScreen.close')}</CustomText>
+              <CustomText fontFamily={'pop'} style={styles.closeButtonText}>{t('close')}</CustomText>
             </TouchableOpacity>
           </View>
         </View>

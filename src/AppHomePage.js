@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import SkeletonPlaceholder from "../Skeleton";
 import FastImage from 'react-native-fast-image';
 import useNavigationBarSync from "./hooks/useNavigationBarSync";
+import { useTranslation } from "react-i18next";
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 export default function HomeScreen() {
@@ -21,6 +22,8 @@ export default function HomeScreen() {
   const [filter, setFilter] = useState('All'); // Filter state
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
+  const { t } = useTranslation();
+
   const backgroundColor = styles.container.backgroundColor; 
   useNavigationBarSync(backgroundColor); 
   useDisableBackButton();
@@ -65,15 +68,15 @@ export default function HomeScreen() {
 
             const latestMessageData = messagesSnapshot.docs.length > 0 
               ? messagesSnapshot.docs[0].data() 
-              : { text: 'No messages yet', createdAt: null, type: 'text' };
+              : { text: t('No messages found'), createdAt: null, type: 'text' }; // Using t for "No messages yet"
 
             let latestMessage = '';
             if (latestMessageData.type === 'image') {
-              latestMessage = 'Image';
+              latestMessage = t('image'); // Translated "Image"
             } else if (latestMessageData.type === 'video') {
-              latestMessage = 'Video';
+              latestMessage = t('video'); // Translated "Video"
             } else if (latestMessageData.type === 'audio') {
-              latestMessage = 'Audio';
+              latestMessage = t('audio'); // Translated "Audio"
             } else {
               latestMessage = latestMessageData.text.length > 40 
                 ? latestMessageData.text.substring(0, 40) + '...' 
@@ -155,7 +158,7 @@ export default function HomeScreen() {
     <View style={styles.actionsContainer}>
       <TouchableOpacity style={styles.deleteAction} onPress={() => removeFriendAndDeleteChat(friendId)}>
         <Ionicons name="trash-outline" size={24} color="#fff" />
-        <Text style={styles.actionText}>Delete</Text>
+        <Text style={styles.actionText}>{t('Delete')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -205,37 +208,24 @@ export default function HomeScreen() {
           style={[styles.filterButton, filter === 'All' && styles.activeFilterButton]}
           onPress={() => setFilter('All')}
         >
-          <Text style={[styles.filterText, filter === 'All' && styles.activeFilterText]}>All</Text>
+          <Text style={[styles.filterText, filter === 'All' && styles.activeFilterText]}>{t('All')}</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.filterButton, filter === 'Favorites' && styles.activeFilterButton]}
+          style={[styles.filterButton, filter === 'Favorites' && styles.activeFilterButton]} 
           onPress={() => setFilter('Favorites')}
         >
-          <Text style={[styles.filterText, filter === 'Favorites' && styles.activeFilterText]}>Favorites</Text>
+          <Text style={[styles.filterText, filter === 'Favorites' && styles.activeFilterText]}>{t('favorites')}</Text>
         </TouchableOpacity>
       </View>
-      {loading ? (
-        <FlatList
-          data={[...Array(10).keys()]}
-          keyExtractor={(item) => item.toString()}
-          renderItem={renderSkeletonItem}
-        />
-      ) : (
-        <FlatList
-          data={filteredChatList}
-          keyExtractor={(item) => item.friendId}
-          renderItem={renderChatItem}
-          ListEmptyComponent={() => (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No chats found</Text>
-            </View>
-          )}
-        />
-      )}
+      <FlatList
+        data={loading ? Array.from({ length: 5 }) : filteredChatList}
+        renderItem={loading ? renderSkeletonItem : renderChatItem}
+        keyExtractor={(item, index) => item?.friendId || index.toString()}
+        contentContainerStyle={styles.listContentContainer}
+      />
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -293,6 +283,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 64,
     height: '100%',
+    borderRadius:33
   },
   actionText: {
     color: '#fff',

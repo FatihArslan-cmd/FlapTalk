@@ -9,6 +9,7 @@ import FastImage from 'react-native-fast-image';
 import AlertComponent from '../components/AlertComponent';
 import SkeletonPlaceholder from '../../Skeleton'; // Import the SkeletonPlaceholder
 import DraggableFlatList from 'react-native-draggable-flatlist';
+import { useTranslation } from 'react-i18next';
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
 const FavoritesScreen = ({ navigation }) => {
@@ -18,7 +19,7 @@ const FavoritesScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true); // Added loading state
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-
+  const {t} = useTranslation();
   const { width } = Dimensions.get('window');
 
   const handleBackPress = useCallback(() => {
@@ -163,7 +164,7 @@ const FavoritesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <SettingsHeader title="Favorites" onBackPress={handleBackPress} />
+      <SettingsHeader title={t('favorites')} onBackPress={handleBackPress} />
       <DraggableFlatList
         data={favorites}
         keyExtractor={(item) => item.id}
@@ -177,13 +178,13 @@ const FavoritesScreen = ({ navigation }) => {
                 resizeMode={FastImage.resizeMode.cover}
                 style={[styles.favoritesImage, { width: width * 0.6, height: width * 0.4 }]}
               />
-              <CustomText fontFamily="pop" style={styles.favoritesTitle}>Favorites</CustomText>
+              <CustomText fontFamily="pop" style={styles.favoritesTitle}>{t('favorites')}</CustomText>
               <CustomText fontFamily="pop" style={styles.favoritesDescription}>
-                Make it easy to find the people that matter most across FlapTalk.
+              {t('favoritesDescription')}
               </CustomText>
             </View>
             <View style={styles.favoritesList}>
-              <CustomText fontFamily="pop" style={styles.favoritesListTitle}>Your Favorites</CustomText>
+              <CustomText fontFamily="pop" style={styles.favoritesListTitle}>{t('yourFavorites')}</CustomText>
             </View>
           </View>
         )}
@@ -198,19 +199,19 @@ const FavoritesScreen = ({ navigation }) => {
           <View>
             <TouchableOpacity style={styles.addFavoriteButton} onPress={toggleModal}>
               <Ionicons name="add-circle-outline" size={40} color="green" />
-              <CustomText fontFamily="pop" style={styles.addFavoriteText}>Add favorite</CustomText>
+              <CustomText fontFamily="pop" style={styles.addFavoriteText}>{t('addFavorite')}</CustomText>
             </TouchableOpacity>
             <Modal visible={isModalVisible} animationType="slide">
               <View style={styles.modalContainer}>
-                <CustomText fontFamily="pop" style={styles.modalTitle}>Select a Friend</CustomText>
+                <CustomText fontFamily="pop" style={styles.modalTitle}>{t('selectFriend')}</CustomText>
                 <FlatList
                   data={friends}
                   keyExtractor={(item) => item.id}
                   renderItem={renderFriendItem}
-                  ListEmptyComponent={<Text style={styles.emptyText}>No friends found</Text>}
+                  ListEmptyComponent={<Text style={styles.emptyText}>{t('noFriendsFound')}</Text>}
                 />
                 <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
-                  <CustomText fontFamily="pop" style={styles.closeButtonText}>Close</CustomText>
+                  <CustomText fontFamily="pop" style={styles.closeButtonText}>{t('close')}</CustomText>
                 </TouchableOpacity>
               </View>
             </Modal>

@@ -10,10 +10,12 @@ import Button from '../components/Button';
 import AlertComponent from '../components/AlertComponent';
 import CustomText from '../components/CustomText';
 import useAlert from '../hooks/useAlert'; // Import your custom hook
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const { width, height } = Dimensions.get('window');
 
 const PhoneLoginScreen = () => {
+  const { t } = useTranslation(); // Initialize translation hook
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState(new Array(6).fill(''));
   const [countryCode, setCountryCode] = useState('US');
@@ -38,24 +40,24 @@ const PhoneLoginScreen = () => {
 
   const signInWithPhoneNumber = async () => {
     if (phoneNumber.trim() === '') {
-      showAlert('Error', 'Please enter your phone number.');
+      showAlert(t('Error'), t('Please enter your phone number.'));
       return;
     }
-  
+
     if (!/^\d+$/.test(phoneNumber)) {
-      showAlert('Error', 'Invalid phone number.');
+      showAlert(t('Error'), t('Invalid phone number.'));
       return;
     }
-  
+
     try {
       setLoading(true);
       const confirmation = await auth().signInWithPhoneNumber(`+${callingCode}${phoneNumber}`);
       setConfirm(confirmation);
     } catch (error) {
       if (error.code === 'auth/too-many-requests') {
-        showAlert('Error', 'Requests from this device have been blocked due to unusual activity. Please try again later.');
+        showAlert(t('Error'), t('Requests from this device have been blocked due to unusual activity. Please try again later.'));
       } else {
-        showAlert('Error', 'Phone number verification failed.');
+        showAlert(t('Error'), t('Phone number verification failed.'));
         console.log(error);
       }
     } finally {
@@ -67,7 +69,7 @@ const PhoneLoginScreen = () => {
     try {
       const fullCode = code.join('');
       if (fullCode.length !== 6) {
-        showAlert('Error', 'Please enter the 6-digit verification code.');
+        showAlert(t('Error'), t('Please enter the 6-digit verification code.'));
         return;
       }
       setLoading(true);
@@ -76,11 +78,11 @@ const PhoneLoginScreen = () => {
       navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'phone' });
     } catch (error) {
       if (error.code === 'auth/invalid-verification-code') {
-        showAlert('Error', 'Invalid verification code.');
+        showAlert(t('Error'), t('Invalid verification code.'));
       } else if (error.code === 'auth/too-many-requests') {
-        showAlert('Error', 'Requests from this device have been blocked due to unusual activity. Please try again later.');
+        showAlert(t('Error'), t('Requests from this device have been blocked due to unusual activity. Please try again later.'));
       } else {
-        showAlert('Error', 'Verification code verification failed.');
+        showAlert(t('Error'), t('Verification code verification failed.'));
         console.log(error);
       }
     } finally {
@@ -93,10 +95,10 @@ const PhoneLoginScreen = () => {
       <LoadingOverlay visible={loading} />
       {!confirm ? (
         <>
-          <Header color='#00ad59' fontFamily='lato-bold' text="Enter your phone number" />
+          <Header color='#00ad59' fontFamily='lato-bold' text={t("Enter your phone number")} />
           <CustomText fontFamily={'lato'} style={styles.infoText}>
-            We will send you a verification code.
-            <CustomText fontFamily={'lato'} style={styles.linkText}> What is my number? </CustomText>
+            {t('We will send you a verification code.')}
+            <CustomText fontFamily={'lato'} style={styles.linkText}>{t('What is my number?')}</CustomText>
           </CustomText>
           <PhoneInput
             countryCode={countryCode}
@@ -106,19 +108,19 @@ const PhoneLoginScreen = () => {
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
           />
-          <Button onPress={signInWithPhoneNumber} text="Next" />
+          <Button onPress={signInWithPhoneNumber} text={t('Next')} />
         </>
       ) : (
         <>
-          <Header color='#00ae59' text="Verifying your number"/>
+          <Header color='#00ae59' text={t("Verifying your number")} />
           <CustomText fontFamily={'lato'} style={styles.verificationInfoText}>
-            Enter the code sent to +{callingCode} {phoneNumber} below.
+            {t('Enter the code sent to {{number}} below.', { number: `+${callingCode} ${phoneNumber}` })}
           </CustomText>
           <CustomText fontFamily={'lato'} style={styles.wrongNumberText}>
-            Wrong number?
+            {t('Wrong number?')}
           </CustomText>
           <CodeInput code={code} setCode={setCode} inputRefs={inputRefs} />
-          <Button margin={15} onPress={confirmCode} text="Confirm" />
+          <Button margin={15} onPress={confirmCode} text={t('Confirm')} />
         </>
       )}
       <AlertComponent
@@ -127,7 +129,7 @@ const PhoneLoginScreen = () => {
         title={title}
         message={message}
         onConfirm={confirmAlert}
-        confirmText="Okay"
+        confirmText={t('Okay')}
       />
     </View>
   );

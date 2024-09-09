@@ -13,6 +13,8 @@ import ClearButton from './renderClearButton';
 import Button from './Button';
 import useAlert from '../hooks/useAlert';
 import useNavigationBarSync from '../hooks/useNavigationBarSync';
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
+
 const { width, height } = Dimensions.get('window');
 
 const UserInfoScreen = ({ route }) => {
@@ -22,6 +24,7 @@ const UserInfoScreen = ({ route }) => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState('');
   const [avatar, setAvatar] = useState('');
+  const { t } = useTranslation(); // Initialize translation hook
   const backgroundColor = styles.container.backgroundColor; 
   useNavigationBarSync(backgroundColor); 
   const navigation = useNavigation();
@@ -63,7 +66,7 @@ const UserInfoScreen = ({ route }) => {
 
   const handleSave = async () => {
     if (!username.trim()) {
-      showAlert('Uyarı', 'Lütfen tüm alanları doldurun.');
+      showAlert(t('Warning'), t('Please fill out all fields.'));
       return;
     }
   
@@ -76,7 +79,7 @@ const UserInfoScreen = ({ route }) => {
         .get();
   
       if (!usernameSnapshot.empty && usernameSnapshot.docs[0].id !== uid) {
-        showAlert('Hata', 'Bu kullanıcı adı zaten alınmış. Lütfen başka bir kullanıcı adı seçin.');
+        showAlert(t('Error'), t('This username is already taken. Please choose another username.'));
         setLoading(false);
         return;
       }
@@ -107,14 +110,14 @@ const UserInfoScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Header fontSize={width * 0.07} color='#00ad59' fontFamily='pop' text="Profil Bilgisi"/>
+      <Header fontSize={width * 0.07} color='#00ad59' fontFamily='pop' text={t('Profile Information')} />
       <CustomText fontFamily="loti" style={styles.subtitle}>
-        Lütfen adınızı girin ve isteğe bağlı olarak profil fotoğrafınızı ekleyin.
+        {t('Please enter your name and optionally add a profile photo.')}
       </CustomText>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Kullanıcı Adı"
+          placeholder={t('Username')}
           value={username}
           onChangeText={(text) => setUsername(text.slice(0, 16))} 
         />
@@ -123,21 +126,21 @@ const UserInfoScreen = ({ route }) => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Hakkında"
+          placeholder={t('About')}
           value={about}
           onChangeText={setAbout}
         />
         <ClearButton value={about} setValue={setAbout} />
       </View>
       <AvatarChoose initialAvatar={avatar} onAvatarSelect={handleAvatarSelect} />
-      <Button onPress={handleSave} text={'Kaydet'}/>
+      <Button onPress={handleSave} text={t('Save')} />
       <AlertComponent
         visible={isVisible}
         onClose={hideAlert}
         title={title}
         message={message}
         onConfirm={confirmAlert}
-        confirmText="Tamam"
+        confirmText={t('Okay')}
       />
       <LoadingOverlay visible={loading} />
     </View>

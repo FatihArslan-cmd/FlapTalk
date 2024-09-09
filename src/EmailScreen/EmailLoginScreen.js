@@ -6,36 +6,39 @@ import '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 import ClearButton from '../components/renderClearButton';
 import CustomText from '../components/CustomText';
 import LoadingOverlay from '../components/LoadingOverlay';
 import useAlert from '../hooks/useAlert'; // Import your custom hook
 import AlertComponent from '../components/AlertComponent';
 import useNavigationBarSync from '../hooks/useNavigationBarSync';
+
 const { width } = Dimensions.get('window');
 
 const EmailLoginScreen = () => {
+  const { t } = useTranslation(); // Initialize translation hook
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert(); // Use the custom hook
-  const backgroundColor = styles.container.backgroundColor; 
-  useNavigationBarSync(backgroundColor); 
+  const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
+  const backgroundColor = styles.container.backgroundColor;
+  useNavigationBarSync(backgroundColor);
 
   const handleForgotPassword = async () => {
     if (!email) {
-      showAlert('Validation Error', 'Please enter your email address.');
+      showAlert(t('Validation Error'), t('Please enter your email address.'));
       return;
     }
 
     try {
       await firebase.auth().sendPasswordResetEmail(email);
-      showAlert('Success', 'Password reset email sent.');
+      showAlert(t('Success'), t('Password reset email sent.'));
     } catch (error) {
-      showAlert('Error', 'Failed to send password reset email. Please try again.');
+      showAlert(t('Error'), t('Failed to send password reset email. Please try again.'));
     }
   };
 
@@ -56,7 +59,7 @@ const EmailLoginScreen = () => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      showAlert('Validation Error', 'Please fill in all fields.');
+      showAlert(t('Validation Error'), t('Please fill in all fields.'));
       return;
     }
 
@@ -66,7 +69,7 @@ const EmailLoginScreen = () => {
       const user = userCredential.user;
 
       if (!user.emailVerified) {
-        showAlert('Email Not Verified', 'Please verify your email before logging in.');
+        showAlert(t('Email Not Verified'), t('Please verify your email before logging in.'));
         return;
       }
 
@@ -78,15 +81,15 @@ const EmailLoginScreen = () => {
 
       navigation.navigate('UserInfoScreen', { uid: userCredential.user.uid, loginMethod: 'email' });
     } catch (error) {
-      let errorMessage = 'Something went wrong. Please try again.';
+      let errorMessage = t('Something went wrong. Please try again.');
       if (error.code === 'auth/invalid-email') {
-        errorMessage = 'That email address is invalid.';
+        errorMessage = t('That email address is invalid.');
       } else if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No user found with that email address.';
+        errorMessage = t('No user found with that email address.');
       } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password.';
+        errorMessage = t('Incorrect password.');
       }
-      showAlert('Login Error', errorMessage);
+      showAlert(t('Login Error'), errorMessage);
     } finally {
       setLoading(false);
     }
@@ -94,12 +97,12 @@ const EmailLoginScreen = () => {
 
   return (
     <Animatable.View style={styles.container} animation="fadeInDownBig" duration={600}>
-      <CustomText fontFamily={'pop'} style={styles.title}>Log In</CustomText>
+      <CustomText fontFamily={'pop'} style={styles.title}>{t('Log In')}</CustomText>
       <View style={styles.inputWrapper}>
         <Icon name="email" size={20} color="#888" style={styles.inputIcon} />
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder={t('Email')}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
@@ -110,7 +113,7 @@ const EmailLoginScreen = () => {
         <Icon name="lock" size={20} color="#888" style={styles.inputIcon} />
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder={t('Password')}
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}
@@ -124,19 +127,19 @@ const EmailLoginScreen = () => {
         <TouchableOpacity onPress={() => setRememberMe(!rememberMe)}>
           <Icon name={rememberMe ? 'check-box' : 'check-box-outline-blank'} size={24} color="#888" />
         </TouchableOpacity>
-        <CustomText fontFamily={'pop'} style={styles.rememberMeText}>Remember me</CustomText>
+        <CustomText fontFamily={'pop'} style={styles.rememberMeText}>{t('Remember me')}</CustomText>
       </View>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Icon name="login" size={20} color="#fff" style={styles.buttonIcon} />
-        <CustomText fontFamily={'pop'} style={styles.buttonText}>Log In</CustomText>
+        <CustomText fontFamily={'pop'} style={styles.buttonText}>{t('Log In')}</CustomText>
       </TouchableOpacity>
       <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
         <Icon name="help-outline" size={20} color="#005657" style={styles.forgotPasswordIcon} />
-        <CustomText fontFamily={'pop'} style={styles.forgotPasswordText}>Forgot Password?</CustomText>
+        <CustomText fontFamily={'pop'} style={styles.forgotPasswordText}>{t('Forgot Password?')}</CustomText>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('EmailSignup')} style={styles.linkWrapper}>
         <Icon name="person-add" size={20} color="#005657" style={styles.linkIcon} />
-        <CustomText fontFamily={'pop'} style={styles.link}>Don't have an account? Sign Up</CustomText>
+        <CustomText fontFamily={'pop'} style={styles.link}>{t("Don't have an account? Sign Up")}</CustomText>
       </TouchableOpacity>
       {isVisible && (
         <AlertComponent
@@ -145,7 +148,7 @@ const EmailLoginScreen = () => {
           title={title}
           message={message}
           onConfirm={confirmAlert}
-          confirmText="OK"
+          confirmText={t('OK')}
         />
       )}
       <LoadingOverlay visible={loading} />

@@ -179,5 +179,8 @@
     "phoneButton": "Telefon numarası ile Devam Et",
     "verificationText": "Devam etmek için e-posta adresinizi doğrulayın.",
     "resendButton": "Doğrulama E-postasını Yeniden Gönder",
-    "verifiedButton": "E-postamı doğruladım"
+    "verifiedButton": "E-postamı doğruladım",
+    "Settings":"Ayarlar",
+    "Calls":"Aramalar",
+    "Search":"Ara"
 }

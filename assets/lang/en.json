@@ -179,6 +179,8 @@
       "phoneButton": "Continue with Phone number",
       "verificationText": "Please verify your email address to continue.",
       "resendButton": "Resend Verification Email",
-      "verifiedButton": "I have verified my email"
+      "verifiedButton": "I have verified my email",
+      "Settings":"Settings"
+
   }
   

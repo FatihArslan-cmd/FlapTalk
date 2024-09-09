@@ -6,10 +6,13 @@ import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomText from "./CustomText";
+import { useTranslation } from "react-i18next";
+
 export default function LogoutButton() {
     const navigation = useNavigation();
     const route = useRoute();
     const [loginMethod, setLoginMethod] = useState(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const fetchLoginMethod = async () => {
@@ -48,7 +51,7 @@ export default function LogoutButton() {
         <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
             <Icon name="log-out-outline" size={28} color="#f44336" />
             <View style={styles.menuTextContainer}>
-                <CustomText fontFamily={'pop'} style={styles.menuLabel}>Exit </CustomText>
+                <CustomText fontFamily={'pop'} style={styles.menuLabel}>{t('Exit')}</CustomText>
             </View>
         </TouchableOpacity>
     );
