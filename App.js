@@ -5,10 +5,12 @@ import Navigation from './src/navigation/Navigation';
 import { AuthProvider,AuthContext } from './src/context/AuthContext';
 import { UserStatusProvider } from './src/context/UserStatusContext';
 import { NavigationBarProvider } from './src/context/NavigationBarContext';
+import { LanguageProvider } from './src/context/LanguageContext';
 LogBox.ignoreAllLogs();
 
 export default function App() {
   return (
+    <LanguageProvider>
     <NavigationBarProvider>
     <UserStatusProvider>
     <NetworkProvider>
@@ -20,5 +22,6 @@ export default function App() {
     </NetworkProvider>
     </UserStatusProvider>
     </NavigationBarProvider>
+    </LanguageProvider>
   );
 }

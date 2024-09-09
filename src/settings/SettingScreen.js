@@ -15,6 +15,8 @@ import AlertComponent from '../components/AlertComponent';
 import useAlert from '../hooks/useAlert';
 import { Barcode } from 'expo-barcode-generator';
 import LanguageSelector from "./LanguageSelectionModal";
+import { useTranslation } from 'react-i18next';
+
 const { width } = Dimensions.get('window');
 
 export default function SettingScreen() {
@@ -25,6 +27,7 @@ export default function SettingScreen() {
   const [barcodeVisible, setBarcodeVisible] = useState(false);  // State to control barcode modal visibility
   const navigation = useNavigation();
   const languageSelectorRef = useRef();
+  const { t } = useTranslation();
 
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
   useDisableBackButton();
@@ -121,7 +124,7 @@ export default function SettingScreen() {
   };
 
   const menuItems = [
-    { icon: 'key-outline', label: 'Hesap', subLabel: 'Güvenlik bildirimleri, numara değiştirme' },
+    { icon: 'key-outline', label: t('account'), subLabel: t('account_sub_label') },
     { icon: 'heart-outline', label: 'Favoriler', subLabel: 'Ekle, yeniden sırala, çıkar' },
     { icon: 'chatbubble-outline', label: 'Sohbetler', subLabel: 'Tema, duvar kağıtları, sohbet geçmişi' },
     { icon: 'people-outline', label: 'Arkadaş davet et', subLabel: 'Arkadaşlarını davet et' },
