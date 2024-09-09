@@ -92,7 +92,6 @@ const LanguageSelector = forwardRef((props, ref) => {
   const handleLanguageSelect = useCallback(
     (language) => {
       changeLanguage(language.code); // Use the changeLanguage function from context
-      console.log(currentLanguage)
       closeModal();
     },
     [changeLanguage, closeModal]

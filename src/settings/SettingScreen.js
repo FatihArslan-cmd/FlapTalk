@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useMemo,useRef } from "react";
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, TextInput, Share, Modal } from "react-native";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { View, Text, StyleSheet, FlatList, TextInput, Share, Modal, TouchableOpacity } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import useDisableBackButton from "../hooks/useDisableBackButton";
 import LogoutButton from "../components/LogoutButton";
@@ -15,16 +15,14 @@ import AlertComponent from '../components/AlertComponent';
 import useAlert from '../hooks/useAlert';
 import { Barcode } from 'expo-barcode-generator';
 import LanguageSelector from "./LanguageSelectionModal";
-import { useTranslation } from 'react-i18next';
-
-const { width } = Dimensions.get('window');
+import { useTranslation } from "react-i18next";
 
 export default function SettingScreen() {
   const { user } = useContext(AuthContext);
   const [userData, setUserData] = useState({ username: '', about: '', avatar: '' });
   const [isChanged, setIsChanged] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [barcodeVisible, setBarcodeVisible] = useState(false);  // State to control barcode modal visibility
+  const [barcodeVisible, setBarcodeVisible] = useState(false);
   const navigation = useNavigation();
   const languageSelectorRef = useRef();
   const { t } = useTranslation();
@@ -96,13 +94,13 @@ export default function SettingScreen() {
 
   const handleInputChange = (field, value) => {
     if (field === 'username' && value.length > 16) {
-      return; // Limit the length of username to 16 characters
+      return;
     }
     setUserData({ ...userData, [field]: value });
     setIsChanged(true);
   };
 
-  const debouncedSearch = useMemo(() => debounce(setSearchText, 300), []);
+  const debouncedSearch = debounce(setSearchText, 300);
 
   const handleSearch = (text) => {
     debouncedSearch(text.toLowerCase());
@@ -120,45 +118,23 @@ export default function SettingScreen() {
   };
 
   const handleInviteFriend = () => {
-    setBarcodeVisible(true);  // Show the barcode modal when "Arkadaş davet et" is pressed
+    setBarcodeVisible(true);
   };
 
-  const menuItems = [
-    { icon: 'key-outline', label: t('account'), subLabel: t('account_sub_label') },
-    { icon: 'heart-outline', label: 'Favoriler', subLabel: 'Ekle, yeniden sırala, çıkar' },
-    { icon: 'chatbubble-outline', label: 'Sohbetler', subLabel: 'Tema, duvar kağıtları, sohbet geçmişi' },
-    { icon: 'people-outline', label: 'Arkadaş davet et', subLabel: 'Arkadaşlarını davet et' },
-    { icon: 'globe-outline', label: 'Uygulama dili', subLabel: 'Türkçe (cihaz dili)' },
-    { icon: 'help-circle-outline', label: 'Yardım', subLabel: 'Destek alın, geri bildirim gönderin' },
-    { icon: 'share-outline', label: 'Uygulamayı Paylaş', subLabel: 'Arkadaşlarınla paylaş' },
-  ];
-
-  const filteredMenuItems = useMemo(() => menuItems.filter(item =>
-    item.label.toLowerCase().includes(searchText) || item.subLabel.toLowerCase().includes(searchText)
-  ), [searchText]);
+  const dynamicMenuItems = [
+    { icon: 'key-outline', label: t('account'), subLabel: t('account_sub_label'), action: () => navigation.navigate('AccountScreen') },
+    { icon: 'heart-outline', label: t('favorites'), subLabel: t('favorites_sub_label'), action: () => navigation.navigate('FavoritesScreen') },
+    { icon: 'chatbubble-outline', label: t('Chats'), subLabel: t('chats_sub_label'), action: () => navigation.navigate('ChatSettingScreen') },
+    { icon: 'people-outline', label: t('invite_friends'), subLabel: t('invite_friends_sub_label'), action: handleInviteFriend },
+    { icon: 'globe-outline', label: t('app_language'), subLabel: 'Türkçe (cihaz dili)', action: () => languageSelectorRef.current.openModal() },
+    { icon: 'help-circle-outline', label: t('help_title'), subLabel: t('help_sub_label'), action: () => navigation.navigate('HelpScreen') },
+    { icon: 'share-outline', label: t('share_app'), subLabel: t('share_app_sub_label'), action: handleShare },
+  ].filter(item => item.label.toLowerCase().includes(searchText) || item.subLabel.toLowerCase().includes(searchText));
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.menuItem}
-      onPress={() => {
-        if (item.label === 'Arkadaş davet et') {
-          handleInviteFriend();
-        } else if (item.label === 'Uygulamayı Paylaş') {
-          handleShare();
-        }else if (item.label === 'Uygulama dili') {
-          languageSelectorRef.current.openModal();
-        }else if (item.label === 'Yardım') {
-          navigation.navigate('HelpScreen');
-        }else if (item.label === 'Sohbetler') {
-          navigation.navigate('ChatSettingScreen');
-        }else if (item.label === 'Favoriler') {
-          navigation.navigate('FavoritesScreen');
-        }else if (item.label === 'Hesap') {
-          navigation.navigate('AccountScreen');
-        } else {
-          // Handle other menu items
-        }
-      }}
+      onPress={item.action}
     >
       <Icon name={item.icon} size={28} color="#4CAF50" />
       <View style={styles.menuTextContainer}>
@@ -172,7 +148,7 @@ export default function SettingScreen() {
     <View style={styles.container}>
       <AppHeader title={'Settings'} onSearch={handleSearch} />
       <FlatList
-        data={filteredMenuItems}
+        data={dynamicMenuItems}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         ListHeaderComponent={
@@ -190,7 +166,7 @@ export default function SettingScreen() {
                     value={userData.username}
                     onChangeText={(text) => handleInputChange('username', text)}
                     placeholder="Username "
-                    maxLength={16}  // Limit the input length to 16 characters
+                    maxLength={16}
                   />
                   <Icon name="pencil-outline" size={20} color="#888" style={styles.editIcon} />
                 </View>
@@ -242,14 +218,12 @@ export default function SettingScreen() {
         </View>
       </Modal>
       <LanguageSelector ref={languageSelectorRef} />
-
       <AlertComponent
         visible={isVisible}
         onClose={hideAlert}
         onConfirm={confirmAlert}
         title={title}
         message={message}
-        confirmText="OK"
       />
     </View>
   );
@@ -258,86 +232,93 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#FAF9F6'
+    backgroundColor: "#fff",
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: 15,
+    padding: 16,
+    backgroundColor: '#fff',
   },
   userInfo: {
-    marginLeft: 20,
+    flex: 1,
+    marginLeft: 16,
   },
   usernameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 8,
   },
   usernameInput: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-  },
-  editIcon: {
-    marginLeft: 10,
+    flex: 1,
   },
   aboutInput: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666',
+    fontSize: 14,
+    color: '#888',
+    flex: 1,
+  },
+  editIcon: {
+    marginLeft: 8,
   },
   updateButton: {
     backgroundColor: '#4CAF50',
-    padding: 10,
-    margin: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginVertical: 16,
+    alignSelf: 'center',
     borderRadius: 5,
-    alignItems: 'center',
   },
   updateButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontSize: 16,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#ddd',
   },
   menuTextContainer: {
-    marginLeft: 15,
+    marginLeft: 16,
   },
   menuLabel: {
     fontSize: 16,
+    fontWeight: 'bold',
   },
   menuSubLabel: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 14,
+    color: '#888',
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    width: width * 0.8,
-    padding: 20,
     backgroundColor: '#fff',
+    padding: 20,
     borderRadius: 10,
+    width: '80%',
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   closeButton: {
-    marginTop: 20,
-    padding: 10,
+    marginTop: 16,
     backgroundColor: '#4CAF50',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 5,
   },
   closeButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
   },
 });
