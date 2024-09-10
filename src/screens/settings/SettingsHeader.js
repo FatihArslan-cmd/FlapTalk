@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 10,
     paddingTop: 40,
+    elevation: 5 // Add some shadow if needed
   },
   iconContainer: {
     paddingRight: 10,

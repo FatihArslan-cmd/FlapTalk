@@ -51,14 +51,13 @@ const ChatSettingsScreen = ({ navigation }) => {
   };
 
   const handleThemeSelection = (theme) => {
-    if (theme === 'dark') {
-      toggleTheme(); // Switch to dark mode
-    } else if (theme === 'light') {
-      toggleTheme(); // Switch to light mode
+    // Check if the selected theme is different from the current one
+    if ((theme === 'dark' && !isDarkMode) || (theme === 'light' && isDarkMode)) {
+      toggleTheme(); // Switch theme only if it's different from the current one
     }
     setThemeModalVisible(false);
   };
-
+  
   const handleColorSelection = async (color) => {
     try {
       await AsyncStorage.setItem('selectedColor', color);

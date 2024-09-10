@@ -240,6 +240,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
+    elevation: 5 // Add some shadow if needed
+
   },
   userInfo: {
     flex: 1,

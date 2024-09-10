@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -120,6 +120,7 @@ const FavoritesScreen = ({ navigation }) => {
           timestamp: firestore.FieldValue.serverTimestamp(),
         });
 
+      setFavorites((prev) => [...prev, friend]); // Favoriler listesine ekle
       console.log(`${friend.username} has been added to favorites!`);
     } catch (error) {
       console.error('Error adding to favorites:', error);
@@ -140,6 +141,7 @@ const FavoritesScreen = ({ navigation }) => {
   ), [handleAddFavorite]);
 
   const renderFavoriteItem = useMemo(() => ({ item, drag }) => (
+    <ScrollView>
     <TouchableOpacity
       style={styles.friendItem}
       onLongPress={drag}
@@ -150,9 +152,10 @@ const FavoritesScreen = ({ navigation }) => {
         style={styles.avatar}
         resizeMode={FastImage.resizeMode.cover}
       />
-      <CustomText fontFamily="pop" style={styles.friendName}>{item.username}</CustomText>
+      <CustomText fontFamily="pop" style={[styles.friendName , { color: isDarkMode ? 'white' : 'black'} ]}>{item.username}</CustomText>
     </TouchableOpacity>
-  ), []);
+    </ScrollView>
+  ), [isDarkMode]);
 
   const renderSkeletonPlaceholder = useMemo(() => (
     <View style={styles.friendItem}>
@@ -167,60 +170,58 @@ const FavoritesScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>
       <SettingsHeader title={t('favorites')} onBackPress={handleBackPress} />
-      <DraggableFlatList
-        data={favorites}
-        keyExtractor={(item) => item.id}
-        onDragEnd={({ data }) => setFavorites(data)}
-        renderItem={renderFavoriteItem}
-        ListHeaderComponent={() => (
-          <View>
-            <View style={styles.favoritesHeader}>
-              <FastImage
-                source={require('../../../assets/Wavy_Bus-22_Single-11.jpg')}
-                resizeMode={FastImage.resizeMode.cover}
-                style={[styles.favoritesImage, { width: width * 0.6, height: width * 0.4 }]}
-              />
-              <CustomText fontFamily="pop" style={[styles.favoritesTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('favorites')}</CustomText>
-              <CustomText fontFamily="pop" style={[styles.favoritesDescription, { color: isDarkMode ? '#aaa' : '#666' }]}>
-                {t('favoritesDescription')}
-              </CustomText>
-            </View>
-            <View style={styles.favoritesList}>
-              <CustomText fontFamily="pop" style={[styles.favoritesListTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('yourFavorites')}</CustomText>
-            </View>
-          </View>
-        )}
-        ListEmptyComponent={
-          loading ? (
-            renderSkeletonPlaceholder
-          ) : (
-            <CustomText fontFamily="pop" style={[styles.emptyText, { color: isDarkMode ? '#aaa' : '#666' }]}>No favorites found</CustomText>
-          )
-        }
-        ListFooterComponent={() => (
-          <View>
-            <TouchableOpacity style={styles.addFavoriteButton} onPress={toggleModal}>
-              <Ionicons name="add-circle-outline" size={40} color="green" />
-              <CustomText fontFamily="pop" style={[styles.addFavoriteText, { color: isDarkMode ? 'lightgreen' : 'green' }]}>{t('addFavorite')}</CustomText>
-            </TouchableOpacity>
-            <Modal visible={isModalVisible} animationType="slide">
-              <View style={[styles.modalContainer, { backgroundColor: isDarkMode ? '#333' : '#fff' }]}>
-                <CustomText fontFamily="pop" style={[styles.modalTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('selectFriend')}</CustomText>
-                <FlatList
-                  data={friends}
-                  keyExtractor={(item) => item.id}
-                  renderItem={renderFriendItem}
-                  ListEmptyComponent={<Text style={styles.emptyText}>{t('noFriendsFound')}</Text>}
+      <View style={styles.contentWrapper}>
+        <DraggableFlatList
+          data={favorites}
+          keyExtractor={(item) => item.id}
+          onDragEnd={({ data }) => setFavorites(data)}
+          renderItem={renderFavoriteItem}
+          ListHeaderComponent={() => (
+            <View>
+              <View style={styles.favoritesHeader}>
+                <FastImage
+                  source={require('../../../assets/Wavy_Bus-22_Single-11.jpg')}
+                  resizeMode={FastImage.resizeMode.cover}
+                  style={[styles.favoritesImage, { width: width * 0.6, height: width * 0.4 }]}
                 />
-                <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
-                  <CustomText fontFamily="pop" style={styles.closeButtonText}>{t('close')}</CustomText>
-                </TouchableOpacity>
+                <CustomText fontFamily="pop" style={[styles.favoritesTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('favorites')}</CustomText>
+                <CustomText fontFamily="pop" style={[styles.favoritesDescription, { color: isDarkMode ? '#aaa' : '#666' }]}>
+                  {t('favoritesDescription')}
+                </CustomText>
               </View>
-            </Modal>
-          </View>
-        )}
-        contentContainerStyle={styles.contentContainer}
-      />
+              <View style={styles.favoritesList}>
+                <CustomText fontFamily="pop" style={[styles.favoritesListTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('yourFavorites')}</CustomText>
+              </View>
+            </View>
+          )}
+          ListEmptyComponent={
+            loading ? (
+              renderSkeletonPlaceholder
+            ) : (
+              <CustomText fontFamily="pop" style={[styles.emptyText, { color: isDarkMode ? '#aaa' : '#666' }]}>No favorites found</CustomText>
+            )
+          }
+          contentContainerStyle={[styles.contentContainer, { paddingBottom: 80 }]} // Added paddingBottom
+        />
+        <TouchableOpacity style={[styles.addFavoriteButton, { backgroundColor: isDarkMode ? '#333' : '#fff' }]} onPress={toggleModal}>
+          <Ionicons name="add-circle-outline" size={40} color={isDarkMode ? 'lightgreen' : 'green'} />
+          <CustomText fontFamily="pop" style={[styles.addFavoriteText, { color: isDarkMode ? 'lightgreen' : 'green' }]}>{t('addFavorite')}</CustomText>
+        </TouchableOpacity>
+      </View>
+      <Modal visible={isModalVisible} animationType="slide">
+        <View style={[styles.modalContainer, { backgroundColor: isDarkMode ? '#333' : '#fff' }]}>
+          <CustomText fontFamily="pop" style={[styles.modalTitle, { color: isDarkMode ? 'white' : 'black' }]}>{t('selectFriend')}</CustomText>
+          <FlatList
+            data={friends}
+            keyExtractor={(item) => item.id}
+            renderItem={renderFriendItem}
+            ListEmptyComponent={<Text style={styles.emptyText}>{t('noFriendsFound')}</Text>}
+          />
+          <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
+            <CustomText fontFamily="pop" style={styles.closeButtonText}>{t('close')}</CustomText>
+          </TouchableOpacity>
+        </View>
+      </Modal>
       <AlertComponent
         visible={alertVisible}
         onClose={() => setAlertVisible(false)}
@@ -235,14 +236,25 @@ const FavoritesScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  contentContainer: { paddingHorizontal: 20, paddingBottom: 20 },
+  contentWrapper: { flex: 1 },
+  contentContainer: { paddingHorizontal: 20 },
   favoritesHeader: { alignItems: 'center', marginVertical: 20 },
   favoritesImage: { borderRadius: 10 },
   favoritesTitle: { fontSize: 24, marginTop: 10, fontWeight: 'bold' },
   favoritesDescription: { fontSize: 16, textAlign: 'center', marginTop: 10 },
   favoritesList: { marginTop: 30 },
   favoritesListTitle: { fontSize: 22, fontWeight: 'bold', marginVertical: 20 },
-  addFavoriteButton: { flexDirection: 'row', alignItems: 'center', marginTop: 20 },
+  addFavoriteButton: { 
+    position: 'absolute', 
+    bottom: 10, 
+    left: 20, 
+    right: 20, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 10,
+    borderRadius: 10,
+    elevation: 5 // Add some shadow if needed
+  },
   addFavoriteText: { fontSize: 18, marginLeft: 10 },
   modalContainer: { flex: 1, padding: 20, justifyContent: 'center' },
   modalTitle: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },

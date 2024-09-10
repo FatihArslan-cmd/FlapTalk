@@ -96,6 +96,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
+    elevation: 5 // Add some shadow if needed
+
   },
   headerText: {
     fontSize: 26,

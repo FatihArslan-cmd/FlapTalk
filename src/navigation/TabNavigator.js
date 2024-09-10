@@ -195,6 +195,7 @@ const TabBarComponent = ({ active, options, onLayout, onPress }) => {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#FAF9F6',
+    
   },
   activeBackground: {
     position: 'absolute',
@@ -202,6 +203,7 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    
   },
   component: {
     height: 60,

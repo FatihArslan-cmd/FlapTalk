@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     zIndex: 10,
+    elevation: 5 // Add some shadow if needed
   },
   inputIcon: {
     margin: width * 0.02,

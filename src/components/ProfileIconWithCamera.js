@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
-
+import { ThemeContext } from '../context/ThemeContext';
+import { useContext } from 'react';
 const { width } = Dimensions.get('window');
 
 const ProfileIconWithCamera = ({ avatarUri, onCameraPress, avatarSize }) => {
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
+
   return (
     <View style={styles.container}>
       <View style={[styles.profileContainer, { width: avatarSize, height: avatarSize }]}>
@@ -15,11 +18,21 @@ const ProfileIconWithCamera = ({ avatarUri, onCameraPress, avatarSize }) => {
             resizeMode={FastImage.resizeMode.cover}
           />
         </TouchableOpacity>
-        <View style={[styles.cameraContainer, { width: avatarSize * 0.3, height: avatarSize * 0.3, borderRadius: (avatarSize * 0.3) / 2 }]}>
+        <View
+          style={[
+            styles.cameraContainer,
+            {
+              width: avatarSize * 0.3,
+              height: avatarSize * 0.3,
+              borderRadius: (avatarSize * 0.3) / 2,
+              backgroundColor: isDarkMode ? '#121212' : 'white', // Set background color based on theme
+            },
+          ]}
+        >
           <TouchableOpacity onPress={onCameraPress}>
             <FastImage
               source={require('../../assets/photo-camera-interface-symbol-for-button.png')}
-              style={[styles.cameraIcon, { width: avatarSize * 0.3, height: avatarSize * 0.3 }]}
+              style={[styles.cameraIcon, { width: avatarSize * 0.3, height: avatarSize * 0.3, tintColor: isDarkMode ? 'white' : 'black' }]} // Set icon color based on theme
               resizeMode={FastImage.resizeMode.cover}
             />
           </TouchableOpacity>
@@ -44,7 +57,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },

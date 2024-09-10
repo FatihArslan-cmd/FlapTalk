@@ -205,7 +205,7 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <AppHeader title={'FlapTalk'} textColor={isDarkMode ? '#00ae59' : '#000'} onSearch={setSearchText} />
+      <AppHeader title={'FlapTalk'} textColor={'#00ae59'} onSearch={setSearchText} />
       <View style={styles.filterContainer}>
         <TouchableOpacity 
           style={[styles.filterButton, filter === 'All' && styles.activeFilterButton]}
@@ -294,6 +294,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
+    
   },
   filterButton: {
     padding: 10,
