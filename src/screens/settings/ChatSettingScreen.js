@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Dimensions, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 import CustomText from '../../components/CustomText';
 import SettingsHeader from './SettingsHeader';
 import { useTranslation } from 'react-i18next';
-import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../context/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,10 +19,13 @@ const colors = [
 
 const ChatSettingsScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext); // Use ThemeContext to access theme
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [themeModalVisible, setThemeModalVisible] = useState(false);
   const [wallpaperModalVisible, setWallpaperModalVisible] = useState(false);
   const [selectedColor, setSelectedColor] = useState(null);
+
+  // Animated value to control theme transition
+  const themeOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const loadColor = async () => {
@@ -50,14 +53,32 @@ const ChatSettingsScreen = ({ navigation }) => {
     setWallpaperModalVisible(true);
   };
 
+  // Function to animate the theme transition
+  const animateThemeChange = () => {
+    // Fade out animation
+    Animated.timing(themeOpacity, {
+      toValue: 0, // Start with fading out
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      toggleTheme(); // Toggle the theme once faded out
+      // Fade in animation
+      Animated.timing(themeOpacity, {
+        toValue: 1, // Fade back in after theme is changed
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
+
   const handleThemeSelection = (theme) => {
     // Check if the selected theme is different from the current one
     if ((theme === 'dark' && !isDarkMode) || (theme === 'light' && isDarkMode)) {
-      toggleTheme(); // Switch theme only if it's different from the current one
+      animateThemeChange(); // Use animation function
     }
     setThemeModalVisible(false);
   };
-  
+
   const handleColorSelection = async (color) => {
     try {
       await AsyncStorage.setItem('selectedColor', color);
@@ -79,7 +100,7 @@ const ChatSettingsScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#FAF9F6' }]}>
+    <Animated.View style={[styles.container, { opacity: themeOpacity, backgroundColor: isDarkMode ? '#121212' : '#FAF9F6' }]}>
       <SettingsHeader title={t('Chats')} onBackPress={handleBackPress} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.section}>
@@ -114,23 +135,22 @@ const ChatSettingsScreen = ({ navigation }) => {
               {t('selectTheme')}
             </CustomText>
             <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection('light')}>
-  <Entypo name="light-up" size={30} color={isDarkMode ? 'white' : 'black'} style={styles.modalIcon} />
-  <CustomText fontFamily={'pop'} style={[styles.modalItemText, { color: isDarkMode ? 'white' : 'black' }]}>
-    {t('light')}
-  </CustomText>
-</TouchableOpacity>
-<TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection('dark')}>
-  <Ionicons name="moon-outline" size={30} color={isDarkMode ? 'white' : 'black'} style={styles.modalIcon} />
-  <CustomText fontFamily={'pop'} style={[styles.modalItemText, { color: isDarkMode ? 'white' : 'black' }]}>
-    {t('dark')}
-  </CustomText>
-</TouchableOpacity>
-<TouchableOpacity style={styles.closeButton} onPress={() => setThemeModalVisible(false)}>
-  <CustomText fontFamily={'pop'} style={[styles.closeButtonText]}>
-    {t('close')}
-  </CustomText>
-</TouchableOpacity>
-
+              <Entypo name="light-up" size={30} color={isDarkMode ? 'white' : 'black'} style={styles.modalIcon} />
+              <CustomText fontFamily={'pop'} style={[styles.modalItemText, { color: isDarkMode ? 'white' : 'black' }]}>
+                {t('light')}
+              </CustomText>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalItem} onPress={() => handleThemeSelection('dark')}>
+              <Ionicons name="moon-outline" size={30} color={isDarkMode ? 'white' : 'black'} style={styles.modalIcon} />
+              <CustomText fontFamily={'pop'} style={[styles.modalItemText, { color: isDarkMode ? 'white' : 'black' }]}>
+                {t('dark')}
+              </CustomText>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setThemeModalVisible(false)}>
+              <CustomText fontFamily={'pop'} style={[styles.closeButtonText]}>
+                {t('close')}
+              </CustomText>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -144,7 +164,9 @@ const ChatSettingsScreen = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <CustomText fontFamily={'pop'} style={[styles.modalTitle,{color: isDarkMode ? 'white' : 'black'}]}>{t('selectColor')}</CustomText>
+            <CustomText fontFamily={'pop'} style={[styles.modalTitle, { color: isDarkMode ? 'white' : 'black' }]}>
+              {t('selectColor')}
+            </CustomText>
             <View style={styles.colorsContainer}>
               {colors.map((color, index) => (
                 <TouchableOpacity
@@ -155,7 +177,9 @@ const ChatSettingsScreen = ({ navigation }) => {
               ))}
             </View>
             <TouchableOpacity style={styles.modalItem} onPress={handleDefaultSelection}>
-              <CustomText fontFamily={'pop'} style={[styles.modalItemText,{color: isDarkMode ? 'white' : 'black'}]}>{t('defaultColor')}</CustomText>
+              <CustomText fontFamily={'pop'} style={[styles.modalItemText, { color: isDarkMode ? 'white' : 'black' }]}>
+                {t('defaultColor')}
+              </CustomText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setWallpaperModalVisible(false)}>
               <CustomText fontFamily={'pop'} style={styles.closeButtonText}>{t('close')}</CustomText>
@@ -163,7 +187,7 @@ const ChatSettingsScreen = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -206,23 +230,23 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: width * 0.8,
+    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   modalTitle: {
     fontSize: 18,
-    marginBottom: 15,
-  },
-  modalIcon:{
-     marginRight:10
+    marginBottom: 10,
   },
   modalItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 15,
-    width: '100%',
+    paddingVertical: 10,
+  },
+  modalIcon: {
+    marginRight: 15,
   },
   modalItemText: {
     fontSize: 16,
@@ -230,19 +254,21 @@ const styles = StyleSheet.create({
   colorsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  colorBox: {
-    width: (width * 0.8) / 5 - 10, // Adjust based on available space
-    height: 50,
     marginBottom: 10,
   },
+  colorBox: {
+    width: 40,
+    height: 40,
+    margin: 5,
+    borderRadius: 5,
+  },
   closeButton: {
-    marginTop: 20,
+    marginTop: 10,
+    alignSelf: 'center',
   },
   closeButtonText: {
-    color: '#009688',
     fontSize: 16,
+    color: '#007AFF',
   },
 });
 

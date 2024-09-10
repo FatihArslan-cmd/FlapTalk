@@ -37,13 +37,13 @@ const ChatRoom = () => {
 
   useEffect(() => {
     // Subscribe to network state changes
-    const unsubscribeNetInfo = NetInfo.addEventListener(state => {
+    const unsubscribeNetInfo = NetInfo.addEventListener((state) => {
       if (!state.isConnected) {
         setAlertVisible(true); // Show alert if disconnected
       }
       setIsConnected(state.isConnected);
     });
-
+  
     // Fetch user and messages
     const fetchUser = async () => {
       try {
@@ -57,16 +57,16 @@ const ChatRoom = () => {
         console.error('Error fetching user:', error);
       }
     };
-
+  
     const fetchMessages = firestore()
       .collection('chats')
       .doc(chatId)
       .collection('messages')
       .orderBy('createdAt', 'asc')
       .onSnapshot(
-        querySnapshot => {
+        (querySnapshot) => {
           if (querySnapshot) {
-            const messages = querySnapshot.docs.map(doc => ({
+            const messages = querySnapshot.docs.map((doc) => ({
               ...doc.data(),
               id: doc.id,
               createdAt: doc.data().createdAt?.toDate(),
@@ -77,32 +77,37 @@ const ChatRoom = () => {
             console.warn('No messages found');
           }
         },
-        error => {
+        (error) => {
           console.error('Error fetching messages:', error);
         }
       );
-
+  
     fetchUser();
-
-    // Fetch background color from AsyncStorage
+  
+    // Fetch background color from AsyncStorage or apply dark mode
     const getBackgroundColor = async () => {
       try {
         const storedColor = await AsyncStorage.getItem('selectedColor');
         if (storedColor) {
           setBackgroundColor(storedColor);
+        } else {
+          // Fallback to isDarkMode if no stored color
+          setBackgroundColor(isDarkMode ? '#121212' : '#ffffff');
         }
       } catch (error) {
         console.error('Error fetching background color:', error);
+        setBackgroundColor(isDarkMode ? '#121212' : '#ffffff'); // Fallback in case of error
       }
     };
-
+  
     getBackgroundColor(); // Fetch color when the component mounts
-
+  
     return () => {
       fetchMessages();
       unsubscribeNetInfo(); // Unsubscribe when component unmounts
     };
-  }, [chatId, userId]);
+  }, [chatId, userId, isDarkMode]);
+  
 
   const sendMessage = async (messageData) => {
     if (!messageData.text && !messageData.url) return;
@@ -216,7 +221,7 @@ const ChatRoom = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>
+    <View style={[styles.container, { backgroundColor }]}>
       <StatusBar style="auto" />
       <ChatRoomHeader user={user} chatId={chatId} />
       <FlatList
