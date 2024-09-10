@@ -5,11 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import Header from './Header';
 import PhoneInput from './PhoneInput';
 import CodeInput from './CodeInput';
-import LoadingOverlay from '../components/LoadingOverlay';
-import Button from '../components/Button';
-import AlertComponent from '../components/AlertComponent';
-import CustomText from '../components/CustomText';
-import useAlert from '../hooks/useAlert'; // Import your custom hook
+import LoadingOverlay from '../../components/LoadingOverlay';
+import Button from '../../components/Button';
+import AlertComponent from '../../components/AlertComponent';
+import CustomText from '../../components/CustomText';
+import useAlert from '../../hooks/useAlert'; // Import your custom hook
 import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const { width, height } = Dimensions.get('window');

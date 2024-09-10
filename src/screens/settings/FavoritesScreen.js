@@ -4,13 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import SettingsHeader from './SettingsHeader';
-import CustomText from '../components/CustomText';
+import CustomText from '../../components/CustomText';
 import FastImage from 'react-native-fast-image';
-import AlertComponent from '../components/AlertComponent';
-import SkeletonPlaceholder from '../../Skeleton'; 
+import AlertComponent from '../../components/AlertComponent';
+import SkeletonPlaceholder from '../../components/Skeleton';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useTranslation } from 'react-i18next';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 
@@ -176,7 +176,7 @@ const FavoritesScreen = ({ navigation }) => {
           <View>
             <View style={styles.favoritesHeader}>
               <FastImage
-                source={require('../../assets/Wavy_Bus-22_Single-11.jpg')}
+                source={require('../../../assets/Wavy_Bus-22_Single-11.jpg')}
                 resizeMode={FastImage.resizeMode.cover}
                 style={[styles.favoritesImage, { width: width * 0.6, height: width * 0.4 }]}
               />

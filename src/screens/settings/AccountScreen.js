@@ -3,10 +3,10 @@ import { View, TextInput, StyleSheet, TouchableOpacity, Modal } from 'react-nati
 import { firebase } from '@react-native-firebase/auth';
 import SettingsHeader from './SettingsHeader';
 import { AntDesign } from '@expo/vector-icons';
-import CustomText from '../components/CustomText';
-import AlertComponent from '../components/AlertComponent';
+import CustomText from '../../components/CustomText';
+import AlertComponent from '../../components/AlertComponent';
 import { useTranslation } from 'react-i18next';
-import { ThemeContext } from '../context/ThemeContext'; // ThemeContext'i ekledik
+import { ThemeContext } from '../../context/ThemeContext'; // ThemeContext'i ekledik
 
 const AccountScreen = ({ navigation }) => {
   const [confirmationText, setConfirmationText] = useState('');

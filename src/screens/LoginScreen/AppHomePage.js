@@ -3,17 +3,17 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from "@react-navigation/native";
-import CustomText from './components/CustomText';
-import AppHeader from "./components/AppHeader";
+import CustomText from '../../components/CustomText';
+import AppHeader from "../../components/AppHeader";
 import moment from 'moment'; 
-import useDisableBackButton from "./hooks/useDisableBackButton";
+import useDisableBackButton from "../../hooks/useDisableBackButton";
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
-import SkeletonPlaceholder from "../Skeleton";
+import SkeletonPlaceholder from "../../components/Skeleton";
 import FastImage from 'react-native-fast-image';
-import useNavigationBarSync from "./hooks/useNavigationBarSync";
+import useNavigationBarSync from "../../hooks/useNavigationBarSync";
 import { useTranslation } from "react-i18next";
-import { ThemeContext } from './context/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 

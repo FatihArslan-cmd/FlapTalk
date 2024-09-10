@@ -4,10 +4,10 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import Svg, { Path } from 'react-native-svg';
 import Animated, { useAnimatedStyle, withTiming, useDerivedValue } from 'react-native-reanimated';
 import Lottie from 'lottie-react-native';
-import AppHomePage from '../AppHomePage';
-import CommunityScreen from '../CommunityScreen.js/CommunityScreen';
-import CallsScreen from '../CallsScreen/CallsScreen';
-import SettingScreen from '../settings/SettingScreen';
+import AppHomePage from '../screens/LoginScreen/AppHomePage';
+import CommunityScreen from '../screens/CommunityScreen.js/CommunityScreen';
+import CallsScreen from '../screens/CallsScreen/CallsScreen';
+import SettingScreen from '../screens/settings/SettingScreen';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeContext } from '../context/ThemeContext'; // Import your theme context
 

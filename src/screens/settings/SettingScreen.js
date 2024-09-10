@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { View, Text, StyleSheet, FlatList, TextInput, Share, Modal, TouchableOpacity } from "react-native";
 import firestore from '@react-native-firebase/firestore';
-import useDisableBackButton from "../hooks/useDisableBackButton";
-import LogoutButton from "../components/LogoutButton";
-import ProfileIconWithCamera from "../components/ProfileIconWithCamera";
+import useDisableBackButton from "../../hooks/useDisableBackButton";
+import LogoutButton from "../../components/LogoutButton";
+import ProfileIconWithCamera from "../../components/ProfileIconWithCamera";
 import { useNavigation } from "@react-navigation/native";
-import { AuthContext } from "../context/AuthContext";
-import { ThemeContext } from "../context/ThemeContext"; // Import ThemeContext
+import { AuthContext } from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext"; // Import ThemeContext
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-import CustomText from "../components/CustomText";
-import AppHeader from "../components/AppHeader";
+import CustomText from "../../components/CustomText";
+import AppHeader from "../../components/AppHeader";
 import { debounce } from 'lodash';
-import AlertComponent from '../components/AlertComponent';
-import useAlert from '../hooks/useAlert';
+import AlertComponent from "../../components/AlertComponent";
+import useAlert from "../../hooks/useAlert";
 import { Barcode } from 'expo-barcode-generator';
 import LanguageSelector from "./LanguageSelectionModal";
 import { useTranslation } from "react-i18next";

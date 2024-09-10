@@ -1,9 +1,9 @@
 import React, { useRef, useState, useCallback, forwardRef, useContext } from 'react';
 import { View, TouchableOpacity, Animated, PanResponder, Dimensions, FlatList, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import CustomText from '../components/CustomText';
-import LanguageContext from '../context/LanguageContext';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import CustomText from '../../components/CustomText';
+import LanguageContext from '../../context/LanguageContext';
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const { height: screenHeight } = Dimensions.get('window');
 

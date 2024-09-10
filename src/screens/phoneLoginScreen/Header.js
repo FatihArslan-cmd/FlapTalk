@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Dimensions } from 'react-native';
-import CustomText from '../components/CustomText';
+import CustomText from '../../components/CustomText';
 
 const { width, height } = Dimensions.get('window');
 

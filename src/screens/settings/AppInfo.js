@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { View, Alert, StyleSheet } from 'react-native';
 import Header from '../phoneLoginScreen/Header';
-import CustomText from '../components/CustomText';
-import Button from '../components/Button';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import CustomText from '../../components/CustomText';
+import Button from '../../components/Button';
+import { ThemeContext } from '../../context/ThemeContext';// Import ThemeContext
 
 export default function AppInfo() {
   const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme

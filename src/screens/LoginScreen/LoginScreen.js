@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Text, Dimensions, Animated } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import CustomText from './components/CustomText';
+import CustomText from '../../components/CustomText';
 import { GoogleSignin } from '@react-native-community/google-signin';
-import AuthButton from './AuthButton';
+import AuthButton from '../../components/AuthButton';
 import auth from '@react-native-firebase/auth';
 import { StatusBar } from 'expo-status-bar';
-import useNavigationBarSync from './hooks/useNavigationBarSync';
+import useNavigationBarSync from '../../hooks/useNavigationBarSync';
 import { useTranslation } from 'react-i18next';
 const { width, height } = Dimensions.get('window');
 

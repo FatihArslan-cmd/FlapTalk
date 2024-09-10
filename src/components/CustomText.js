@@ -1,7 +1,7 @@
 import React, { useEffect, useState, memo } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import * as Font from 'expo-font';
-import SkeletonPlaceholder from '../../Skeleton'; // Import the SkeletonPlaceholder component
+import SkeletonPlaceholder from './Skeleton'; // Import the SkeletonPlaceholder component
 
 const useFonts = (fontMap) => {
   const [fontsLoaded, setFontsLoaded] = useState(false);

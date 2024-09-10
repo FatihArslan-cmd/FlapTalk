@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import CustomText from '../components/CustomText';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import CustomText from '../../components/CustomText';
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const SettingsHeader = ({ title, onBackPress }) => {
   const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext

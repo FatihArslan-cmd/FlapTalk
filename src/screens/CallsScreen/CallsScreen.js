@@ -1,8 +1,8 @@
 import { View } from 'react-native';
 import React, { useContext } from 'react';
-import AppHeader from '../components/AppHeader';
+import AppHeader from '../../components/AppHeader';
 import { useTranslation } from 'react-i18next';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const CallsScreen = () => {
   const { t } = useTranslation();

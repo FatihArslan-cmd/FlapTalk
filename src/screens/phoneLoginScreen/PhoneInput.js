@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Dimensions, Text, TouchableOpacity, Modal, FlatList } from 'react-native';
-import countryCodes from '../utils/countryCodes';
-import ClearButton from '../components/renderClearButton';
+import countryCodes from '../../utils/countryCodes';
+import ClearButton from '../../components/renderClearButton';
 import CountryFlag from 'react-native-country-flag';
 
 const { width, height } = Dimensions.get('window');

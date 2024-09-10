@@ -6,14 +6,14 @@ import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import ClearButton from '../components/renderClearButton';
-import CustomText from '../components/CustomText';
-import LoadingOverlay from '../components/LoadingOverlay';
-import useAlert from '../hooks/useAlert';
-import AlertComponent from '../components/AlertComponent';
-import useNavigationBarSync from '../hooks/useNavigationBarSync';
+import ClearButton from '../../components/renderClearButton';
+import CustomText from '../../components/CustomText';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import useAlert from '../../hooks/useAlert';
+import AlertComponent from '../../components/AlertComponent';
+import useNavigationBarSync from '../../hooks/useNavigationBarSync';
 import { useTranslation } from 'react-i18next';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const { width } = Dimensions.get('window');
 

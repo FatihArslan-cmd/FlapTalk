@@ -5,13 +5,13 @@ import auth from '@react-native-firebase/auth';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Ionicons';
-import AppHeader from "../components/AppHeader";
-import CustomText from "../components/CustomText";
-import AlertComponent from "../components/AlertComponent";
-import { calculateMembershipDuration } from "../utils/calculateMembershipDuration ";
+import AppHeader from "../../components/AppHeader";
+import CustomText from "../../components/CustomText";
+import AlertComponent from "../../components/AlertComponent";
+import { calculateMembershipDuration } from "../../utils/calculateMembershipDuration ";
 import FastImage from "react-native-fast-image";
 import { useTranslation } from "react-i18next";
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
 

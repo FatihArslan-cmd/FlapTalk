@@ -7,13 +7,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTranslation } from 'react-i18next';
-import ClearButton from '../components/renderClearButton';
-import CustomText from '../components/CustomText';
-import LoadingOverlay from '../components/LoadingOverlay';
-import useAlert from '../hooks/useAlert';
-import AlertComponent from '../components/AlertComponent';
-import useNavigationBarSync from '../hooks/useNavigationBarSync';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import ClearButton from '../../components/renderClearButton';
+import CustomText from '../../components/CustomText';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import useAlert from '../../hooks/useAlert';
+import AlertComponent from '../../components/AlertComponent';
+import useNavigationBarSync from '../../hooks/useNavigationBarSync';
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const { width } = Dimensions.get('window');
 

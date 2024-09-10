@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Bounce } from 'react-native-animated-spinkit';
-import CustomText from './components/CustomText';
+import CustomText from './CustomText';
 
 const { width, height } = Dimensions.get('window');
 

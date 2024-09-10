@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 import { View, TouchableOpacity, StyleSheet, ScrollView, Linking } from 'react-native';
 import { Foundation, Ionicons, MaterialCommunityIcons, Entypo } from '@expo/vector-icons';
 import SettingsHeader from './SettingsHeader';
-import CustomText from '../components/CustomText';
+import CustomText from '../../components/CustomText';
 import { useTranslation } from 'react-i18next';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const HelpScreen = ({ navigation }) => {
   const { t } = useTranslation();

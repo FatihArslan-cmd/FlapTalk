@@ -6,7 +6,7 @@ import { getCurrentDate } from '../utils/date';
 import AlertComponent from './AlertComponent';
 import LoadingOverlay from './LoadingOverlay';
 import CustomText from './CustomText';
-import Header from '../phoneLoginScreen/Header';
+import Header from '../screens/phoneLoginScreen/Header';
 import AvatarChoose from './AvatarChoose';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClearButton from './renderClearButton';

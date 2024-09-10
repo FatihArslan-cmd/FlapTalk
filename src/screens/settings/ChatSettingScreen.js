@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, Entypo } from '@expo/vector-icons';
-import CustomText from '../components/CustomText';
+import CustomText from '../../components/CustomText';
 import SettingsHeader from './SettingsHeader';
 import { useTranslation } from 'react-i18next';
-import { ThemeContext } from '../context/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const { width, height } = Dimensions.get('window');
 
