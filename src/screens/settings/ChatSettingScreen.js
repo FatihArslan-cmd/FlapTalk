@@ -144,7 +144,7 @@ const ChatSettingsScreen = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <CustomText fontFamily={'pop'} style={[styles.modalTitle,{color: isDarkMode ? 'white' : '#757575'}]}>{t('selectColor')}</CustomText>
+            <CustomText fontFamily={'pop'} style={[styles.modalTitle,{color: isDarkMode ? 'white' : 'black'}]}>{t('selectColor')}</CustomText>
             <View style={styles.colorsContainer}>
               {colors.map((color, index) => (
                 <TouchableOpacity
@@ -155,7 +155,7 @@ const ChatSettingsScreen = ({ navigation }) => {
               ))}
             </View>
             <TouchableOpacity style={styles.modalItem} onPress={handleDefaultSelection}>
-              <CustomText fontFamily={'pop'} style={[styles.modalItemText,{color: isDarkMode ? 'white' : '#757575'}]}>{t('defaultColor')}</CustomText>
+              <CustomText fontFamily={'pop'} style={[styles.modalItemText,{color: isDarkMode ? 'white' : 'black'}]}>{t('defaultColor')}</CustomText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setWallpaperModalVisible(false)}>
               <CustomText fontFamily={'pop'} style={styles.closeButtonText}>{t('close')}</CustomText>

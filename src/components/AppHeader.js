@@ -43,7 +43,7 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
   };
 
   return (
-    <View style={[styles.header, { backgroundColor: isDarkMode ? '#121212' : '#FAF9F6' }]}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#FAF9F6' }]}>
       {isSearching ? (
         <View style={styles.searchContainer}>
           <TouchableOpacity onPress={handleBackPress}>
@@ -89,15 +89,15 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
 };
 
 const styles = StyleSheet.create({
-  header: {
+  container: {
     height: 70,
     justifyContent: 'center',
     borderBottomColor: '#ccc',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
-    elevation: 5 // Add some shadow if needed
-
+    elevation: 5,
+    paddingTop: 20,
   },
   headerText: {
     fontSize: 26,

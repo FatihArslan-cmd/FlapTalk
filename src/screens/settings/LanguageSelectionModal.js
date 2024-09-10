@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, forwardRef, useContext } from 'react';
-import { View, TouchableOpacity, Animated, PanResponder, Dimensions, FlatList, StyleSheet } from 'react-native';
+import { View,ScrollView, TouchableOpacity, Animated, PanResponder, Dimensions, FlatList, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CustomText from '../../components/CustomText';
 import LanguageContext from '../../context/LanguageContext';
@@ -119,7 +119,7 @@ const LanguageSelector = forwardRef((props, ref) => {
             ]}
             {...panResponder.panHandlers}
           >
-            <View style={styles.modalHandle} />
+            <ScrollView style={styles.modalHandle} />
             <View style={[styles.modalHeader, { backgroundColor: isDarkMode ? '#333' : 'white' }]}>
               <TouchableOpacity onPress={closeModal}>
                 <Ionicons name="arrow-back" size={24} color={isDarkMode ? 'white' : 'black'} />

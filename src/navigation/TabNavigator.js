@@ -18,7 +18,7 @@ const TabNavigator = () => {
   const { isDarkMode } = useContext(ThemeContext); // Access theme context
 
   return (
-    <View style={{ flex: 1, paddingTop: 10 }}>
+    <View style={{ flex: 1 }}>
       <StatusBar style="auto" />
       <Tab.Navigator
         tabBar={(props) => <AnimatedTabBar {...props} />}

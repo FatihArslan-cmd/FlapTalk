@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, StyleSheet, Text, Dimensions, TouchableOpacity, Linking, Modal, Pressable } from 'react-native';
+import React, { useState, useEffect, useRef,useContext } from 'react';
+import { View, FlatList, StyleSheet, Text, Dimensions, TouchableOpacity, Linking, Modal, Pressable, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -9,12 +9,15 @@ import { Video } from 'expo-av';
 import MessageInput from './MessageInput';
 import moment from 'moment';
 import FullScreenImageModal from './FullScreenImageModal';
-import * as Clipboard from 'expo-clipboard'; // Import Clipboard API
+import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
-import * as Speech from 'expo-speech'; // Import Speech API
-import FastImage from 'react-native-fast-image'; // Import FastImage
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
-
+import * as Speech from 'expo-speech';
+import FastImage from 'react-native-fast-image';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo'; // Import NetInfo
+import AlertComponent from '../../components/AlertComponent';// Import AlertComponent
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
+import CustomText from '../../components/CustomText';
 const { width } = Dimensions.get('window');
 
 const ChatRoom = () => {
@@ -26,10 +29,21 @@ const ChatRoom = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#f8f8f8'); // Default background color
+  const [isConnected, setIsConnected] = useState(true); // Track network status
+  const [alertVisible, setAlertVisible] = useState(false); // Control alert visibility
+  const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext to access theme
 
   const flatListRef = useRef(null);
 
   useEffect(() => {
+    // Subscribe to network state changes
+    const unsubscribeNetInfo = NetInfo.addEventListener(state => {
+      if (!state.isConnected) {
+        setAlertVisible(true); // Show alert if disconnected
+      }
+      setIsConnected(state.isConnected);
+    });
+
     // Fetch user and messages
     const fetchUser = async () => {
       try {
@@ -84,11 +98,19 @@ const ChatRoom = () => {
 
     getBackgroundColor(); // Fetch color when the component mounts
 
-    return () => fetchMessages();
+    return () => {
+      fetchMessages();
+      unsubscribeNetInfo(); // Unsubscribe when component unmounts
+    };
   }, [chatId, userId]);
 
   const sendMessage = async (messageData) => {
     if (!messageData.text && !messageData.url) return;
+
+    if (!isConnected) {
+      setAlertVisible(true); // Show alert if no internet connection
+      return;
+    }
 
     try {
       await firestore()
@@ -194,7 +216,7 @@ const ChatRoom = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>
       <StatusBar style="auto" />
       <ChatRoomHeader user={user} chatId={chatId} />
       <FlatList
@@ -223,100 +245,89 @@ const ChatRoom = () => {
           <View style={styles.modalContent}>
             <Pressable onPress={handleCopy}>
               <Ionicons name="copy-outline" size={30} color="black" />
-              <Text style={styles.modalText}>Copy</Text>
+              <CustomText fontFamily='pop' style={styles.modalText}>Copy</CustomText>
             </Pressable>
             <Pressable onPress={handleDelete}>
               <Ionicons name="trash-outline" size={30} color="red" />
-              <Text style={styles.modalText}>Delete</Text>
+              <CustomText fontFamily='pop' style={styles.modalText}>Delete</CustomText>
             </Pressable>
             <Pressable onPress={handleVoice}>
               <Ionicons name="mic-outline" size={30} color="black" />
-              <Text style={styles.modalText}>Voice</Text>
+              <CustomText fontFamily='pop' style={styles.modalText}>Voice</CustomText>
             </Pressable>
           </View>
         </Pressable>
       </Modal>
+      {/* Alert Component */}
+      {alertVisible && (
+        <AlertComponent
+          title="No Internet Connection"
+          message="You are currently offline. Please check your network settings."
+          onConfirm={() => {
+            setAlertVisible(false);
+            // Retry or other logic on confirm
+          }}
+          confirmText={'Retry'}
+        />
+      )}
     </View>
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
   },
   messagesContainer: {
     padding: 10,
   },
-  audioMessage: {
-    fontSize: 16,
-    color: '#007AFF',
-    textDecorationLine: 'underline',
-  },
-  link: {
-    color: '#007AFF',
-    textDecorationLine: 'underline',
+  noMessages: {
+    textAlign: 'center',
+    color: '#888',
+    marginTop: 20,
   },
   myMessage: {
     alignSelf: 'flex-end',
-    flexDirection: 'column',
-    backgroundColor: '#DCF8C6',
-    borderRadius: 10,
+    marginBottom: 10,
     padding: 10,
-    marginVertical: 5,
-    maxWidth: width * 0.75,
-    flexShrink: 1,
-    overflow: 'hidden',
+    borderRadius: 10,
+    maxWidth: '70%',
   },
   theirMessage: {
     alignSelf: 'flex-start',
-    flexDirection: 'column',
-    backgroundColor: '#ECECEC',
-    borderRadius: 10,
+    marginBottom: 10,
     padding: 10,
-    marginVertical: 5,
-    maxWidth: width * 0.75,
-    flexShrink: 1,
-    overflow: 'hidden',
-  },
-  textContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+    borderRadius: 10,
+    maxWidth: '70%',
   },
   messageText: {
     fontSize: 16,
-    flexShrink: 1,
   },
   messageTime: {
-    fontSize: 12,
-    color: 'gray',
-    marginLeft: 10,
     alignSelf: 'flex-end',
-  },
-  mediaTime: {
     fontSize: 12,
-    color: 'gray',
+    color: '#555',
     marginTop: 5,
-    textAlign: 'right',
   },
   media: {
-    width: width * 0.70,
-    height: 200,
+    width: width * 0.7,
+    height: width * 0.7,
     borderRadius: 10,
-    marginVertical: 5,
+    marginBottom: 5,
   },
-  noMessages: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: 'gray',
+  mediaTime: {
+    alignSelf: 'flex-end',
+    fontSize: 12,
+    color: '#555',
+  },
+  textContainer: {
+    flexDirection: 'column',
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dimmed background
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
     width: 200,
@@ -327,10 +338,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   modalText: {
-    textAlign: 'center',
-    marginTop: 5,
-    fontSize: 14,
-    color: 'black',
+    fontSize: 16,
+    marginTop: 10,
+  },
+  modalDeleteText: {
+    color: 'red',
+  },
+  audioMessage: {
+    fontSize: 16,
+    color: '#555',
+  },
+  documentMessage: {
+    fontSize: 16,
+    color: '#555',
   },
 });
 
