@@ -9,10 +9,9 @@
     - [⚙️ Installation](#installation)
     - [🛠️ Usage](#usage)
 3. [📷 Screenshots](#screenshots)
-4. [📦 Dependencies](#dependencies)
-5. [🤝 Contributing](#contributing)
-6. [📞 Contact](#contact)
-7. [📌 Important Versions](#important-versions)
+4. [🤝 Contributing](#contributing)
+5. [📞 Contact](#contact)
+6. [📌 Important Versions](#important-versions)
 
 <hr>
 
@@ -29,6 +28,8 @@ Key Features:<br/>
 🗑️ **Account Management**: Users can delete their accounts if needed. <br/>
 📦 **Barcode System**: Add friends by scanning unique barcodes. <br/>
 🌟 **Favorites**: Mark friends as favorites for quick access. <br/>
+🌐 **Multi-language Support**: Supports over 10 languages using i18next for localization.<br/>
+📸 **Media Sharing**: Send photos, videos, and audio messages to your contacts.<br/>
 🆘 **Help Section**: Contact support for assistance within the app. <br/>
 <hr>
 
@@ -86,10 +87,7 @@ Use the barcode feature to add friends quickly.
 
 ## <a id="screenshots"></a>📷 Screenshots
 
-https://github.com/user-attachments/assets/dc308d5e-ee21-4632-b3d8-f382931877dd
-https://github.com/user-attachments/assets/e4736336-a56d-4e48-bf64-8b0b248b8e22
-https://github.com/user-attachments/assets/4d4b2615-a3dc-4da0-9d38-4d6847d650d3
-![WhatsApp Image 2024-09-11 at 17 14 34](https://github.com/user-attachments/assets/d578f1b8-41ce-4325-bb59-747147a219f6)
+<p align="center"> <img src="https://github.com/user-attachments/assets/f158b08f-9247-4a7e-b8e5-1853346d0b35" width="300" alt="Screenshot 1"/> <img src="https://github.com/user-attachments/assets/fea36784-1b87-4b7d-9715-c90695238c33" width="300" alt="Screenshot 2"/> <img src="https://github.com/user-attachments/assets/94f9eb70-5b62-4912-ac93-201f2f6187f9" width="300" alt="Screenshot 3"/> <img src="https://github.com/user-attachments/assets/9ae0db81-c8ce-41c3-b1ea-9ab6be6faf77" width="300" alt="Screenshot 4"/> <img src="https://github.com/user-attachments/assets/d578f1b8-41ce-4325-bb59-747147a219f6" width="300" alt="Screenshot 5"/> </p> <hr>
 
 <hr>
 
