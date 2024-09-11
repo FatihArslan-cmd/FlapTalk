@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const defaultAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFLHz0vltSz4jyrQ5SmjyKiVAF-xjpuoHcCw&s';
+const placeholderImage = require('../../../assets/delete_16321346.png'); // Update path to your asset image
 
 export default function HomeScreen() {
   const [chatList, setChatList] = useState([]);
@@ -225,9 +226,22 @@ export default function HomeScreen() {
         renderItem={loading ? renderSkeletonItem : renderChatItem}
         keyExtractor={(item, index) => item?.friendId || index.toString()}
         contentContainerStyle={styles.listContentContainer}
+        ListEmptyComponent={
+          !loading ? (
+            <View style={styles.emptyContainer}>
+              <Image 
+                source={placeholderImage} 
+                style={styles.placeholderImage} 
+                resizeMode='cover'
+              />
+              <Text style={styles.emptyText}>{t('No chats available')}</Text>
+            </View>
+          ) : null
+        }
       />
     </View>
   );
+
 }
 
 const styles = StyleSheet.create({
@@ -273,6 +287,10 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#999',
+  },
+  placeholderImage: {
+    width: 100,
+    height: 100,
   },
   actionsContainer: {
     flexDirection: 'row',
