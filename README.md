@@ -114,6 +114,6 @@ Open a Pull Request
 <hr>
 
 ## <a id="contact"></a>📞 Contact
-Fatih Arslan - Developer
+Fatih Arslan - Developer - https://www.linkedin.com/in/fatih-arslan-4582231b1/
 
 
