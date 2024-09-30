@@ -78,9 +78,7 @@ const AppHeader = ({ title, textColor, showCameraIcon, onSearch }) => {
             <TouchableOpacity onPress={() => setIsSearching(true)}>
               <Icon name="search" size={28} color={isDarkMode ? 'white' : 'black'} style={styles.inputIcon} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleMenuPress('Introduction')}>
-              <MaterialCommunityIcons name="dots-vertical" size={28} color={isDarkMode ? 'white' : 'black'} style={styles.inputIcon} />
-            </TouchableOpacity>
+
           </View>
         </>
       )}

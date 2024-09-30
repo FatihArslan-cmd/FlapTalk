@@ -22,14 +22,13 @@ export default function HomeScreen() {
   const [chatList, setChatList] = useState([]);
   const [favoritesList, setFavoritesList] = useState([]); // State to store favorites
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('All'); // Filter state
+  const [filter, setFilter] = useState('All' ); // Filter state
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const { t } = useTranslation();
   const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext to check theme mode
 
   const backgroundColor = isDarkMode ? '#121212' : '#FAF9F6'; 
-  useNavigationBarSync(backgroundColor); 
   useDisableBackButton();
 
   useEffect(() => {
@@ -210,7 +209,7 @@ export default function HomeScreen() {
       <View style={styles.filterContainer}>
         <TouchableOpacity 
           style={[styles.filterButton, filter === 'All' && styles.activeFilterButton]}
-          onPress={() => setFilter('All')}
+          onPress={() => setFilter('All ')}
         >
           <Text style={[styles.filterText, filter === 'All' && styles.activeFilterText, { color: isDarkMode ? '#E0E0E0' : '#555' }]}>{t('All')}</Text>
         </TouchableOpacity>

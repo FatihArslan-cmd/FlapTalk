@@ -16,15 +16,15 @@ export default function App() {
       <NavigationBarProvider>
        <UserStatusProvider>
         <NetworkProvider>
-        <AuthProvider>
-         <AuthContext.Consumer>
+         <AuthProvider>
+          <AuthContext.Consumer>
            {({ user }) => <Navigation user={user} />}
-         </AuthContext.Consumer>
-        </AuthProvider>
-      </NetworkProvider>
-      </UserStatusProvider>
-     </NavigationBarProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+          </AuthContext.Consumer>
+         </AuthProvider>
+       </NetworkProvider>
+     </UserStatusProvider>
+    </NavigationBarProvider>
+   </LanguageProvider>
+  </ThemeProvider>
   );
 }

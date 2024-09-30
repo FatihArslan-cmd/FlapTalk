@@ -17,7 +17,7 @@ import useAlert from "../../hooks/useAlert";
 import { Barcode } from 'expo-barcode-generator';
 import LanguageSelector from "./LanguageSelectionModal";
 import { useTranslation } from "react-i18next";
-
+import useNavigationBarSync from "../../hooks/useNavigationBarSync";
 export default function SettingScreen() {
   const { user } = useContext(AuthContext);
   const { isDarkMode } = useContext(ThemeContext); // Use ThemeContext for theme
@@ -31,7 +31,8 @@ export default function SettingScreen() {
 
   const { isVisible, title, message, showAlert, hideAlert, confirmAlert } = useAlert();
   useDisableBackButton();
-
+  const backgroundColor = isDarkMode ? '#121212' : '#FAF9F6'; 
+  useNavigationBarSync(backgroundColor); 
   useEffect(() => {
     if (user) {
       const fetchUserData = async () => {
